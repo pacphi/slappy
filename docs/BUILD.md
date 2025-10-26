@@ -141,9 +141,9 @@ The build generates ES2020 JavaScript with CommonJS modules:
 ```typescript
 // nametag-generator.ts
 interface NameTagRow {
-  line1: string;
-  line2: string;
-  line3: string;
+  line1: string
+  line2: string
+  line3: string
 }
 
 export async function generateNameTags(spreadsheetId: string, gid: string): Promise<void> {
@@ -155,14 +155,14 @@ export async function generateNameTags(spreadsheetId: string, gid: string): Prom
 
 ```javascript
 // dist/nametag-generator.js
-'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
-exports.generateNameTags = void 0;
+'use strict'
+Object.defineProperty(exports, '__esModule', { value: true })
+exports.generateNameTags = void 0
 
 async function generateNameTags(spreadsheetId, gid) {
   // Compiled implementation
 }
-exports.generateNameTags = generateNameTags;
+exports.generateNameTags = generateNameTags
 ```
 
 ### Type Declarations
@@ -175,7 +175,7 @@ export declare function generateNameTags(
   spreadsheetId: string,
   gid: string,
   outputPath?: string
-): Promise<void>;
+): Promise<void>
 ```
 
 ### Source Maps

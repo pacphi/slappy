@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Slappy - A Nuxt 4 application for generating printable name tag labels in the TownStix US-10 format (4×2" labels, 10 per sheet). This is a Vue 3/Nuxt migration of a Next.js application, using modern glassmorphism design patterns.
 
 **Key Technologies:**
+
 - **Nuxt 4** with Vue 3 Composition API
 - **@nuxt/ui** (Tailwind CSS-based component library)
 - **Pinia** for state management
@@ -95,17 +96,20 @@ CSV Data
 ### Component Architecture: Atomic Design
 
 **Atoms** (`app/components/atoms/`):
+
 - `Card.vue` - Glass card with backdrop blur
 - `ContentBox.vue` - Inner content container
 - `Button.vue`, `Badge.vue` - Basic interactive elements
 
 **Molecules** (`app/components/molecules/`):
+
 - `FeatureCard.vue` - Icon + title + description
 - `FileUpload.vue` - Drag-and-drop file upload
 - `ProgressIndicator.vue` - Wizard step progress
 - `DataTable.vue` - Data preview table
 
 **Organisms** (`app/components/organisms/`):
+
 - `NameTagWizard.vue` - Main wizard container (orchestrates all steps)
 - `ColumnMapper.vue` - Column mapping interface (select dropdowns for line1/2/3)
 - `PreviewPanel.vue` - HTML preview with zoom controls

@@ -5,44 +5,44 @@ export interface NameTagConfig {
   // Font settings
   fonts: {
     line1: {
-      size: string; // e.g., "32pt"
-      weight: string; // e.g., "bold"
-      family?: string; // e.g., "Arial, sans-serif"
-    };
+      size: string // e.g., "32pt"
+      weight: string // e.g., "bold"
+      family?: string // e.g., "Arial, sans-serif"
+    }
     line2: {
-      size: string; // e.g., "18pt"
-      weight?: string; // e.g., "normal"
-      family?: string;
-    };
+      size: string // e.g., "18pt"
+      weight?: string // e.g., "normal"
+      family?: string
+    }
     line3: {
-      size: string;
-      weight?: string;
-      family?: string;
-    };
-  };
+      size: string
+      weight?: string
+      family?: string
+    }
+  }
 
   // Layout settings
   layout: {
-    labelWidth: string; // e.g., "4in"
-    labelHeight: string; // e.g., "2in"
-    columns: number; // e.g., 2
-    rows: number; // e.g., 5
-    padding: string; // e.g., "0.25in"
-  };
+    labelWidth: string // e.g., "4in"
+    labelHeight: string // e.g., "2in"
+    columns: number // e.g., 2
+    rows: number // e.g., 5
+    padding: string // e.g., "0.25in"
+  }
 
   // Page settings
   page: {
-    size: string; // e.g., "letter"
-    margin: string; // e.g., "0.5in"
-  };
+    size: string // e.g., "letter"
+    margin: string // e.g., "0.5in"
+  }
 
   // Style settings
   style: {
-    showBorders: boolean; // Show dashed borders for alignment
-    backgroundColor?: string;
-    textColor?: string;
-    line1Color?: string; // Different color for line 1
-  };
+    showBorders: boolean // Show dashed borders for alignment
+    backgroundColor?: string
+    textColor?: string
+    line1Color?: string // Different color for line 1
+  }
 }
 
 // Default configuration for TownStix US-10
@@ -79,7 +79,7 @@ export const defaultConfig: NameTagConfig = {
     showBorders: true,
     backgroundColor: 'transparent',
   },
-};
+}
 
 // Example: Conference badges with company logos
 export const conferenceBadgeConfig: NameTagConfig = {
@@ -116,7 +116,7 @@ export const conferenceBadgeConfig: NameTagConfig = {
     backgroundColor: '#f8f9fa',
     line1Color: '#003366',
   },
-};
+}
 
 // Example: Choir name tags with decorative styling
 export const choirConfig: NameTagConfig = {
@@ -153,4 +153,4 @@ export const choirConfig: NameTagConfig = {
     backgroundColor: 'white',
     line1Color: '#8B4513',
   },
-};
+}

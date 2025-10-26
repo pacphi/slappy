@@ -41,13 +41,13 @@ Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vu
 
 ### Frontend (Web App)
 
-| Technology      | Version | Purpose                                |
-| --------------- | ------- | -------------------------------------- |
-| **Nuxt**        | 4.2.0+  | Vue meta-framework with server support |
-| **Vue**         | 3.5.22+ | Progressive JavaScript framework       |
-| **TypeScript**  | 5.x     | Type-safe development                  |
-| **@nuxt/ui**    | 4.1.0+  | Tailwind CSS-based component library   |
-| **Pinia**       | Latest  | State management (via composables)     |
+| Technology       | Version | Purpose                                |
+| ---------------- | ------- | -------------------------------------- |
+| **Nuxt**         | 4.2.0+  | Vue meta-framework with server support |
+| **Vue**          | 3.5.22+ | Progressive JavaScript framework       |
+| **TypeScript**   | 5.x     | Type-safe development                  |
+| **@nuxt/ui**     | 4.1.0+  | Tailwind CSS-based component library   |
+| **Pinia**        | Latest  | State management (via composables)     |
 | **Tailwind CSS** | 3.x     | Utility-first CSS (via @nuxt/ui)       |
 
 ### Backend (Server)
@@ -76,20 +76,20 @@ Runtime-agnostic business logic used by both web and CLI:
 
 ### CLI Tools
 
-| Module                    | Purpose                               |
-| ------------------------- | ------------------------------------- |
-| **cli/nametag-generator.ts** | Main CLI with Google Sheets support   |
-| **cli/test-local.ts**     | Local CSV testing utility             |
-| **tsx**                   | TypeScript execution for CLI          |
+| Module                       | Purpose                             |
+| ---------------------------- | ----------------------------------- |
+| **cli/nametag-generator.ts** | Main CLI with Google Sheets support |
+| **cli/test-local.ts**        | Local CSV testing utility           |
+| **tsx**                      | TypeScript execution for CLI        |
 
 ### Development Tools
 
-| Tool         | Purpose                      |
-| ------------ | ---------------------------- |
-| **pnpm**     | Package management           |
-| **ESLint**   | Code linting (@nuxt/eslint)  |
-| **Prettier** | Code formatting              |
-| **Knip**     | Dead code detection          |
+| Tool         | Purpose                     |
+| ------------ | --------------------------- |
+| **pnpm**     | Package management          |
+| **ESLint**   | Code linting (@nuxt/eslint) |
+| **Prettier** | Code formatting             |
+| **Knip**     | Dead code detection         |
 
 ### Key APIs Used
 
@@ -458,13 +458,7 @@ Example: `FileUpload.vue`
     >
       <UIcon name="i-heroicons-arrow-up-tray" class="upload-icon" />
       <p>Drag CSV file here or click to browse</p>
-      <input
-        ref="fileInput"
-        type="file"
-        accept=".csv"
-        @change="handleFileSelect"
-        class="hidden"
-      />
+      <input ref="fileInput" type="file" accept=".csv" @change="handleFileSelect" class="hidden" />
     </div>
   </ContentBox>
 </template>
@@ -509,10 +503,7 @@ Example: `NameTagWizard.vue`
 ```vue
 <template>
   <Card>
-    <ProgressIndicator
-      :steps="steps"
-      :current-step="currentStep"
-    />
+    <ProgressIndicator :steps="steps" :current-step="currentStep" />
 
     <!-- Step 1: Upload -->
     <div v-if="currentStep === 'upload'">
@@ -572,10 +563,12 @@ The Nuxt server provides two main API endpoints using **H3** (Nitro's HTTP frame
 Parses uploaded CSV file or Google Sheets URL:
 
 **Input:**
+
 - Multipart form data with CSV file, OR
 - JSON with Google Sheets URL
 
 **Output:**
+
 ```typescript
 {
   columns: string[][],      // All rows as column arrays
@@ -593,7 +586,7 @@ Parses uploaded CSV file or Google Sheets URL:
 import { parseRawData } from '~/lib/data-parser'
 import { fetchGoogleSheetAsCSV, parseGoogleSheetsUrl } from '~/lib/sheets-fetcher'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const contentType = getHeader(event, 'content-type')
 
   let csvContent: string
@@ -631,6 +624,7 @@ export default defineEventHandler(async (event) => {
 Generates name tags with column mapping:
 
 **Input:**
+
 ```typescript
 {
   csvContent: string,
@@ -641,6 +635,7 @@ Generates name tags with column mapping:
 ```
 
 **Output:**
+
 - HTML string (if format='html')
 - PDF binary (if format='pdf')
 
@@ -652,7 +647,7 @@ import { parseCSVToPagesWithMapping } from '~/lib/column-mapper'
 import { generateNameTagsHTML } from '~/lib/html-generator'
 import { generatePDF } from '~/lib/pdf-generator'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { csvContent, mapping, hasHeaders, format } = await readBody(event)
 
   // Parse CSV with column mapping
@@ -952,9 +947,11 @@ export function parseCSVLine(line: string): string[] {
 ```
 
 **Example:**
+
 ```csv
 "Smith, John", "123 Main St", "Anytown, USA"
 ```
+
 Parses to: `["Smith, John", "123 Main St", "Anytown, USA"]`
 
 ### Column Mapping Application
@@ -1011,6 +1008,7 @@ export function parseCSVToPagesWithMapping(
 ```
 
 **Key features:**
+
 - Supports null mapping (skip a line)
 - Handles blank rows as page breaks
 - Validates that at least one line has content
@@ -1083,6 +1081,7 @@ export function generateNameTagsHTML(pages: NameTagPage[], labelsPerPage = 10): 
 ```
 
 **Key features:**
+
 - CSS Grid for precise 2×5 layout
 - Padding empty cells to fill sheet
 - Page breaks for multi-page printing
@@ -1129,6 +1128,7 @@ export async function generatePDF(html: string): Promise<Buffer> {
 ```
 
 **Key features:**
+
 - Headless Chrome rendering
 - Preserves CSS layout exactly
 - Print background graphics
@@ -1180,6 +1180,7 @@ The application uses a modern **glassmorphism** design with:
 ```
 
 **Why component-scoped CSS:**
+
 - Semantic class names
 - Single source of truth
 - Easier to maintain
@@ -1241,6 +1242,7 @@ export default defineNuxtConfig({
 **Chosen**: Nuxt 4 with Vue 3
 
 **Reasoning**:
+
 - **Vue 3 Composition API** is more concise than React hooks
 - **File-based routing** with better conventions
 - **Nitro server** is faster and more flexible than Next.js API routes
@@ -1253,6 +1255,7 @@ export default defineNuxtConfig({
 **Chosen**: Separate `lib/` with runtime-agnostic code
 
 **Reasoning**:
+
 - **DRY principle**: One implementation for web and CLI
 - **Testability**: Business logic isolated from framework
 - **Portability**: Easy to add new interfaces
@@ -1264,6 +1267,7 @@ export default defineNuxtConfig({
 **Chosen**: Vue 3 Composables for state management
 
 **Reasoning**:
+
 - **Simpler**: No store boilerplate
 - **Co-located**: State near where it's used
 - **Type-safe**: Better TypeScript inference
@@ -1271,6 +1275,7 @@ export default defineNuxtConfig({
 - **Standard**: Vue 3 Composition API is the standard
 
 **When to use Pinia**: Only if you need:
+
 - Global state across unrelated components
 - DevTools time-travel debugging
 - Plugin ecosystem
@@ -1280,6 +1285,7 @@ export default defineNuxtConfig({
 **Chosen**: Atoms → Molecules → Organisms component hierarchy
 
 **Reasoning**:
+
 - **Reusability**: Small components compose into large ones
 - **Consistency**: Shared atoms ensure visual consistency
 - **Testability**: Easy to test small components
@@ -1291,6 +1297,7 @@ export default defineNuxtConfig({
 **Chosen**: PostCSS with Tailwind `@apply` in `<style scoped>`
 
 **Reasoning**:
+
 - **Readability**: Semantic class names in templates
 - **Maintainability**: CSS in one place
 - **Responsive**: Easier to handle complex responsive logic
@@ -1302,17 +1309,20 @@ export default defineNuxtConfig({
 **Chosen**: Puppeteer for PDF generation
 
 **Reasoning**:
+
 - **Accuracy**: Renders exactly like browser
 - **CSS support**: Full modern CSS (Grid, Flexbox)
 - **Mature**: Battle-tested, widely used
 - **Control**: Fine-grained control over rendering
 
 **Trade-offs**:
+
 - **Size**: Requires Chromium (~200MB)
 - **Memory**: Needs 512MB-1GB RAM
 - **Speed**: 1-5 seconds per PDF
 
 **Alternatives considered**:
+
 - jsPDF: Limited CSS support
 - PDFKit: Manual layout required
 - wkhtmltopdf: Outdated WebKit engine
@@ -1322,6 +1332,7 @@ export default defineNuxtConfig({
 **Chosen**: pnpm enforced via `packageManager` field
 
 **Reasoning**:
+
 - **Disk efficiency**: Content-addressable storage
 - **Speed**: 2-3× faster than npm
 - **Strict**: Enforces proper dependencies
@@ -1332,6 +1343,7 @@ export default defineNuxtConfig({
 **Chosen**: Direct CSV export URL
 
 **Reasoning**:
+
 - **No OAuth**: Works with published sheets
 - **Simple**: Just parse CSV
 - **Fast**: Direct download
@@ -1344,6 +1356,7 @@ export default defineNuxtConfig({
 **Chosen**: Nuxt server API routes vs client-only
 
 **Reasoning**:
+
 - **Security**: Keep Puppeteer server-side
 - **Performance**: Server has more resources
 - **CORS**: Avoid CORS issues
@@ -1354,6 +1367,7 @@ export default defineNuxtConfig({
 **Chosen**: Preview in iframe before PDF
 
 **Reasoning**:
+
 - **User control**: See before download
 - **Feedback**: Catch errors early
 - **Adjustment**: Can go back and remap

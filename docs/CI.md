@@ -445,6 +445,7 @@ test-cli:
 ```
 
 This test:
+
 1. Runs the CLI with `sample/sample-roster.csv`
 2. Generates HTML output
 3. Verifies the file was created

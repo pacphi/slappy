@@ -79,7 +79,7 @@ Slappy provides both a **Nuxt web application** with multi-step wizard and **CLI
 | Method                     | Best For                         | Pros                                                           | Cons                                                           |
 | -------------------------- | -------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
 | **Fly.io (Web App)**       | Non-technical users, teams       | Browser access, no installation, column mapping UI, PDF export | Requires hosting (~$0-5/mo), Puppeteer increases memory needs  |
-| **Vercel (Web App)**       | Zero-config deployment           | Instant deployment, edge network, serverless                   | Cold starts, Puppeteer requires pro plan for memory           |
+| **Vercel (Web App)**       | Zero-config deployment           | Instant deployment, edge network, serverless                   | Cold starts, Puppeteer requires pro plan for memory            |
 | **Cloudflare Pages**       | Edge-first deployment            | Global CDN, fast cold starts, generous free tier               | Limited Node.js APIs, may need Worker for some features        |
 | **Netlify (Web App)**      | JAMstack deployment              | Easy setup, build plugins, edge functions                      | Function timeouts, Puppeteer memory limits                     |
 | **Docker**                 | Isolated environments, CI/CD     | Consistent runtime, no local deps, includes Chromium           | Larger image size (~500MB with Puppeteer)                      |
@@ -436,6 +436,7 @@ All web deployments provide:
 Fly.io provides full Node.js runtime support, making it ideal for Puppeteer-based PDF generation.
 
 **Official Documentation:**
+
 - [Fly.io Documentation](https://fly.io/docs/)
 - [Fly.io Node.js Guide](https://fly.io/docs/languages-and-frameworks/node/)
 - [Fly.io Deployment Guide](https://fly.io/docs/hands-on/launch-app/)
@@ -474,6 +475,7 @@ Follow the prompts:
 - **Deploy now**: Yes
 
 The deployment will:
+
 1. Use the Dockerfile to build the Nuxt app
 2. Install Chromium for Puppeteer
 3. Deploy to Fly.io's infrastructure
@@ -517,6 +519,7 @@ primary_region = "sjc"
 Vercel offers zero-configuration Nuxt deployment with excellent performance, though Puppeteer PDF generation requires specific configuration.
 
 **Official Documentation:**
+
 - [Vercel Nuxt Deployment Guide](https://vercel.com/docs/frameworks/nuxt)
 - [Vercel CLI Documentation](https://vercel.com/docs/cli)
 - [Vercel Serverless Functions](https://vercel.com/docs/functions)
@@ -572,22 +575,26 @@ Create `vercel.json` for advanced configuration:
 **Important**: Puppeteer PDF generation has limitations on Vercel:
 
 **Free/Hobby Tier:**
+
 - 1GB memory limit (may timeout for PDF generation)
 - 10-second serverless function timeout
 - PDF generation may fail or timeout
 
 **Pro Tier ($20/month):**
+
 - Use `@sparticuz/chromium` for serverless Chrome
 - Increase function memory and timeout
 
 **Pro Tier Setup:**
 
 1. Install serverless Chrome:
+
    ```bash
    pnpm add @sparticuz/chromium
    ```
 
 2. Update `lib/pdf-generator.ts`:
+
    ```typescript
    import chromium from '@sparticuz/chromium'
 
@@ -645,6 +652,7 @@ vercel remove slappy
 ### Pros & Cons
 
 **Pros:**
+
 - Zero configuration for Nuxt
 - Instant deployments and rollbacks
 - Global edge network
@@ -652,6 +660,7 @@ vercel remove slappy
 - Preview deployments for PRs
 
 **Cons:**
+
 - PDF generation requires Pro tier
 - Function timeout limits
 - Cold starts for serverless functions
@@ -662,6 +671,7 @@ vercel remove slappy
 Cloudflare Pages offers edge deployment with excellent global performance and generous free tier.
 
 **Official Documentation:**
+
 - [Cloudflare Pages - Nuxt Guide](https://developers.cloudflare.com/pages/framework-guides/deploy-a-nuxt-site/)
 - [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
 - [Wrangler CLI Reference](https://developers.cloudflare.com/workers/wrangler/)
@@ -733,16 +743,19 @@ Cloudflare Pages/Workers have Node.js compatibility layers but **do not support 
 **Solutions:**
 
 **Option 1: Use Cloudflare Workers with Browser Rendering API (Paid)**
+
 - Requires Cloudflare Workers Paid plan ($5/month)
 - Use [Cloudflare Browser Rendering](https://developers.cloudflare.com/browser-rendering/)
 - Replace Puppeteer with Cloudflare's browser API
 
 **Option 2: Disable PDF generation**
+
 - Only offer HTML output
 - Users can use browser print-to-PDF
 - Simplest solution for free tier
 
 **Option 3: Hybrid approach**
+
 - Deploy HTML generation to Cloudflare Pages
 - Use separate Fly.io/Vercel function for PDF generation
 - Call external API for PDF conversion
@@ -765,6 +778,7 @@ NODE_VERSION=20
 ### Pros & Cons
 
 **Pros:**
+
 - Extremely fast edge deployment
 - Generous free tier (unlimited requests, 500 builds/month)
 - Global CDN with excellent performance
@@ -773,6 +787,7 @@ NODE_VERSION=20
 - No cold starts
 
 **Cons:**
+
 - **No Puppeteer support** (major limitation for PDF)
 - Limited Node.js API compatibility
 - Build time limits (20 minutes)
@@ -787,6 +802,7 @@ Cloudflare Pages is **excellent for HTML-only deployment**. For full PDF support
 Netlify provides easy deployment with build plugins and edge functions.
 
 **Official Documentation:**
+
 - [Netlify Nuxt Guide](https://docs.netlify.com/frameworks/nuxt/)
 - [Netlify Documentation](https://docs.netlify.com/)
 - [Netlify CLI Documentation](https://docs.netlify.com/cli/get-started/)
@@ -861,6 +877,7 @@ Create `netlify.toml`:
 **Solutions:**
 
 **Option 1: Netlify Pro ($19/month)**
+
 - Increased timeout and memory
 - May still struggle with Puppeteer's Chromium dependency
 
@@ -883,6 +900,7 @@ const browser = await chromium.puppeteer.launch({
 ```
 
 **Option 3: Disable PDF** (recommended for free tier)
+
 - HTML output only
 - Let users use browser print-to-PDF
 
@@ -904,6 +922,7 @@ NODE_VERSION=20
 ### Pros & Cons
 
 **Pros:**
+
 - Easy setup and deployment
 - Good free tier
 - Build plugins ecosystem
@@ -911,6 +930,7 @@ NODE_VERSION=20
 - Forms and identity features
 
 **Cons:**
+
 - Function timeouts limit PDF generation
 - Puppeteer memory constraints
 - May require paid plan for reliable PDF generation

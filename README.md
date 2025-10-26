@@ -277,7 +277,7 @@ Follow atomic design principles:
 
 ```typescript
 // server/api/myroute.post.ts
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const body = await readBody(event)
   // Handle request using lib/ utilities
   return { data: result }

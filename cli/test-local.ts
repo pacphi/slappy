@@ -48,7 +48,9 @@ async function testWithLocalFile(csvFilePath: string) {
 }
 
 // CLI interface
-if (require.main === module) {
+// Check if this file is being run directly (ES module version)
+const isMainModule = import.meta.url === `file://${process.argv[1]}`
+if (isMainModule) {
   const args = process.argv.slice(2)
   const csvFile = args.length > 0 ? args[0] : './sample/sample-roster.csv'
   testWithLocalFile(csvFile)
