@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Name Tags - TownStix US-10 (Example)</title>
+  <style>
+    @page {
+      size: letter;
+      margin: 0.5in;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .info {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .info h1 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .info p {
+      margin-bottom: 5px;
+      color: #666;
+    }
+
+    .page {
+      page-break-after: always;
+      width: 8.5in;
+      padding: 0.5in;
+      background: white;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .page:last-child {
+      page-break-after: auto;
+    }
+
+    /* TownStix US-10: 2 columns x 5 rows = 10 labels per sheet */
+    .label-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 4in);
+      grid-template-rows: repeat(5, 2in);
+      gap: 0;
+      width: 8in;
+    }
+
+    .name-tag {
+      width: 4in;
+      height: 2in;
+      border: 1px dashed #ccc;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0.25in;
+      overflow: hidden;
+      background: white;
+    }
+
+    .line1 {
+      font-size: 32pt;
+      font-weight: bold;
+      line-height: 1.2;
+      margin-bottom: 0.1in;
+      max-width: 100%;
+      word-wrap: break-word;
+    }
+
+    .line2, .line3 {
+      font-size: 18pt;
+      line-height: 1.3;
+      max-width: 100%;
+      word-wrap: break-word;
+    }
+
+    .line2 {
+      margin-bottom: 0.05in;
+    }
+
+    /* Hide info section and borders for printing */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .info {
+        display: none;
+      }
+
+      .name-tag {
+        border: none;
+      }
+
+      .page {
+        box-shadow: none;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="info">
+    <h1>📄 Example Name Tags - TownStix US-10 Format</h1>
+    <p><strong>Format:</strong> 2 columns × 5 rows = 10 labels per sheet</p>
+    <p><strong>Label Size:</strong> 4" × 2" each</p>
+    <p><strong>Paper:</strong> US Letter (8.5" × 11")</p>
+    <p><strong>To Print:</strong> Press Ctrl+P (Cmd+P on Mac), set margins to 0.5", scale 100%, no headers/footers</p>
+  </div>
+
+  <div class="page">
+    <div class="label-grid">
+      <div class="name-tag">
+        <div class="line1">Sarah Johnson</div>
+        <div class="line2">Soprano</div>
+        <div class="line3">New Member</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Michael Chen</div>
+        <div class="line2">Tenor</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Emma Williams</div>
+        <div class="line2">Alto</div>
+        <div class="line3">Section Leader</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">David Brown</div>
+        <div class="line2">Bass</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Lisa Anderson</div>
+        <div class="line2">Soprano</div>
+        <div class="line3">Returning</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Karen Martinez</div>
+        <div class="line2">Alto</div>
+        <div class="line3">Assistant Director</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">James Taylor</div>
+        <div class="line2">Bass</div>
+        <div class="line3">New Member</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Emily White</div>
+        <div class="line2">Soprano</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Robert Garcia</div>
+        <div class="line2">Tenor</div>
+        <div class="line3">Section Leader</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Amanda Lewis</div>
+        <div class="line2">Alto</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <div class="label-grid">
+      <div class="name-tag">
+        <div class="line1">Jennifer Clark</div>
+        <div class="line2">Soprano</div>
+        <div class="line3">Returning</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Christopher Lee</div>
+        <div class="line2">Bass</div>
+        <div class="line3">Section Leader</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Michelle Walker</div>
+        <div class="line2">Alto</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Daniel Hall</div>
+        <div class="line2">Tenor</div>
+        <div class="line3">New Member</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Rebecca Allen</div>
+        <div class="line2">Soprano</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Kevin Young</div>
+        <div class="line2">Bass</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Laura King</div>
+        <div class="line2">Alto</div>
+        <div class="line3">Assistant</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Thomas Wright</div>
+        <div class="line2">Tenor</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Nicole Lopez</div>
+        <div class="line2">Soprano</div>
+        <div class="line3">New Member</div>
+      </div>
+      <div class="name-tag">
+        <div class="line1">Steven Hill</div>
+        <div class="line2">Bass</div>
+        <div class="line3">Returning</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

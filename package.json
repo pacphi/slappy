@@ -1,0 +1,52 @@
+{
+  "name": "slappy",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.17.1",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,vue,js,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,vue,js,json,css,md}\"",
+    "deadcode": "knip",
+    "check:all": "pnpm lint && pnpm format:check && pnpm deadcode",
+    "fix:all": "pnpm lint:fix && pnpm format",
+    "outdated": "pnpm outdated",
+    "update": "pnpm up",
+    "update:latest": "pnpm up --latest",
+    "update:interactive": "pnpm up --interactive --latest",
+    "audit": "pnpm audit",
+    "audit:fix": "pnpm audit --fix",
+    "cli": "tsx cli/nametag-generator.ts",
+    "test:local": "tsx cli/test-local.ts"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.1.0",
+    "@pinia/colada": "^0.17.6",
+    "@pinia/colada-nuxt": "^0.2.3",
+    "@pinia/nuxt": "^0.11.2",
+    "date-fns": "^4.1.0",
+    "nuxt": "^4.2.0",
+    "puppeteer": "^24.26.1",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.3",
+    "@iconify-json/lucide": "^1.2.71",
+    "@nuxt/eslint": "^1.9.0",
+    "@types/node": "^22.10.5",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "knip": "^5.66.3",
+    "prettier": "^3.6.2",
+    "tsx": "^4.19.2",
+    "typescript-eslint": "^8.46.2"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["app/app.vue", "app/pages/**/*.vue", "server/api/**/*.ts"],
+  "project": ["app/**/*.{ts,vue}", "server/**/*.ts"],
+  "ignore": [
+    "**/*.md",
+    ".nuxt/**",
+    ".output/**",
+    "dist/**",
+    "node_modules/**",
+    "app/components/**",
+    "app/composables/**",
+    "app/layouts/**",
+    "types/**"
+  ],
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": [
+    "vue",
+    "date-fns",
+    "@iconify-json/heroicons",
+    "@iconify-json/lucide",
+    "eslint-config-prettier",
+    "eslint-plugin-prettier",
+    "typescript-eslint"
+  ],
+  "nuxt": {
+    "entry": ["nuxt.config.ts", "app.config.ts"]
+  }
+}
