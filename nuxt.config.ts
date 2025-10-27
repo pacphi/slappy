@@ -24,5 +24,11 @@ export default defineNuxtConfig({
       // Suppress esbuild CSS minifier warnings for PostCSS/Tailwind @apply directives
       cssMinify: 'lightningcss',
     },
+    optimizeDeps: {
+      include: ['vue', 'vue-router', 'pinia', '@pinia/colada'],
+    },
+    ssr: {
+      noExternal: ['vue', 'vue-router', '@nuxt/ui'],
+    },
   },
 })

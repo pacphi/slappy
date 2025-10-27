@@ -1,23 +1,25 @@
-# fly.toml app configuration file generated for slappy
+# fly.toml app configuration file generated for slappy on 2025-10-27T08:56:16-07:00
+#
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "slappy"
-primary_region = "sjc"
+app = 'slappy'
+primary_region = 'sjc'
 
 [build]
+
+[env]
+  NODE_ENV = 'production'
 
 [http_service]
   internal_port = 3000
   force_https = true
-  auto_stop_machines = "stop"
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
 [[vm]]
-  memory = "1gb"
-  cpu_kind = "shared"
+  memory = '1gb'
+  cpu_kind = 'shared'
   cpus = 1
-
-[env]
-  NODE_ENV = "production"

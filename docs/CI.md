@@ -186,7 +186,7 @@ Create `.eslintrc.json`:
 
 Create `.eslintignore`:
 
-```
+```text
 dist/
 node_modules/
 *.js
