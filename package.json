@@ -34,18 +34,22 @@
     "nuxt": "^4.2.0",
     "puppeteer": "^24.26.1",
     "vue": "^3.5.22",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.71",
+    "@iconify-json/simple-icons": "^1.2.55",
     "@nuxt/eslint": "^1.9.0",
+    "@tailwindcss/vite": "^4.1.16",
     "@types/node": "^24.9.1",
     "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "knip": "^5.66.3",
     "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.16",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2"

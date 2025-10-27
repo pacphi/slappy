@@ -1,92 +1,97 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
 const emit = defineEmits<{
   fileSelected: [file: File]
+  error: [message: string]
 }>()
 
-const isDragging = ref(false)
-const fileInputRef = ref<HTMLInputElement | null>(null)
+defineProps<{
+  loading?: boolean
+}>()
 
-const handleDragOver = (e: DragEvent) => {
-  e.preventDefault()
-  isDragging.value = true
+// C3 + C4: File validation
+const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+
+interface ValidationResult {
+  valid: boolean
+  error?: string
 }
 
-const handleDragLeave = () => {
-  isDragging.value = false
-}
-
-const handleDrop = (e: DragEvent) => {
-  e.preventDefault()
-  isDragging.value = false
-
-  const files = e.dataTransfer?.files
-  if (files && files.length > 0 && files[0].type === 'text/csv') {
-    emit('fileSelected', files[0])
+const validateFile = (file: File): ValidationResult => {
+  // Check file extension (more reliable than MIME type)
+  if (!file.name.toLowerCase().endsWith('.csv')) {
+    return {
+      valid: false,
+      error: 'Please upload a CSV file (.csv extension required)',
+    }
   }
-}
 
-const handleFileInput = (e: Event) => {
-  const input = e.target as HTMLInputElement
-  if (input.files && input.files.length > 0) {
-    emit('fileSelected', input.files[0])
+  // Check MIME type (when available)
+  if (file.type && file.type !== 'text/csv' && file.type !== 'application/csv') {
+    return {
+      valid: false,
+      error: 'Please upload a CSV file',
+    }
   }
+
+  // Check file size
+  if (file.size > MAX_FILE_SIZE) {
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1)
+    return {
+      valid: false,
+      error: `File size (${sizeMB}MB) exceeds the 5MB limit. Please use a smaller file or split your data.`,
+    }
+  }
+
+  return { valid: true }
 }
 
-const openFilePicker = () => {
-  fileInputRef.value?.click()
+const handleFileChange = (files: File[] | File | null) => {
+  if (!files) return
+
+  // Handle both array and single file
+  const file = Array.isArray(files) ? files[0] : files
+  if (!file) return
+
+  const validation = validateFile(file)
+
+  if (!validation.valid && validation.error) {
+    emit('error', validation.error)
+    return
+  }
+
+  emit('fileSelected', file)
 }
 </script>
 
 <template>
-  <AtomsContentBox
-    class="file-upload"
-    :class="{ 'is-dragging': isDragging }"
-    @dragover="handleDragOver"
-    @dragleave="handleDragLeave"
-    @drop="handleDrop"
-    @click="openFilePicker"
-  >
-    <input ref="fileInputRef" type="file" accept=".csv" class="hidden" @change="handleFileInput" />
-
-    <div class="upload-content">
-      <UIcon name="i-heroicons-arrow-up-tray" class="upload-icon" />
-      <p class="upload-text">
-        {{ isDragging ? 'Drop your CSV file here' : 'Drag & drop your CSV file here' }}
-      </p>
-      <p class="upload-subtext">or click to browse</p>
+  <div class="file-upload-wrapper">
+    <!-- M4: Loading overlay -->
+    <div v-if="loading" class="loading-overlay">
+      <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin" />
+      <p class="mt-4 text-lg font-medium">Processing CSV file...</p>
+      <p class="mt-2 text-sm opacity-60">This may take a few seconds for large files</p>
     </div>
-  </AtomsContentBox>
+
+    <!-- File upload component -->
+    <UFileUpload
+      v-else
+      variant="area"
+      accept=".csv"
+      label="Drag & drop your CSV file here"
+      description="or click to browse"
+      icon="i-heroicons-arrow-up-tray"
+      class="min-h-[200px]"
+      @update:model-value="handleFileChange"
+    />
+  </div>
 </template>
 
 <style lang="postcss" scoped>
-.file-upload {
-  @apply cursor-pointer border-2 border-dashed border-white/10 bg-white/5 p-16 text-center transition-all;
-  @apply hover:border-purple-500/50 hover:bg-white/10;
-
-  &.is-dragging {
-    @apply scale-[1.01] border-purple-500 bg-purple-500/10;
-  }
+.file-upload-wrapper {
+  @apply relative min-h-[200px];
 }
 
-.upload-content {
-  @apply flex flex-col items-center gap-4;
-}
-
-.upload-icon {
-  @apply h-16 w-16 text-purple-500 transition-transform;
-
-  .file-upload:hover & {
-    @apply scale-110;
-  }
-}
-
-.upload-text {
-  @apply text-lg font-semibold text-white;
-}
-
-.upload-subtext {
-  @apply text-sm text-white/70;
+.loading-overlay {
+  @apply flex flex-col items-center justify-center py-16;
 }
 </style>

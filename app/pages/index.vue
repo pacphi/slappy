@@ -7,7 +7,9 @@ useSeoMeta({
   ogDescription: 'Generate print-ready name tags from CSV files or Google Sheets',
 })
 
-const isFeaturesExpanded = ref(false)
+const { currentView, uploadMode } = useAppNavigation()
+
+const isFeaturesExpanded = ref(true)
 
 const features = [
   {
@@ -48,13 +50,20 @@ const features = [
     <!-- Header -->
     <OrganismsAppHeader />
 
-    <!-- Name Tag Wizard -->
-    <section class="wizard-section">
-      <OrganismsNameTagWizard />
+    <!-- Name Tag Wizard (shown when navigation option is selected) -->
+    <section v-if="currentView === 'wizard'" class="wizard-section">
+      <OrganismsNameTagWizard :initial-upload-mode="uploadMode" />
     </section>
 
-    <!-- Features Grid (collapsible) -->
-    <section class="features-section">
+    <!-- Features Grid (shown by default) -->
+    <section v-if="currentView === 'features'" class="features-section">
+      <div class="hero-text">
+        <h1 class="hero-title">Professional Name Tags in 60 Seconds</h1>
+        <p class="hero-description">
+          Transform your spreadsheets into print-ready labels instantly. No design skills required.
+        </p>
+      </div>
+
       <div class="features-container">
         <button class="features-heading-button" @click="isFeaturesExpanded = !isFeaturesExpanded">
           <h2 class="features-heading">Why Choose Slappy?</h2>
@@ -79,9 +88,8 @@ const features = [
     <footer class="app-footer">
       <div class="footer-container">
         <p class="footer-text">
-          Built with
-          <UIcon name="i-heroicons-heart-solid" class="inline h-4 w-4 text-red-500" />
-          using Nuxt & Vue
+          Built with <UIcon name="i-heroicons-heart-solid" class="h-4 w-4 text-red-500" /> using
+          Nuxt & Vue
         </p>
       </div>
     </footer>
@@ -101,6 +109,20 @@ const features = [
 
 .features-section {
   @apply px-6 pb-16;
+  padding-top: 50px;
+}
+
+.hero-text {
+  @apply mx-auto max-w-4xl text-center;
+  margin-bottom: 50px;
+}
+
+.hero-title {
+  @apply mb-4 text-4xl font-bold md:text-5xl;
+}
+
+.hero-description {
+  @apply text-lg text-neutral-600 dark:text-white/70;
 }
 
 .features-container {
@@ -121,7 +143,7 @@ const features = [
 }
 
 .features-heading {
-  @apply text-lg font-semibold;
+  @apply text-2xl font-semibold;
   margin-bottom: 0;
 }
 
@@ -153,6 +175,7 @@ const features = [
   @apply border-t py-8;
   @apply border-neutral-200 bg-neutral-50;
   @apply dark:border-white/10 dark:bg-neutral-950/80;
+  margin-top: 50px;
 }
 
 .footer-container {

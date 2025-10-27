@@ -36,10 +36,12 @@ const features = [
 <template>
   <section class="hero-section">
     <!-- Headline -->
-    <h1 class="hero-title">Professional Name Tags in 60 Seconds</h1>
+    <h1 class="max-w-4xl text-center text-5xl font-extrabold">
+      Professional Name Tags in 60 Seconds
+    </h1>
 
     <!-- Subtitle -->
-    <p class="hero-subtitle">
+    <p class="max-w-2xl text-center text-xl">
       Transform your spreadsheets into print-ready labels instantly. No design skills required.
     </p>
 
@@ -59,17 +61,5 @@ const features = [
 <style lang="postcss" scoped>
 .hero-section {
   @apply mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 py-16;
-}
-
-.hero-badge {
-  @apply rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur-sm;
-}
-
-.hero-title {
-  @apply max-w-4xl text-center text-5xl font-extrabold leading-tight text-white;
-}
-
-.hero-subtitle {
-  @apply max-w-2xl text-center text-xl leading-relaxed text-white/70;
 }
 </style>

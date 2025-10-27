@@ -47,77 +47,119 @@ const zoomOut = () => {
 const resetZoom = () => {
   zoom.value = 100
 }
+
+// U2: Confirmation before starting over
+const handleStartOver = () => {
+  const confirmed = confirm(
+    'Are you sure you want to start over? This will reset all your work and cannot be undone.'
+  )
+  if (confirmed) {
+    emit('close')
+  }
+}
+
+// Keyboard shortcuts
+defineShortcuts({
+  meta_p: {
+    handler: () => {
+      handlePrint()
+    },
+  },
+  meta_d: {
+    handler: () => {
+      handleDownloadPDF()
+    },
+  },
+  meta_h: {
+    handler: () => {
+      downloadHtml()
+    },
+  },
+  plus: {
+    handler: () => {
+      zoomIn()
+    },
+  },
+  minus: {
+    handler: () => {
+      zoomOut()
+    },
+  },
+  '0': {
+    handler: () => {
+      resetZoom()
+    },
+  },
+})
 </script>
 
 <template>
   <div class="preview-panel">
     <!-- Error Display -->
-    <AtomsContentBox v-if="error" class="error-box">
-      <p>{{ error }}</p>
-    </AtomsContentBox>
+    <UAlert v-if="error" color="error" variant="soft" :title="error" />
 
     <!-- Loading State -->
     <div v-if="loading" class="loading-state">
-      <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin text-purple-500" />
-      <p class="text-white/70">Generating preview...</p>
+      <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin" />
+      <p>Generating preview...</p>
     </div>
 
     <!-- Preview Controls -->
     <div v-if="!loading && !error" class="preview-controls">
       <div class="zoom-controls">
-        <AtomsButton size="sm" variant="secondary" @click="zoomOut">
+        <UButton size="sm" variant="outline" :disabled="zoom <= 50" @click="zoomOut">
           <UIcon name="i-heroicons-minus" class="h-4 w-4" />
-        </AtomsButton>
+        </UButton>
         <span class="zoom-display">{{ zoom }}%</span>
-        <AtomsButton size="sm" variant="secondary" @click="zoomIn">
+        <UButton size="sm" variant="outline" :disabled="zoom >= 200" @click="zoomIn">
           <UIcon name="i-heroicons-plus" class="h-4 w-4" />
-        </AtomsButton>
-        <AtomsButton size="sm" variant="ghost" @click="resetZoom"> Reset </AtomsButton>
+        </UButton>
+        <UButton size="sm" variant="ghost" @click="resetZoom">Reset</UButton>
       </div>
 
       <div class="action-buttons">
-        <AtomsButton variant="secondary" @click="handleDownloadPDF">
+        <UButton variant="outline" @click="handleDownloadPDF">
           <UIcon name="i-heroicons-document-arrow-down" class="h-4 w-4" />
           Download PDF
-        </AtomsButton>
-        <AtomsButton variant="secondary" @click="downloadHtml">
+        </UButton>
+        <UButton variant="outline" @click="downloadHtml">
           <UIcon name="i-heroicons-code-bracket" class="h-4 w-4" />
           Download HTML
-        </AtomsButton>
-        <AtomsButton variant="secondary" @click="handlePrint">
+        </UButton>
+        <UButton variant="outline" @click="handlePrint">
           <UIcon name="i-heroicons-printer" class="h-4 w-4" />
           Print
-        </AtomsButton>
+        </UButton>
       </div>
     </div>
 
     <!-- Preview Iframe -->
-    <AtomsContentBox v-if="!loading && !error" class="preview-container">
+    <div v-if="!loading && !error" class="preview-card">
       <iframe
         :srcdoc="iframeContent"
-        :style="{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left' }"
+        :style="{
+          width: `${(8 * 96) / (zoom / 100)}px`,
+          height: `${(10.5 * 96) / (zoom / 100)}px`,
+          transform: `scale(${zoom / 100})`,
+          transformOrigin: 'top left',
+        }"
         class="preview-iframe"
         title="Name Tags Preview"
       />
-    </AtomsContentBox>
+    </div>
 
     <!-- Actions -->
-    <div class="actions">
-      <AtomsButton variant="secondary" class="w-full" @click="emit('close')">
-        Start Over
-        <UIcon name="i-heroicons-arrow-path" class="h-4 w-4" />
-      </AtomsButton>
-    </div>
+    <UButton color="error" class="w-full flex-shrink-0" @click="handleStartOver">
+      Start Over
+      <UIcon name="i-heroicons-arrow-path" class="h-4 w-4" />
+    </UButton>
   </div>
 </template>
 
 <style lang="postcss" scoped>
 .preview-panel {
-  @apply flex flex-col gap-6;
-}
-
-.error-box {
-  @apply bg-red-500/10 p-4 text-red-400;
+  @apply flex flex-1 flex-col gap-6;
+  min-height: 0;
 }
 
 .loading-state {
@@ -126,6 +168,7 @@ const resetZoom = () => {
 
 .preview-controls {
   @apply flex flex-col gap-4 md:flex-row md:items-center md:justify-between;
+  flex-shrink: 0;
 }
 
 .zoom-controls {
@@ -133,24 +176,27 @@ const resetZoom = () => {
 }
 
 .zoom-display {
-  @apply min-w-[4rem] text-center text-sm font-medium text-white;
+  @apply min-w-16 text-center;
 }
 
 .action-buttons {
   @apply flex flex-wrap gap-2;
 }
 
-.preview-container {
-  @apply bg-white/5 p-4 overflow-auto;
-  min-height: 500px;
+.preview-card {
+  @apply flex flex-1 items-start justify-center overflow-auto;
+  min-height: 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .preview-iframe {
-  @apply w-full border-0;
-  min-height: 800px;
-}
-
-.actions {
-  @apply flex items-center justify-center gap-4;
+  @apply border-0;
+  background: white;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 </style>

@@ -10,10 +10,22 @@ export const useColumnMapping = (columnCount: number) => {
 
   const hasHeaders = ref(false)
 
-  const isValid = computed(() => {
-    return (
-      mapping.value.line1 !== null || mapping.value.line2 !== null || mapping.value.line3 !== null
+  // C2: Check for duplicate column mappings
+  const hasDuplicates = computed(() => {
+    const mappedValues = [mapping.value.line1, mapping.value.line2, mapping.value.line3].filter(
+      v => v !== null
     )
+
+    const uniqueValues = new Set(mappedValues)
+    return uniqueValues.size !== mappedValues.length
+  })
+
+  const isValid = computed(() => {
+    // Must have at least one mapping AND no duplicates
+    const hasMapping =
+      mapping.value.line1 !== null || mapping.value.line2 !== null || mapping.value.line3 !== null
+
+    return hasMapping && !hasDuplicates.value
   })
 
   const updateMapping = (line: keyof ColumnMapping, value: number | null) => {
@@ -33,6 +45,7 @@ export const useColumnMapping = (columnCount: number) => {
     mapping: readonly(mapping),
     hasHeaders,
     isValid,
+    hasDuplicates: readonly(hasDuplicates),
     updateMapping,
     reset,
   }
