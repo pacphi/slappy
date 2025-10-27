@@ -8,28 +8,28 @@ defineProps<{
 
 <template>
   <div class="feature-card">
-    <div class="feature-icon-wrapper">
+    <div class="feature-header">
       <div class="feature-icon">
-        <UIcon :name="icon" class="h-7 w-7 text-white" />
+        <UIcon :name="icon" class="h-5 w-5 text-white" />
       </div>
+      <h3 class="feature-title">{{ title }}</h3>
     </div>
-    <h3 class="feature-title">{{ title }}</h3>
     <p class="feature-description">{{ description }}</p>
   </div>
 </template>
 
 <style lang="postcss" scoped>
 .feature-card {
-  @apply relative flex flex-col items-center gap-3 rounded-2xl bg-neutral-900/30 p-6 text-center transition-all duration-300;
-  @apply border border-white/5 hover:border-purple-500/20 hover:bg-neutral-900/40;
+  @apply relative flex flex-col gap-3 rounded-lg border border-white/10 bg-neutral-900/20 p-5 transition-all duration-300;
+  @apply hover:border-purple-500/30 hover:bg-neutral-900/30 hover:shadow-lg hover:shadow-purple-500/5;
 }
 
-.feature-icon-wrapper {
-  @apply relative;
+.feature-header {
+  @apply flex items-center gap-3;
 }
 
 .feature-icon {
-  @apply flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-b from-purple-500 to-purple-700;
+  @apply flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-b from-purple-500 to-purple-700;
   @apply transition-transform duration-300;
 
   .feature-card:hover & {
@@ -38,10 +38,10 @@ defineProps<{
 }
 
 .feature-title {
-  @apply text-lg font-semibold text-white;
+  @apply text-base font-semibold text-white;
 }
 
 .feature-description {
-  @apply text-sm leading-relaxed text-white/60;
+  @apply pl-12 text-sm leading-relaxed text-white/60;
 }
 </style>

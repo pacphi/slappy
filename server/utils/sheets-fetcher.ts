@@ -3,4 +3,4 @@
  * Re-exports from shared lib/ for use in Nuxt server
  */
 
-export { fetchGoogleSheetAsCSV, parseGoogleSheetsUrl } from '../../lib/sheets-fetcher'
+export { fetchGoogleSheetAsCSV } from '../../lib/sheets-fetcher'

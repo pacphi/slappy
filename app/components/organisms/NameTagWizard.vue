@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { ColumnMapping } from '~/types'
+import { ref, computed } from 'vue'
+import type { ColumnMapping, WizardStep } from '~/types'
 
-const { currentStep, nextStep, previousStep, reset: resetWizard } = useWizardNavigation()
+const {
+  currentStep,
+  goToStep,
+  nextStep,
+  isStepCompleted,
+  isStepLocked,
+  reset: resetWizard,
+} = useWizardNavigation()
 const { parsedData, uploadFile, uploadSheets, loading, error, reset: resetUpload } = useDataUpload()
 
 const uploadMode = ref<'csv' | 'sheets'>('csv')
@@ -10,6 +17,14 @@ const sheetsUrl = ref('')
 const csvContent = ref('')
 const mapping = ref<ColumnMapping | null>(null)
 const hasHeaders = ref(false)
+
+// All columns are always visible, but content is conditional
+const canShowMappingContent = computed(
+  () => isStepCompleted('upload') || currentStep.value !== 'upload'
+)
+const canShowPreviewContent = computed(
+  () => isStepCompleted('mapping') || currentStep.value === 'preview'
+)
 
 const handleFileSelected = async (file: File) => {
   await uploadFile(file)
@@ -41,105 +56,178 @@ const handleReset = () => {
   mapping.value = null
   hasHeaders.value = false
 }
+
+const handleColumnClick = (step: WizardStep) => {
+  goToStep(step)
+}
 </script>
 
 <template>
-  <AtomsCard class="wizard-container">
-    <!-- Progress Indicator -->
-    <MoleculesProgressIndicator v-if="currentStep !== 'preview'" :current-step="currentStep" />
-
+  <div class="wizard-container">
     <!-- Error Display -->
     <AtomsContentBox v-if="error" class="error-box">
       <p>{{ error }}</p>
     </AtomsContentBox>
 
-    <!-- Step: Upload -->
-    <div v-if="currentStep === 'upload'" class="wizard-step">
-      <h2 class="step-title">Upload Your Data</h2>
+    <!-- Three-Column Layout -->
+    <div class="columns-grid">
+      <!-- Upload Column -->
+      <AtomsCard class="column">
+        <MoleculesColumnHeader
+          title="Upload"
+          :is-active="currentStep === 'upload'"
+          :is-completed="isStepCompleted('upload')"
+          :is-locked="isStepLocked('upload')"
+          @click="handleColumnClick('upload')"
+        />
+        <div class="column-content">
+          <!-- Mode Toggle -->
+          <div class="mode-toggle">
+            <button
+              :class="['mode-button', { active: uploadMode === 'csv' }]"
+              @click="uploadMode = 'csv'"
+            >
+              <UIcon name="i-heroicons-arrow-up-tray" />
+              CSV Upload
+            </button>
+            <button
+              :class="['mode-button', { active: uploadMode === 'sheets' }]"
+              @click="uploadMode = 'sheets'"
+            >
+              <UIcon name="i-heroicons-link" />
+              Google Sheets
+            </button>
+          </div>
 
-      <!-- Mode Toggle -->
-      <div class="mode-toggle">
-        <button
-          :class="['mode-button', { active: uploadMode === 'csv' }]"
-          @click="uploadMode = 'csv'"
-        >
-          <UIcon name="i-heroicons-arrow-up-tray" />
-          CSV Upload
-        </button>
-        <button
-          :class="['mode-button', { active: uploadMode === 'sheets' }]"
-          @click="uploadMode = 'sheets'"
-        >
-          <UIcon name="i-heroicons-link" />
-          Google Sheets
-        </button>
-      </div>
+          <!-- CSV Upload Mode -->
+          <MoleculesFileUpload
+            v-if="uploadMode === 'csv'"
+            :loading="loading"
+            @file-selected="handleFileSelected"
+          />
 
-      <!-- CSV Upload Mode -->
-      <MoleculesFileUpload
-        v-if="uploadMode === 'csv'"
-        :loading="loading"
-        @file-selected="handleFileSelected"
-      />
+          <!-- Google Sheets Mode -->
+          <div v-if="uploadMode === 'sheets'" class="sheets-input-container">
+            <AtomsContentBox class="sheets-input">
+              <label class="sheets-label">
+                Google Sheets URL:
+                <input
+                  v-model="sheetsUrl"
+                  type="url"
+                  class="sheets-url-input"
+                  placeholder="https://docs.google.com/spreadsheets/d/..."
+                />
+              </label>
+              <AtomsButton :disabled="!sheetsUrl.trim() || loading" @click="handleSheetsSubmit">
+                <UIcon v-if="loading" name="i-heroicons-arrow-path" class="h-4 w-4 animate-spin" />
+                <UIcon v-else name="i-heroicons-arrow-right" class="h-4 w-4" />
+                Load Sheet
+              </AtomsButton>
+            </AtomsContentBox>
+          </div>
+        </div>
+      </AtomsCard>
 
-      <!-- Google Sheets Mode -->
-      <div v-if="uploadMode === 'sheets'" class="sheets-input-container">
-        <AtomsContentBox class="sheets-input">
-          <label class="sheets-label">
-            Google Sheets URL:
-            <input
-              v-model="sheetsUrl"
-              type="url"
-              class="sheets-url-input"
-              placeholder="https://docs.google.com/spreadsheets/d/..."
-            />
-          </label>
-          <AtomsButton :disabled="!sheetsUrl.trim() || loading" @click="handleSheetsSubmit">
-            <UIcon v-if="loading" name="i-heroicons-arrow-path" class="h-4 w-4 animate-spin" />
-            <UIcon v-else name="i-heroicons-arrow-right" class="h-4 w-4" />
-            Load Sheet
-          </AtomsButton>
-        </AtomsContentBox>
-      </div>
+      <!-- Mapping Column -->
+      <AtomsCard class="column">
+        <MoleculesColumnHeader
+          title="Map"
+          :is-active="currentStep === 'mapping'"
+          :is-completed="isStepCompleted('mapping')"
+          :is-locked="isStepLocked('mapping')"
+          @click="handleColumnClick('mapping')"
+        />
+        <div v-if="canShowMappingContent" class="column-content">
+          <OrganismsColumnMapper
+            v-if="parsedData"
+            :parsed-data="parsedData"
+            @complete="handleMappingComplete"
+          />
+        </div>
+        <div v-else class="column-content column-placeholder">
+          <p class="placeholder-text">Complete upload to map columns</p>
+        </div>
+      </AtomsCard>
+
+      <!-- Preview Column -->
+      <AtomsCard class="column column-preview">
+        <MoleculesColumnHeader
+          title="Preview"
+          :is-active="currentStep === 'preview'"
+          :is-completed="isStepCompleted('preview')"
+          :is-locked="isStepLocked('preview')"
+          @click="handleColumnClick('preview')"
+        />
+        <div v-if="canShowPreviewContent" class="column-content">
+          <OrganismsPreviewPanel
+            v-if="mapping && csvContent"
+            :csv-content="csvContent"
+            :mapping="mapping"
+            :has-headers="hasHeaders"
+            @close="handleReset"
+          />
+        </div>
+        <div v-else class="column-content column-placeholder">
+          <p class="placeholder-text">Complete mapping to preview</p>
+        </div>
+      </AtomsCard>
     </div>
-
-    <!-- Step: Mapping -->
-    <OrganismsColumnMapper
-      v-if="currentStep === 'mapping' && parsedData"
-      :parsed-data="parsedData"
-      @complete="handleMappingComplete"
-      @back="previousStep"
-    />
-
-    <!-- Step: Preview -->
-    <OrganismsPreviewPanel
-      v-if="currentStep === 'preview' && mapping && csvContent"
-      :csv-content="csvContent"
-      :mapping="mapping"
-      :has-headers="hasHeaders"
-      @back="previousStep"
-      @close="handleReset"
-    />
-  </AtomsCard>
+  </div>
 </template>
 
 <style lang="postcss" scoped>
 .wizard-container {
-  @apply mx-auto w-full max-w-4xl p-8;
-}
-
-.wizard-step {
-  @apply flex flex-col gap-6;
-}
-
-.step-title {
-  @apply text-3xl font-bold text-white;
+  @apply mx-auto w-full p-4 md:p-8;
+  max-width: 1600px; /* Wider to accommodate three columns */
 }
 
 .error-box {
-  @apply bg-red-500/10 p-4 text-red-400;
+  @apply mb-6 bg-red-500/10 p-4 text-red-400;
 }
 
+/* Three-column grid layout */
+.columns-grid {
+  display: grid;
+  gap: 1rem;
+  /* Single column on mobile */
+  grid-template-columns: 1fr;
+
+  /* Three columns on tablet and up: 25% | 25% | 50% */
+  @media (min-width: 768px) {
+    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr 2fr;
+  }
+}
+
+.column {
+  @apply flex flex-col overflow-hidden p-0;
+  /* Remove default card padding, add it to column-content instead */
+}
+
+.column-content {
+  @apply flex flex-col gap-6 p-6;
+  padding-top: 50px;
+}
+
+.column-placeholder {
+  @apply items-center justify-center py-12;
+  min-height: 200px;
+}
+
+.placeholder-text {
+  @apply text-center text-sm text-white/40;
+}
+
+.column-preview {
+  /* Preview column takes the third position in the grid */
+  @apply col-span-1;
+
+  @media (min-width: 768px) {
+    grid-column: 3 / 4;
+  }
+}
+
+/* Upload mode toggle */
 .mode-toggle {
   @apply flex gap-2 rounded-lg bg-white/5 p-1;
 }

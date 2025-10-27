@@ -46,8 +46,3 @@ export interface ParsedData {
  * Output format options
  */
 export type OutputFormat = 'html' | 'pdf'
-
-/**
- * Wizard step type
- */
-export type WizardStep = 'upload' | 'mapping' | 'preview'

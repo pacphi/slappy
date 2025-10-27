@@ -8,7 +8,6 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   complete: [mapping: ColumnMapping, hasHeaders: boolean, csvContent: string]
-  back: []
 }>()
 
 const { mapping, hasHeaders, isValid, updateMapping } = useColumnMapping(
@@ -56,11 +55,6 @@ const handleContinue = () => {
 
 <template>
   <div class="column-mapper">
-    <h2 class="step-title">Map Your Columns</h2>
-    <p class="step-description">
-      Choose which columns from your data should appear on each line of the name tags.
-    </p>
-
     <!-- Has Headers Toggle -->
     <AtomsContentBox class="headers-toggle">
       <label class="toggle-label">
@@ -141,14 +135,10 @@ const handleContinue = () => {
       <MoleculesDataTable :headers="previewHeaders" :rows="previewData" :max-rows="5" />
     </div>
 
-    <!-- Actions -->
+    <!-- Continue Button -->
     <div class="actions">
-      <AtomsButton variant="ghost" @click="emit('back')">
-        <UIcon name="i-heroicons-arrow-left" class="h-4 w-4" />
-        Back
-      </AtomsButton>
-      <AtomsButton variant="primary" :disabled="!isValid" @click="handleContinue">
-        Continue
+      <AtomsButton variant="primary" :disabled="!isValid" class="w-full" @click="handleContinue">
+        Continue to Preview
         <UIcon name="i-heroicons-arrow-right" class="h-4 w-4" />
       </AtomsButton>
     </div>
@@ -158,14 +148,6 @@ const handleContinue = () => {
 <style lang="postcss" scoped>
 .column-mapper {
   @apply flex flex-col gap-6;
-}
-
-.step-title {
-  @apply text-3xl font-bold text-white;
-}
-
-.step-description {
-  @apply text-white/70;
 }
 
 .headers-toggle {
@@ -211,6 +193,6 @@ const handleContinue = () => {
 }
 
 .actions {
-  @apply flex items-center justify-between gap-4;
+  @apply flex items-center justify-center gap-4;
 }
 </style>

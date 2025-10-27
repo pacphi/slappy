@@ -43,8 +43,8 @@ const features = [
       Transform your spreadsheets into print-ready labels instantly. No design skills required.
     </p>
 
-    <!-- Features Grid (3x2 as requested) -->
-    <div class="features-grid">
+    <!-- Features Grid (4 columns) -->
+    <div class="grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
       <MoleculesFeatureCard
         v-for="feature in features"
         :key="feature.title"
@@ -71,9 +71,5 @@ const features = [
 
 .hero-subtitle {
   @apply max-w-2xl text-center text-xl leading-relaxed text-white/70;
-}
-
-.features-grid {
-  @apply grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
 }
 </style>

@@ -1,7 +1,7 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["app/app.vue", "app/pages/**/*.vue", "server/api/**/*.ts"],
-  "project": ["app/**/*.{ts,vue}", "server/**/*.ts"],
+  "entry": ["app/app.vue", "app/pages/**/*.vue", "server/api/**/*.ts", "cli/**/*.ts"],
+  "project": ["app/**/*.{ts,vue}", "server/**/*.ts", "lib/**/*.ts", "cli/**/*.ts"],
   "ignore": [
     "**/*.md",
     ".nuxt/**",

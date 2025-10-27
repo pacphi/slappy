@@ -9,7 +9,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  back: []
   close: []
 }>()
 
@@ -52,8 +51,6 @@ const resetZoom = () => {
 
 <template>
   <div class="preview-panel">
-    <h2 class="step-title">Preview & Download</h2>
-
     <!-- Error Display -->
     <AtomsContentBox v-if="error" class="error-box">
       <p>{{ error }}</p>
@@ -106,11 +103,7 @@ const resetZoom = () => {
 
     <!-- Actions -->
     <div class="actions">
-      <AtomsButton variant="ghost" @click="emit('back')">
-        <UIcon name="i-heroicons-arrow-left" class="h-4 w-4" />
-        Back
-      </AtomsButton>
-      <AtomsButton variant="secondary" @click="emit('close')">
+      <AtomsButton variant="secondary" class="w-full" @click="emit('close')">
         Start Over
         <UIcon name="i-heroicons-arrow-path" class="h-4 w-4" />
       </AtomsButton>
@@ -121,10 +114,6 @@ const resetZoom = () => {
 <style lang="postcss" scoped>
 .preview-panel {
   @apply flex flex-col gap-6;
-}
-
-.step-title {
-  @apply text-3xl font-bold text-white;
 }
 
 .error-box {
@@ -162,6 +151,6 @@ const resetZoom = () => {
 }
 
 .actions {
-  @apply flex items-center justify-between gap-4;
+  @apply flex items-center justify-center gap-4;
 }
 </style>

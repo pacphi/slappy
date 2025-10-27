@@ -7,6 +7,8 @@ useSeoMeta({
   ogDescription: 'Generate print-ready name tags from CSV files or Google Sheets',
 })
 
+const isFeaturesExpanded = ref(false)
+
 const features = [
   {
     icon: 'i-heroicons-bolt',
@@ -46,25 +48,22 @@ const features = [
     <!-- Header -->
     <OrganismsAppHeader />
 
-    <!-- Hero Section (title + subtitle only) -->
-    <section class="hero-section">
-      <h1 class="hero-title">Professional Name Tags in 60 Seconds</h1>
-
-      <p class="hero-subtitle">
-        Transform your spreadsheets into print-ready labels instantly. No design skills required.
-      </p>
-    </section>
-
     <!-- Name Tag Wizard -->
     <section class="wizard-section">
       <OrganismsNameTagWizard />
     </section>
 
-    <!-- Features Grid (3x2) -->
+    <!-- Features Grid (collapsible) -->
     <section class="features-section">
       <div class="features-container">
-        <h2 class="features-heading">Why Choose Slappy?</h2>
-        <div class="features-grid">
+        <button class="features-heading-button" @click="isFeaturesExpanded = !isFeaturesExpanded">
+          <h2 class="features-heading">Why Choose Slappy?</h2>
+          <UIcon
+            :name="isFeaturesExpanded ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
+            class="chevron-icon"
+          />
+        </button>
+        <div v-show="isFeaturesExpanded" class="features-grid">
           <MoleculesFeatureCard
             v-for="feature in features"
             :key="feature.title"
@@ -84,7 +83,6 @@ const features = [
           <UIcon name="i-heroicons-heart-solid" class="inline h-4 w-4 text-red-500" />
           using Nuxt & Vue
         </p>
-        <p class="footer-text text-white/50">Open Source • Free Forever</p>
       </div>
     </footer>
   </div>
@@ -93,29 +91,12 @@ const features = [
 <style lang="postcss" scoped>
 .home-page {
   @apply min-h-screen;
-}
-
-.hero-section {
-  @apply mx-auto flex max-w-6xl flex-col items-center gap-8 px-6 py-12;
-}
-
-.hero-badge {
-  @apply rounded-full border px-4 py-2 text-sm backdrop-blur-sm;
-  @apply border-neutral-200 bg-neutral-100 text-neutral-700;
-  @apply dark:border-white/10 dark:bg-white/5 dark:text-white/80;
-}
-
-.hero-title {
-  @apply max-w-4xl text-center text-4xl font-extrabold leading-tight;
-}
-
-.hero-subtitle {
-  @apply max-w-2xl text-center text-lg leading-relaxed;
-  @apply text-neutral-600 dark:text-white/70;
+  padding: 50px;
 }
 
 .wizard-section {
   @apply px-6 pb-12;
+  padding-top: 50px;
 }
 
 .features-section {
@@ -126,12 +107,46 @@ const features = [
   @apply mx-auto max-w-6xl;
 }
 
+.features-heading-button {
+  @apply relative flex w-full cursor-pointer items-center justify-center gap-3;
+  padding: 5px;
+  @apply border-b border-white/10 bg-white/5 backdrop-blur-sm;
+  @apply font-semibold text-white/60 transition-all;
+  @apply hover:bg-white/10;
+  margin-bottom: 2rem;
+}
+
+.features-heading-button:hover {
+  @apply text-white;
+}
+
 .features-heading {
-  @apply mb-8 text-center text-2xl font-bold;
+  @apply text-lg font-semibold;
+  margin-bottom: 0;
+}
+
+.chevron-icon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
 }
 
 .features-grid {
-  @apply grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .app-footer {
