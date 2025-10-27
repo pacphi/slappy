@@ -36,7 +36,9 @@ const features = [
 <template>
   <section class="hero-section">
     <!-- Headline -->
-    <h1 class="max-w-4xl text-center text-5xl font-extrabold">Professional Name Tags in 60 Seconds</h1>
+    <h1 class="max-w-4xl text-center text-5xl font-extrabold">
+      Professional Name Tags in 60 Seconds
+    </h1>
 
     <!-- Subtitle -->
     <p class="max-w-2xl text-center text-xl">

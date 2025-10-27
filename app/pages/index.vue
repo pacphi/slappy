@@ -88,7 +88,8 @@ const features = [
     <footer class="app-footer">
       <div class="footer-container">
         <p class="footer-text">
-          Built with <UIcon name="i-heroicons-heart-solid" class="h-4 w-4 text-red-500" /> using Nuxt & Vue
+          Built with <UIcon name="i-heroicons-heart-solid" class="h-4 w-4 text-red-500" /> using
+          Nuxt & Vue
         </p>
       </div>
     </footer>

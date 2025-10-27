@@ -21,36 +21,39 @@ const mappingState = reactive({
 })
 
 // Validation schema
-const mappingSchema = z.object({
-  line1: z.number().nullable(),
-  line2: z.number().nullable(),
-  line3: z.number().nullable(),
-  hasHeaders: z.boolean(),
-}).refine(
-  (data) => {
-    // At least one line must be selected
-    return data.line1 !== null || data.line2 !== null || data.line3 !== null
-  },
-  {
-    message: 'Select at least one column to continue',
-    path: ['line1'], // Show error on line1
-  }
-).refine(
-  (data) => {
-    // No duplicates allowed
-    const selected = [data.line1, data.line2, data.line3].filter((v) => v !== null)
-    return selected.length === new Set(selected).size
-  },
-  {
-    message: 'Each column can only be mapped once',
-    path: ['line1'], // Show error on line1
-  }
-)
+const mappingSchema = z
+  .object({
+    line1: z.number().nullable(),
+    line2: z.number().nullable(),
+    line3: z.number().nullable(),
+    hasHeaders: z.boolean(),
+  })
+  .refine(
+    data => {
+      // At least one line must be selected
+      return data.line1 !== null || data.line2 !== null || data.line3 !== null
+    },
+    {
+      message: 'Select at least one column to continue',
+      path: ['line1'], // Show error on line1
+    }
+  )
+  .refine(
+    data => {
+      // No duplicates allowed
+      const selected = [data.line1, data.line2, data.line3].filter(v => v !== null)
+      return selected.length === new Set(selected).size
+    },
+    {
+      message: 'Each column can only be mapped once',
+      path: ['line1'], // Show error on line1
+    }
+  )
 
 const isValid = computed(() => {
   const selected = [mappingState.line1, mappingState.line2, mappingState.line3]
-  const hasSelection = selected.some((v) => v !== null)
-  const uniqueSelected = selected.filter((v) => v !== null)
+  const hasSelection = selected.some(v => v !== null)
+  const uniqueSelected = selected.filter(v => v !== null)
   const noDuplicates = uniqueSelected.length === new Set(uniqueSelected).size
   return hasSelection && noDuplicates
 })
@@ -173,7 +176,7 @@ const handleLoadTemplate = (name: string) => {
 }
 
 // Watch for template selection changes
-watch(selectedTemplate, (newValue) => {
+watch(selectedTemplate, newValue => {
   if (newValue) {
     handleLoadTemplate(newValue)
     selectedTemplate.value = '' // Reset after loading
@@ -205,34 +208,37 @@ defineShortcuts({
         </UFormField>
       </UCard>
 
-    <!-- F2: Template Management -->
-    <UCard v-if="hasTemplates || isValid" variant="outline" class="template-section">
-      <div v-if="hasTemplates" class="flex flex-col gap-2">
-        <label class="text-sm font-medium">Load Template:</label>
-        <USelect
-          v-model="selectedTemplate"
-          placeholder="Choose a saved template..."
-          :items="[{ label: 'Choose a saved template...', value: '' }, ...templateNames.map(name => ({ label: name, value: name }))]"
-        />
-      </div>
+      <!-- F2: Template Management -->
+      <UCard v-if="hasTemplates || isValid" variant="outline" class="template-section">
+        <div v-if="hasTemplates" class="flex flex-col gap-2">
+          <label class="text-sm font-medium">Load Template:</label>
+          <USelect
+            v-model="selectedTemplate"
+            placeholder="Choose a saved template..."
+            :items="[
+              { label: 'Choose a saved template...', value: '' },
+              ...templateNames.map(name => ({ label: name, value: name })),
+            ]"
+          />
+        </div>
 
-      <div v-if="isValid" class="template-save">
-        <UInput
-          v-model="templateName"
-          placeholder="Template name..."
-          @keyup.enter="handleSaveTemplate"
-        />
-        <UButton
-          size="sm"
-          variant="outline"
-          :disabled="!templateName.trim()"
-          @click="handleSaveTemplate"
-        >
-          <UIcon name="i-heroicons-bookmark" class="h-4 w-4" />
-          Save Template
-        </UButton>
-      </div>
-    </UCard>
+        <div v-if="isValid" class="template-save">
+          <UInput
+            v-model="templateName"
+            placeholder="Template name..."
+            @keyup.enter="handleSaveTemplate"
+          />
+          <UButton
+            size="sm"
+            variant="outline"
+            :disabled="!templateName.trim()"
+            @click="handleSaveTemplate"
+          >
+            <UIcon name="i-heroicons-bookmark" class="h-4 w-4" />
+            Save Template
+          </UButton>
+        </div>
+      </UCard>
 
       <!-- Column Mapping -->
       <div class="mapping-grid">
@@ -261,24 +267,24 @@ defineShortcuts({
         </UFormField>
       </div>
 
-    <!-- U7: Label Count Display -->
-    <UCard variant="soft" color="primary" class="label-count-box">
-      <div class="flex items-center gap-3">
-        <UIcon name="i-heroicons-document-text" class="h-8 w-8 flex-shrink-0" />
-        <div class="flex flex-col gap-1">
-          <p class="text-lg font-semibold">{{ labelCount }} name tags</p>
-          <p class="text-sm opacity-70">
-            {{ sheetsCount }} sheet{{ sheetsCount !== 1 ? 's' : '' }} (10 labels per sheet)
-          </p>
+      <!-- U7: Label Count Display -->
+      <UCard variant="soft" color="primary" class="label-count-box">
+        <div class="flex items-center gap-3">
+          <UIcon name="i-heroicons-document-text" class="h-8 w-8 flex-shrink-0" />
+          <div class="flex flex-col gap-1">
+            <p class="text-lg font-semibold">{{ labelCount }} name tags</p>
+            <p class="text-sm opacity-70">
+              {{ sheetsCount }} sheet{{ sheetsCount !== 1 ? 's' : '' }} (10 labels per sheet)
+            </p>
+          </div>
         </div>
-      </div>
-    </UCard>
+      </UCard>
 
-    <!-- Data Preview -->
-    <div class="preview-section">
-      <h3 class="text-xl font-semibold">Data Preview</h3>
-      <MoleculesDataTable :headers="previewHeaders" :rows="previewData" :max-rows="5" />
-    </div>
+      <!-- Data Preview -->
+      <div class="preview-section">
+        <h3 class="text-xl font-semibold">Data Preview</h3>
+        <MoleculesDataTable :headers="previewHeaders" :rows="previewData" :max-rows="5" />
+      </div>
 
       <!-- Success Feedback -->
       <UAlert

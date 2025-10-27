@@ -141,7 +141,7 @@ defineShortcuts({
           width: `${(8 * 96) / (zoom / 100)}px`,
           height: `${(10.5 * 96) / (zoom / 100)}px`,
           transform: `scale(${zoom / 100})`,
-          transformOrigin: 'top left'
+          transformOrigin: 'top left',
         }"
         class="preview-iframe"
         title="Name Tags Preview"
@@ -195,6 +195,8 @@ defineShortcuts({
 .preview-iframe {
   @apply border-0;
   background: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 </style>

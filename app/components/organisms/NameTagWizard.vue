@@ -50,7 +50,7 @@ const hasHeaders = ref(false)
 // Update upload mode when prop changes
 watch(
   () => props.initialUploadMode,
-  (newMode) => {
+  newMode => {
     if (newMode) {
       uploadMode.value = newMode
     }
@@ -63,7 +63,7 @@ const sheetsSchema = z.object({
     .string()
     .min(1, 'Please enter a Google Sheets URL')
     .url('Please enter a valid URL')
-    .refine((val) => isValidGoogleSheetsUrl(val), {
+    .refine(val => isValidGoogleSheetsUrl(val), {
       message: 'Please enter a valid Google Sheets URL (https://docs.google.com/spreadsheets/...)',
     }),
 })
@@ -117,7 +117,6 @@ const handleReset = () => {
   hasHeaders.value = false
   uploadError.value = null
 }
-
 
 const handleColumnClick = (step: WizardStep) => {
   goToStep(step)
