@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, reactive } from 'vue'
+import { z } from 'zod'
 import type { ColumnMapping, WizardStep } from '~/types'
+import type { FormSubmitEvent } from '#ui/types'
+import { getErrorMessage } from '~/utils/error-messages'
+import { isValidGoogleSheetsUrl } from '~/utils/validators'
+import type { UploadMode } from '~/composables/useAppNavigation'
+
+const props = defineProps<{
+  initialUploadMode?: UploadMode
+}>()
 
 const {
   currentStep,
@@ -11,12 +20,57 @@ const {
   reset: resetWizard,
 } = useWizardNavigation()
 const { parsedData, uploadFile, uploadSheets, loading, error, reset: resetUpload } = useDataUpload()
+const toast = useToast()
 
-const uploadMode = ref<'csv' | 'sheets'>('csv')
-const sheetsUrl = ref('')
+// C1: Browser navigation protection
+useUnsavedChanges()
+
+// Local error state for file upload
+const uploadError = ref<string | null>(null)
+
+// Watch for errors and show toast
+watch([() => uploadError.value, error], ([uploadErr, apiErr]) => {
+  const errorMessage = uploadErr || apiErr
+  if (errorMessage) {
+    const errorContext = getErrorMessage(errorMessage)
+    toast.add({
+      title: errorContext.message,
+      description: errorContext.solution,
+      color: 'error',
+      timeout: 8000,
+    })
+  }
+})
+
+const uploadMode = ref<UploadMode>(props.initialUploadMode || 'csv')
 const csvContent = ref('')
 const mapping = ref<ColumnMapping | null>(null)
 const hasHeaders = ref(false)
+
+// Update upload mode when prop changes
+watch(
+  () => props.initialUploadMode,
+  (newMode) => {
+    if (newMode) {
+      uploadMode.value = newMode
+    }
+  }
+)
+
+// Google Sheets form validation
+const sheetsSchema = z.object({
+  url: z
+    .string()
+    .min(1, 'Please enter a Google Sheets URL')
+    .url('Please enter a valid URL')
+    .refine((val) => isValidGoogleSheetsUrl(val), {
+      message: 'Please enter a valid Google Sheets URL (https://docs.google.com/spreadsheets/...)',
+    }),
+})
+
+const sheetsState = reactive({
+  url: '',
+})
 
 // All columns are always visible, but content is conditional
 const canShowMappingContent = computed(
@@ -27,17 +81,23 @@ const canShowPreviewContent = computed(
 )
 
 const handleFileSelected = async (file: File) => {
+  uploadError.value = null // Clear previous errors
   await uploadFile(file)
   if (parsedData.value) {
     nextStep()
   }
 }
 
-const handleSheetsSubmit = async () => {
-  if (!sheetsUrl.value.trim()) return
-  await uploadSheets(sheetsUrl.value)
+const handleUploadError = (errorMessage: string) => {
+  uploadError.value = errorMessage
+}
+
+const handleSheetsSubmit = async (event: FormSubmitEvent<z.infer<typeof sheetsSchema>>) => {
+  uploadError.value = null
+  await uploadSheets(event.data.url)
   if (parsedData.value) {
     nextStep()
+    sheetsState.url = '' // Clear form on success
   }
 }
 
@@ -51,28 +111,66 @@ const handleMappingComplete = (newMapping: ColumnMapping, headers: boolean, cont
 const handleReset = () => {
   resetWizard()
   resetUpload()
-  sheetsUrl.value = ''
+  sheetsState.url = ''
   csvContent.value = ''
   mapping.value = null
   hasHeaders.value = false
+  uploadError.value = null
 }
+
 
 const handleColumnClick = (step: WizardStep) => {
   goToStep(step)
+}
+
+// Keyboard shortcuts
+defineShortcuts({
+  escape: {
+    handler: () => {
+      if (currentStep.value === 'preview') {
+        handleReset()
+      }
+    },
+  },
+  meta_r: {
+    handler: () => {
+      handleReset()
+    },
+  },
+})
+
+// F6: Sample data / demo mode
+const loadSampleData = async () => {
+  const sampleCSV = `Name,Company,Title
+John Doe,Acme Corp,CEO
+Jane Smith,TechStart,CTO
+Bob Johnson,DataCo,Engineer
+Alice Williams,InnovateLabs,Designer
+Charlie Brown,CloudSystems,Developer
+Diana Prince,StartupHub,Product Manager
+Eve Adams,FutureTech,Data Scientist
+Frank Miller,WebWorks,UX Researcher
+Grace Lee,CodeFactory,DevOps Engineer
+Henry Clark,AppStudio,Mobile Developer`
+
+  // Create a Blob and File from the sample data
+  const blob = new Blob([sampleCSV], { type: 'text/csv' })
+  const file = new File([blob], 'sample-data.csv', { type: 'text/csv' })
+
+  uploadError.value = null
+  await uploadFile(file)
+  if (parsedData.value) {
+    nextStep()
+  }
 }
 </script>
 
 <template>
   <div class="wizard-container">
-    <!-- Error Display -->
-    <AtomsContentBox v-if="error" class="error-box">
-      <p>{{ error }}</p>
-    </AtomsContentBox>
-
     <!-- Three-Column Layout -->
     <div class="columns-grid">
       <!-- Upload Column -->
-      <AtomsCard class="column">
+      <UCard variant="outline" class="column">
         <MoleculesColumnHeader
           title="Upload"
           :is-active="currentStep === 'upload'"
@@ -81,55 +179,53 @@ const handleColumnClick = (step: WizardStep) => {
           @click="handleColumnClick('upload')"
         />
         <div class="column-content">
-          <!-- Mode Toggle -->
-          <div class="mode-toggle">
-            <button
-              :class="['mode-button', { active: uploadMode === 'csv' }]"
-              @click="uploadMode = 'csv'"
-            >
-              <UIcon name="i-heroicons-arrow-up-tray" />
-              CSV Upload
-            </button>
-            <button
-              :class="['mode-button', { active: uploadMode === 'sheets' }]"
-              @click="uploadMode = 'sheets'"
-            >
-              <UIcon name="i-heroicons-link" />
-              Google Sheets
-            </button>
-          </div>
-
           <!-- CSV Upload Mode -->
-          <MoleculesFileUpload
-            v-if="uploadMode === 'csv'"
-            :loading="loading"
-            @file-selected="handleFileSelected"
-          />
+          <template v-if="uploadMode === 'csv'">
+            <MoleculesFileUpload
+              :loading="loading"
+              @file-selected="handleFileSelected"
+              @error="handleUploadError"
+            />
+
+            <!-- F6: Sample Data Button -->
+            <div class="sample-data-section">
+              <p class="sample-data-text">Want to try it first?</p>
+              <UButton variant="ghost" size="sm" :disabled="loading" @click="loadSampleData">
+                <UIcon name="i-heroicons-sparkles" class="h-4 w-4" />
+                Try Sample Data
+              </UButton>
+            </div>
+          </template>
 
           <!-- Google Sheets Mode -->
           <div v-if="uploadMode === 'sheets'" class="sheets-input-container">
-            <AtomsContentBox class="sheets-input">
-              <label class="sheets-label">
-                Google Sheets URL:
-                <input
-                  v-model="sheetsUrl"
-                  type="url"
-                  class="sheets-url-input"
-                  placeholder="https://docs.google.com/spreadsheets/d/..."
-                />
-              </label>
-              <AtomsButton :disabled="!sheetsUrl.trim() || loading" @click="handleSheetsSubmit">
-                <UIcon v-if="loading" name="i-heroicons-arrow-path" class="h-4 w-4 animate-spin" />
-                <UIcon v-else name="i-heroicons-arrow-right" class="h-4 w-4" />
-                Load Sheet
-              </AtomsButton>
-            </AtomsContentBox>
+            <UForm :schema="sheetsSchema" :state="sheetsState" @submit="handleSheetsSubmit">
+              <UCard variant="outline" class="sheets-input">
+                <UFormField
+                  name="url"
+                  label="Google Sheets URL"
+                  description="Paste a link to a published Google Sheets document"
+                  required
+                >
+                  <UInput
+                    v-model="sheetsState.url"
+                    type="url"
+                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                    icon="i-heroicons-link"
+                  />
+                </UFormField>
+                <UButton type="submit" :loading="loading" :disabled="loading">
+                  <UIcon v-if="!loading" name="i-heroicons-arrow-right" class="h-4 w-4" />
+                  Load Sheet
+                </UButton>
+              </UCard>
+            </UForm>
           </div>
         </div>
-      </AtomsCard>
+      </UCard>
 
       <!-- Mapping Column -->
-      <AtomsCard class="column">
+      <UCard variant="outline" class="column">
         <MoleculesColumnHeader
           title="Map"
           :is-active="currentStep === 'mapping'"
@@ -147,10 +243,10 @@ const handleColumnClick = (step: WizardStep) => {
         <div v-else class="column-content column-placeholder">
           <p class="placeholder-text">Complete upload to map columns</p>
         </div>
-      </AtomsCard>
+      </UCard>
 
       <!-- Preview Column -->
-      <AtomsCard class="column column-preview">
+      <UCard variant="outline" class="column column-preview">
         <MoleculesColumnHeader
           title="Preview"
           :is-active="currentStep === 'preview'"
@@ -170,7 +266,7 @@ const handleColumnClick = (step: WizardStep) => {
         <div v-else class="column-content column-placeholder">
           <p class="placeholder-text">Complete mapping to preview</p>
         </div>
-      </AtomsCard>
+      </UCard>
     </div>
   </div>
 </template>
@@ -178,83 +274,30 @@ const handleColumnClick = (step: WizardStep) => {
 <style lang="postcss" scoped>
 .wizard-container {
   @apply mx-auto w-full p-4 md:p-8;
-  max-width: 1600px; /* Wider to accommodate three columns */
+  max-width: 1600px;
 }
 
-.error-box {
-  @apply mb-6 bg-red-500/10 p-4 text-red-400;
-}
-
-/* Three-column grid layout */
 .columns-grid {
-  display: grid;
-  gap: 1rem;
-  /* Single column on mobile */
-  grid-template-columns: 1fr;
-
-  /* Three columns on tablet and up: 25% | 25% | 50% */
-  @media (min-width: 768px) {
-    gap: 1.5rem;
-    grid-template-columns: 1fr 1fr 2fr;
-  }
-}
-
-.column {
-  @apply flex flex-col overflow-hidden p-0;
-  /* Remove default card padding, add it to column-content instead */
+  @apply grid gap-4 md:grid-cols-[1fr_1fr_2fr] md:gap-6;
 }
 
 .column-content {
   @apply flex flex-col gap-6 p-6;
-  padding-top: 50px;
 }
 
 .column-placeholder {
-  @apply items-center justify-center py-12;
-  min-height: 200px;
-}
-
-.placeholder-text {
-  @apply text-center text-sm text-white/40;
-}
-
-.column-preview {
-  /* Preview column takes the third position in the grid */
-  @apply col-span-1;
-
-  @media (min-width: 768px) {
-    grid-column: 3 / 4;
-  }
-}
-
-/* Upload mode toggle */
-.mode-toggle {
-  @apply flex gap-2 rounded-lg bg-white/5 p-1;
-}
-
-.mode-button {
-  @apply flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-white/70 transition-all;
-  @apply hover:bg-white/10 hover:text-white;
-
-  &.active {
-    @apply bg-gradient-to-b from-purple-500 to-purple-700 text-white shadow-lg;
-  }
-}
-
-.sheets-input-container {
-  @apply flex flex-col gap-4;
+  @apply flex min-h-[200px] items-center justify-center py-12;
 }
 
 .sheets-input {
-  @apply flex flex-col gap-4 bg-white/5 p-6;
+  @apply flex flex-col gap-4;
 }
 
 .sheets-label {
-  @apply flex flex-col gap-2 text-sm font-medium text-white;
+  @apply flex flex-col gap-2;
 }
 
-.sheets-url-input {
-  @apply rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-white;
-  @apply focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-500;
+.sample-data-section {
+  @apply flex flex-col items-center gap-3 p-4;
 }
 </style>

@@ -1,12 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+/* Tailwind CSS v4 Import */
+@import "tailwindcss";
+@import "@nuxt/ui";
 
+/* Nuxt UI Design System - Custom Theme Configuration */
+@theme {
+  /* Font Family Configuration */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Scrollbar Styling */
 * {
   scrollbar-color: #555 rgba(0, 0, 0, 0);
   scrollbar-width: thin;
-}
-
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 /* Accessibility: Reduced Motion */
@@ -18,19 +24,4 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Manual dark mode styles as fallback since Tailwind dark: variants aren't working */
-html.dark {
-  color-scheme: dark;
-}
-
-html.dark .min-h-screen {
-  background-color: #0a0a0a;
-  color: white;
-}
-
-html.light .min-h-screen {
-  background-color: white;
-  color: #171717;
 }
