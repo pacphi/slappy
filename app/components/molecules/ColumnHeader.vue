@@ -17,7 +17,7 @@ const handleClick = () => {
 
 <template>
   <button
-    class="flex items-center justify-between gap-3 border-b p-1 text-left font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
+    class="flex items-center justify-between gap-3 border-b py-3 px-4 text-left font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
     :class="{
       'border-primary': isActive,
       'hover:bg-muted': !isLocked,

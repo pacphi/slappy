@@ -134,17 +134,22 @@ defineShortcuts({
     </div>
 
     <!-- Preview Iframe -->
-    <UCard v-if="!loading && !error" variant="outline" class="min-h-[500px] overflow-auto">
+    <div v-if="!loading && !error" class="preview-card">
       <iframe
         :srcdoc="iframeContent"
-        :style="{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left' }"
+        :style="{
+          width: `${(8 * 96) / (zoom / 100)}px`,
+          height: `${(10.5 * 96) / (zoom / 100)}px`,
+          transform: `scale(${zoom / 100})`,
+          transformOrigin: 'top left'
+        }"
         class="preview-iframe"
         title="Name Tags Preview"
       />
-    </UCard>
+    </div>
 
     <!-- Actions -->
-    <UButton color="error" class="w-full" @click="handleStartOver">
+    <UButton color="error" class="w-full flex-shrink-0" @click="handleStartOver">
       Start Over
       <UIcon name="i-heroicons-arrow-path" class="h-4 w-4" />
     </UButton>
@@ -153,7 +158,8 @@ defineShortcuts({
 
 <style lang="postcss" scoped>
 .preview-panel {
-  @apply flex flex-col gap-6;
+  @apply flex flex-1 flex-col gap-6;
+  min-height: 0;
 }
 
 .loading-state {
@@ -162,6 +168,7 @@ defineShortcuts({
 
 .preview-controls {
   @apply flex flex-col gap-4 md:flex-row md:items-center md:justify-between;
+  flex-shrink: 0;
 }
 
 .zoom-controls {
@@ -176,8 +183,18 @@ defineShortcuts({
   @apply flex flex-wrap gap-2;
 }
 
+.preview-card {
+  @apply flex flex-1 items-start justify-center overflow-auto;
+  min-height: 0;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
 .preview-iframe {
-  @apply w-full border-0;
-  min-height: 800px;
+  @apply border-0;
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 </style>

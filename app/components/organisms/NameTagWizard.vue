@@ -275,14 +275,23 @@ Henry Clark,AppStudio,Mobile Developer`
 .wizard-container {
   @apply mx-auto w-full p-4 md:p-8;
   max-width: 1600px;
+  min-height: calc(100vh - 8rem);
 }
 
 .columns-grid {
   @apply grid gap-4 md:grid-cols-[1fr_1fr_2fr] md:gap-6;
+  height: 100%;
+}
+
+.column {
+  @apply flex flex-col;
+  min-height: 0;
 }
 
 .column-content {
-  @apply flex flex-col gap-6 p-6;
+  @apply flex flex-1 flex-col gap-8 p-6;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .column-placeholder {

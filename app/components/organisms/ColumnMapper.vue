@@ -60,24 +60,41 @@ const { templateNames, hasTemplates, saveTemplate, loadTemplate } = useMappingTe
 const templateName = ref('')
 const selectedTemplate = ref('')
 
+// Extract headers from first row when checkbox is checked
+const effectiveHeaders = computed(() => {
+  if (!mappingState.hasHeaders) return undefined
+
+  // Use parsed headers if available, otherwise extract from first data row
+  if (props.parsedData.headers) {
+    return props.parsedData.headers
+  }
+
+  // Extract headers from the first row of columns
+  const firstRow = props.parsedData.columns[0]
+  if (!firstRow) return undefined
+
+  return firstRow
+})
+
 // F7: Create column options for dropdowns with sample data preview
 const columnOptions = computed(() => {
   const options = [{ label: '(Skip this line)', value: null }]
 
   for (let i = 0; i < props.parsedData.columnCount; i++) {
-    let label = `Column ${i + 1}`
+    let label: string
 
-    // Add header name (already implemented)
-    if (mappingState.hasHeaders && props.parsedData.headers) {
-      label = `${label}: ${props.parsedData.headers[i]}`
-    }
-
-    // F7: Add sample data preview
-    const sampleRow = mappingState.hasHeaders ? props.parsedData.preview[1] : props.parsedData.preview[0]
-    if (sampleRow && sampleRow[i]) {
-      const sampleValue = String(sampleRow[i]).substring(0, 20) // Truncate long values
-      const truncated = sampleValue.length < String(sampleRow[i]).length ? '...' : ''
-      label = `${label} (${sampleValue}${truncated})`
+    if (mappingState.hasHeaders && effectiveHeaders.value) {
+      // When headers are enabled, show only the header name
+      label = effectiveHeaders.value[i] || `Column ${i + 1}`
+    } else {
+      // When headers are disabled, show column number with sample data
+      label = `Column ${i + 1}`
+      const sampleRow = props.parsedData.preview[0]
+      if (sampleRow && sampleRow[i]) {
+        const sampleValue = String(sampleRow[i]).substring(0, 20) // Truncate long values
+        const truncated = sampleValue.length < String(sampleRow[i]).length ? '...' : ''
+        label = `${label} (${sampleValue}${truncated})`
+      }
     }
 
     options.push({ label, value: i })
@@ -88,15 +105,15 @@ const columnOptions = computed(() => {
 
 // Preview data
 const previewData = computed(() => {
-  if (mappingState.hasHeaders && props.parsedData.headers) {
+  if (mappingState.hasHeaders && effectiveHeaders.value) {
     return props.parsedData.preview.slice(1) // Skip header row in preview
   }
   return props.parsedData.preview
 })
 
 const previewHeaders = computed(() => {
-  if (mappingState.hasHeaders && props.parsedData.headers) {
-    return props.parsedData.headers
+  if (mappingState.hasHeaders && effectiveHeaders.value) {
+    return effectiveHeaders.value
   }
   return undefined
 })
@@ -283,7 +300,7 @@ defineShortcuts({
 
 <style lang="postcss" scoped>
 .column-mapper {
-  @apply flex flex-col gap-6;
+  @apply flex flex-col gap-8;
 }
 
 .template-section {
@@ -295,7 +312,7 @@ defineShortcuts({
 }
 
 .mapping-grid {
-  @apply flex flex-col gap-4;
+  @apply flex flex-col gap-5;
 }
 
 .mapping-row {
@@ -303,6 +320,6 @@ defineShortcuts({
 }
 
 .preview-section {
-  @apply flex flex-col gap-4;
+  @apply flex flex-col gap-4 mt-2;
 }
 </style>
