@@ -1,6 +1,6 @@
 # Slappy
 
-[![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy-muddy-silence-8378.fly.dev/)
+[![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy.fly.dev/)
 
 Generate print-ready name tags in TownStix US-10 format (4" x 2" labels) from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
 
