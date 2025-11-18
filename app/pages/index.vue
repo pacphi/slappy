@@ -131,7 +131,7 @@ const features = [
       </div>
 
       <!-- Google AdSense - Landing Page Ad (only shown when feature flag is enabled) -->
-      <MoleculesAdSenseAd v-if="isAdSenseEnabled" slot="LANDING_HERO_AD_SLOT_ID" format="horizontal" />
+      <MoleculesAdSenseAd v-if="isAdSenseEnabled" ad-slot="LANDING_HERO_AD_SLOT_ID" format="horizontal" />
 
       <div class="features-container">
         <button class="features-heading-button" @click="isFeaturesExpanded = !isFeaturesExpanded">

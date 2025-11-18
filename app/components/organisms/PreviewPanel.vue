@@ -154,7 +154,7 @@ defineShortcuts({
     <!-- Google AdSense - Preview Sidebar Ad (only shown when feature flag is enabled) -->
     <MoleculesAdSenseAd
       v-if="isAdSenseEnabled && !loading && !error"
-      slot="PREVIEW_SIDEBAR_AD_SLOT_ID"
+      ad-slot="PREVIEW_SIDEBAR_AD_SLOT_ID"
       format="display"
     />
 

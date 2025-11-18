@@ -14,7 +14,7 @@ interface Props {
    * AdSense ad slot ID (from your AdSense account)
    * @example "1234567890"
    */
-  slot: string
+  adSlot: string
 
   /**
    * Ad format/style
@@ -29,19 +29,23 @@ interface Props {
   responsive?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   format: 'display',
   responsive: true,
 })
+
+// Extend window type for AdSense
+interface WindowWithAdsByGoogle extends Window {
+  adsbygoogle?: Array<Record<string, unknown>>
+}
 
 // Initialize ads when component mounts
 onMounted(() => {
   // Push ads to AdSense queue (window.adsbygoogle)
   try {
-    if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
-      ;((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {},
-      )
+    const win = window as unknown as WindowWithAdsByGoogle
+    if (typeof window !== 'undefined' && win.adsbygoogle) {
+      ;(win.adsbygoogle = win.adsbygoogle || []).push({})
     }
   } catch (error) {
     console.error('AdSense error:', error)
@@ -55,7 +59,7 @@ onMounted(() => {
       class="adsbygoogle"
       style="display: block"
       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-      :data-ad-slot="slot"
+      :data-ad-slot="adSlot"
       :data-ad-format="responsive ? 'auto' : format"
       :data-full-width-responsive="responsive ? 'true' : 'false'"
     ></ins>
