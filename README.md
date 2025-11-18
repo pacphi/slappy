@@ -195,12 +195,13 @@ export default defineAppConfig({
   features: {
     // Enable/disable Google AdSense ads
     // Set to false to completely disable all AdSense integration
-    adsense: false,  // Change to true to enable AdSense
+    adsense: false, // Change to true to enable AdSense
   },
 })
 ```
 
 **AdSense Feature Flag:**
+
 - When `adsense: false` (default): No AdSense scripts loaded, no ad components rendered, zero performance impact
 - When `adsense: true`: AdSense ads appear on landing page and preview panel
 

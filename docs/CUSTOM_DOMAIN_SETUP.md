@@ -39,7 +39,8 @@ flyctl certs create www.slappy.cloud --app slappy
 **What this does:** Tells Fly.io you want to use these domains with your app and starts the SSL certificate request process.
 
 **Expected output:**
-```
+
+```text
 Your certificate for slappy.cloud is being issued.
 Hostname = slappy.cloud
 Certificate Authority = Let's Encrypt
@@ -57,6 +58,7 @@ flyctl ips list --app slappy
 ```
 
 **Example output:**
+
 ```
 VERSION    IP                      TYPE
 v6         2a09:8280:1::1:abcd     public
@@ -73,26 +75,28 @@ Now go to your domain registrar's website (e.g., Namecheap, GoDaddy, Cloudflare,
 
 #### For slappy.cloud (main domain):
 
-| Type  | Name/Host | Value/Points To           | TTL       |
-|-------|-----------|---------------------------|-----------|
-| A     | @         | `66.241.124.100`*         | Automatic |
-| AAAA  | @         | `2a09:8280:1::1:abcd`*    | Automatic |
+| Type | Name/Host | Value/Points To         | TTL       |
+| ---- | --------- | ----------------------- | --------- |
+| A    | @         | `66.241.124.100`\*      | Automatic |
+| AAAA | @         | `2a09:8280:1::1:abcd`\* | Automatic |
 
-*Replace with YOUR actual IP addresses from Step 2
+\*Replace with YOUR actual IP addresses from Step 2
 
 #### For www.slappy.cloud:
 
 | Type  | Name/Host | Value/Points To | TTL       |
-|-------|-----------|-----------------|-----------|
+| ----- | --------- | --------------- | --------- |
 | CNAME | www       | slappy.fly.dev  | Automatic |
 
 **DNS Provider Tips:**
+
 - **"@" or "Name/Host"** means the root domain (slappy.cloud)
 - **"www"** is exactly that - the subdomain prefix
 - **TTL** (Time To Live) can usually be left as "Automatic" or set to 3600 (1 hour)
 - Some providers call it "Points To" or "Value" - same thing!
 
 **Important:**
+
 - Delete any existing A, AAAA, or CNAME records for @ and www first
 - Make sure there are no conflicting records
 
@@ -103,6 +107,7 @@ Now go to your domain registrar's website (e.g., Namecheap, GoDaddy, Cloudflare,
 After saving your DNS records, you need to wait for them to propagate across the internet.
 
 **How long?**
+
 - Minimum: 5-15 minutes
 - Typical: 1-2 hours
 - Maximum: Up to 48 hours
@@ -137,12 +142,14 @@ flyctl certs show www.slappy.cloud --app slappy
 ```
 
 **Look for these lines:**
+
 ```
 DNS Validated = true
 Certificate Issued = true
 ```
 
 **If it says "Pending":**
+
 - Wait a bit longer for DNS to propagate
 - Check that your DNS records are correct
 - See troubleshooting section below
@@ -158,6 +165,7 @@ Once certificates show as "issued", test your domain in a browser:
 3. Check for the padlock icon (🔒) in the address bar
 
 **Command line test:**
+
 ```bash
 curl -I https://slappy.cloud
 curl -I https://www.slappy.cloud
@@ -177,6 +185,7 @@ Good news - **HTTPS is already configured!** Your app's `fly.toml` file already 
 ```
 
 This means:
+
 - All HTTP requests automatically redirect to HTTPS
 - Visitors always get a secure connection
 - SSL certificates auto-renew every 90 days (handled by Fly.io)
@@ -194,10 +203,12 @@ This means:
 **Solutions:**
 
 1. **Verify DNS records are correct:**
+
    ```bash
    dig slappy.cloud A
    dig slappy.cloud AAAA
    ```
+
    Should return your Fly.io IP addresses.
 
 2. **Check DNS propagation globally:**
@@ -216,6 +227,7 @@ This means:
 **Cause:** Certificate not issued yet or DNS not pointing to Fly.io.
 
 **Solution:**
+
 - Wait for certificate to be issued (check with `flyctl certs show`)
 - Verify DNS is pointing to correct IP addresses
 - Try in incognito/private browsing mode (clears cache)
@@ -225,17 +237,21 @@ This means:
 **Problem:** Domain loads but shows 404 error.
 
 **Solutions:**
+
 1. **Check app is deployed and running:**
+
    ```bash
    flyctl status --app slappy
    ```
 
 2. **Check app logs:**
+
    ```bash
    flyctl logs --app slappy
    ```
 
 3. **Redeploy the app:**
+
    ```bash
    flyctl deploy --app slappy
    ```
@@ -245,6 +261,7 @@ This means:
 **Problem:** `slappy.cloud` works but `www.slappy.cloud` doesn't.
 
 **Solution:**
+
 - Verify you created certificate for www: `flyctl certs show www.slappy.cloud`
 - Check CNAME record points to `slappy.fly.dev`
 - Make sure CNAME is for "www" hostname, not "@"
@@ -256,22 +273,26 @@ This means:
 1. **Flush your local DNS cache:**
 
    **macOS:**
+
    ```bash
    sudo dscacheutil -flushcache
    sudo killall -HUP mDNSResponder
    ```
 
    **Windows:**
+
    ```bash
    ipconfig /flushdns
    ```
 
    **Linux:**
+
    ```bash
    sudo systemd-resolve --flush-caches
    ```
 
 2. **Test using Google DNS:**
+
    ```bash
    dig @8.8.8.8 slappy.cloud A
    ```
@@ -285,24 +306,28 @@ This means:
 Use this checklist to verify everything is working:
 
 ### DNS Configuration
+
 - [ ] A record for @ points to Fly.io IPv4
 - [ ] AAAA record for @ points to Fly.io IPv6
 - [ ] CNAME record for www points to slappy.fly.dev
 - [ ] DNS propagation confirmed (use whatsmydns.net)
 
 ### SSL/HTTPS
+
 - [ ] `flyctl certs show slappy.cloud` shows "Certificate Issued: true"
 - [ ] `flyctl certs show www.slappy.cloud` shows "Certificate Issued: true"
 - [ ] Browser shows padlock icon for https://slappy.cloud
 - [ ] Browser shows padlock icon for https://www.slappy.cloud
 
 ### Functionality
+
 - [ ] http://slappy.cloud redirects to https://slappy.cloud
 - [ ] http://www.slappy.cloud redirects to https://www.slappy.cloud
 - [ ] App loads and works correctly on custom domain
 - [ ] No certificate warnings in browser
 
 ### Optional (SEO/Analytics)
+
 - [ ] Update Google Search Console with new domain
 - [ ] Update AdSense settings (if applicable)
 - [ ] Update social media links
@@ -347,14 +372,14 @@ flyctl open --app slappy
 
 Here's what happens and when:
 
-| Step | What Happens | Time |
-|------|--------------|------|
-| Add domain to Fly.io | `flyctl certs create` command | 1-2 minutes |
-| Configure DNS | Update records at registrar | 5-10 minutes |
-| DNS propagation | Records spread across internet | 1-2 hours (up to 48h) |
-| DNS verification | Let's Encrypt checks domain ownership | 5-15 minutes |
-| Certificate issuance | Let's Encrypt issues SSL certificate | 1-5 minutes |
-| Domain active | Everything works! | Immediate |
+| Step                 | What Happens                          | Time                  |
+| -------------------- | ------------------------------------- | --------------------- |
+| Add domain to Fly.io | `flyctl certs create` command         | 1-2 minutes           |
+| Configure DNS        | Update records at registrar           | 5-10 minutes          |
+| DNS propagation      | Records spread across internet        | 1-2 hours (up to 48h) |
+| DNS verification     | Let's Encrypt checks domain ownership | 5-15 minutes          |
+| Certificate issuance | Let's Encrypt issues SSL certificate  | 1-5 minutes           |
+| Domain active        | Everything works!                     | Immediate             |
 
 **Total typical time:** 2-3 hours from start to finish
 

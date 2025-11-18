@@ -2,13 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: { compatibilityVersion: 4 },
-  modules: [
-    '@nuxt/ui',
-    '@pinia/nuxt',
-    '@pinia/colada-nuxt',
-    '@nuxt/eslint',
-    '@nuxtjs/seo',
-  ],
+  modules: ['@nuxt/ui', '@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxtjs/seo'],
   css: ['~/assets/css/main.css'],
 
   // SEO Configuration

@@ -21,18 +21,20 @@ export default defineAppConfig({
   features: {
     // Enable/disable Google AdSense ads
     // Set to false to completely disable all AdSense integration
-    adsense: false,  // Change to true to enable AdSense
+    adsense: false, // Change to true to enable AdSense
   },
 })
 ```
 
 **When `adsense: false` (default):**
+
 - AdSense script will NOT be loaded
 - No DNS prefetch/preconnect for AdSense domains
 - Ad components will NOT render (no blank containers)
 - Zero performance impact from AdSense
 
 **When `adsense: true`:**
+
 - AdSense script loads asynchronously
 - DNS prefetch/preconnect optimizations enabled
 - Ad slots render on landing page and preview panel
@@ -82,27 +84,36 @@ Once your AdSense account is approved:
 ### Step 3: Update Code with Ad Slot IDs
 
 **File: `/app/app.vue` (line 30)**
+
 ```vue
-src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX',
+src:
+'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX',
 ```
+
 Replace `ca-pub-XXXXXXXXXXXXXXXX` with your **Publisher ID**.
 
 **File: `/app/components/molecules/AdSenseAd.vue` (line 53)**
+
 ```vue
 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
 ```
+
 Replace `ca-pub-XXXXXXXXXXXXXXXX` with your **Publisher ID**.
 
 **File: `/app/pages/index.vue` (line 68)**
+
 ```vue
 <MoleculesAdSenseAd slot="LANDING_HERO_AD_SLOT_ID" format="horizontal" />
 ```
+
 Replace `LANDING_HERO_AD_SLOT_ID` with your **Landing Hero Ad** slot ID.
 
 **File: `/app/components/organisms/PreviewPanel.vue` (line 152)**
+
 ```vue
 <MoleculesAdSenseAd v-if="!loading && !error" slot="PREVIEW_SIDEBAR_AD_SLOT_ID" format="display" />
 ```
+
 Replace `PREVIEW_SIDEBAR_AD_SLOT_ID` with your **Preview Sidebar Ad** slot ID.
 
 ### Step 4: Test AdSense Integration
@@ -130,24 +141,28 @@ Replace `PREVIEW_SIDEBAR_AD_SLOT_ID` with your **Preview Sidebar Ad** slot ID.
 You need to create a social sharing image (1200×630px) for Facebook, LinkedIn, and Twitter.
 
 **Requirements:**
+
 - Dimensions: **1200px × 630px**
 - Format: PNG or JPG
 - File name: `og-image.png`
 - Location: `/public/og-image.png`
 
 **Recommended Content:**
+
 - Slappy logo or branding
 - Tagline: "Professional Name Tags in 60 Seconds"
 - Background: Match the purple theme (#8646F4)
 - Optional: Screenshot of the app or example name tags
 
 **Tools to create the image:**
+
 - [Canva](https://www.canva.com) - Free templates for social media images
 - [Figma](https://www.figma.com) - Design from scratch
 - Adobe Photoshop / Illustrator
 - Online generators: [og-image.vercel.app](https://og-image.vercel.app)
 
 **Steps:**
+
 1. Create the 1200×630px image
 2. Save as `og-image.png`
 3. Place in `/public/og-image.png`
@@ -158,12 +173,14 @@ You need to create a social sharing image (1200×630px) for Facebook, LinkedIn, 
 #### Sitemap & Robots.txt
 
 After deployment, verify these URLs are accessible:
+
 - **Sitemap**: [https://slappy.cloud/sitemap.xml](https://slappy.cloud/sitemap.xml)
 - **Robots.txt**: [https://slappy.cloud/robots.txt](https://slappy.cloud/robots.txt)
 
 #### Meta Tags Validation
 
 **Facebook Sharing Debugger:**
+
 1. Go to [https://developers.facebook.com/tools/debug/](https://developers.facebook.com/tools/debug/)
 2. Enter `https://slappy.cloud`
 3. Click "Debug"
@@ -173,12 +190,14 @@ After deployment, verify these URLs are accessible:
    - Image shows your OG image (1200×630px)
 
 **Twitter Card Validator:**
+
 1. Go to [https://cards-dev.twitter.com/validator](https://cards-dev.twitter.com/validator)
 2. Enter `https://slappy.cloud`
 3. Click "Preview card"
 4. Verify the card displays correctly with image
 
 **Google Rich Results Test:**
+
 1. Go to [https://search.google.com/test/rich-results](https://search.google.com/test/rich-results)
 2. Enter `https://slappy.cloud`
 3. Click "Test URL"
@@ -195,6 +214,7 @@ Run a Lighthouse audit in Chrome DevTools:
 5. **Target score: 90+**
 
 **Common issues to fix:**
+
 - Missing meta description (should already be added)
 - Missing viewport meta tag (should already be added)
 - Document doesn't have a valid `hreflang` (not applicable for single language)
@@ -223,26 +243,31 @@ Run a Lighthouse audit in Chrome DevTools:
 ### DNS Prefetch & Preconnect
 
 Already configured in `/app/app.vue` for:
+
 - Google AdSense domains (performance optimization)
 - Reduces ad load latency by ~100-200ms
 
 ### Mobile Optimization
 
 **Viewport meta tag** (✅ Added):
+
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 ```
 
 **Theme color** (✅ Added):
+
 ```html
-<meta name="theme-color" content="#8646F4">
+<meta name="theme-color" content="#8646F4" />
 ```
+
 - Matches the purple primary color
 - Customizes mobile browser UI on Android
 
 ### Structured Data
 
 **WebApplication schema** (✅ Added):
+
 - Helps Google understand your app
 - Shows app details in search results
 - Includes features, pricing (free), and operating system compatibility
@@ -314,6 +339,7 @@ Already configured in `/app/app.vue` for:
 ### AdSense Ads Not Showing
 
 **Possible causes:**
+
 1. **Account not approved yet** → Wait for AdSense approval email (1-3 days)
 2. **New ad unit** → Ads may take 24-48 hours to start showing
 3. **Ad blocker enabled** → Disable ad blocker to test
@@ -321,6 +347,7 @@ Already configured in `/app/app.vue` for:
 5. **Incorrect slot ID** → Verify slot IDs in AdSense dashboard match your code
 
 **Debugging:**
+
 - Open browser DevTools → Console
 - Look for AdSense errors (e.g., "Ad slot not found")
 - Check Network tab for requests to `googlesyndication.com`
@@ -328,16 +355,19 @@ Already configured in `/app/app.vue` for:
 ### SEO Issues
 
 **Sitemap not found:**
+
 - Ensure `@nuxtjs/seo` is installed and in `nuxt.config.ts` modules
 - Rebuild and redeploy: `pnpm build && pnpm preview`
 - Check `/.nuxt/dist/sitemap.xml` exists in build output
 
 **OG image not showing:**
+
 - Verify image is exactly 1200×630px
 - File must be in `/public/og-image.png` (not `/app/public/`)
 - Use Facebook Debugger and click "Scrape Again" to refresh cache
 
 **Low Lighthouse SEO score:**
+
 - Check for missing meta tags in DevTools → Elements → `<head>`
 - Verify canonical URL is absolute (not relative)
 - Ensure viewport meta tag is present
@@ -347,6 +377,7 @@ Already configured in `/app/app.vue` for:
 ## Summary of Changes Made
 
 ### New Files Created
+
 - `/app/components/molecules/AdSenseAd.vue` - Reusable AdSense ad component
 - `/ADSENSE_SEO_SETUP.md` - This setup guide
 
@@ -374,6 +405,7 @@ Already configured in `/app/app.vue` for:
    - Configured robots.txt with sitemap reference
 
 ### Dependencies Added
+
 - `@nuxtjs/seo@3.2.2` - Comprehensive SEO module for Nuxt
 
 ---
