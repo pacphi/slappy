@@ -28,6 +28,12 @@ jobs:
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Check deployment status
+        run: flyctl status --app slappy || echo "App does not exist yet - will create new deployment"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        continue-on-error: true
+
       - name: Deploy to Fly.io
         run: flyctl deploy --remote-only
         env:

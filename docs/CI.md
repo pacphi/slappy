@@ -556,6 +556,63 @@ primary_region = 'sjc'
 
 **Deployed URL:** https://slappy.fly.dev
 
+**Deployment Behavior:**
+
+The workflow handles both scenarios automatically:
+
+- **New Deployment**: If the app doesn't exist, `flyctl deploy` creates it with the configuration from `fly.toml`
+- **Existing Deployment**: If the app exists, `flyctl deploy` updates it with zero-downtime rolling deployment
+
+A status check step runs before deployment to verify the app state and provide visibility.
+
+### Fly.io Teardown
+
+**Workflow**: `.github/workflows/fly-teardown.yml`
+
+**Purpose:** Safely destroy a Fly.io deployment when no longer needed.
+
+**⚠️ WARNING:** This is a destructive operation that permanently deletes the deployment. Use with caution.
+
+**Running Manual Teardown:**
+
+1. Go to Actions tab in GitHub
+2. Select "Fly Teardown" workflow
+3. Click "Run workflow"
+4. Choose environment (production or staging)
+5. Type `DESTROY` exactly in the confirmation field
+6. Click "Run workflow" button
+
+**Safety Features:**
+
+- Manual trigger only (workflow_dispatch)
+- Requires explicit `DESTROY` confirmation
+- Environment-specific (targets production or staging)
+- Pre-flight check to verify app exists
+- Detailed summary of destruction in workflow output
+
+**When to Use:**
+
+- Removing staging environments after testing
+- Cleaning up old deployments
+- Reducing infrastructure costs
+- Decommissioning the application
+
+**What Gets Deleted:**
+
+- The Fly.io app and all its resources
+- All deployed machines/VMs
+- App configuration (can be recreated from `fly.toml`)
+- DNS entries for the app
+
+**What Persists:**
+
+- GitHub repository and code
+- Fly.io account and API tokens
+- Local configuration files (`fly.toml`, workflows)
+- Git history
+
+After teardown, you can redeploy anytime using the deployment workflow.
+
 ### Docker Image Build
 
 **Workflow**: `.github/workflows/docker.yml` (to be implemented)
