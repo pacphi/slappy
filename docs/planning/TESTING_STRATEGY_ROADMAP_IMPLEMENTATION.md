@@ -814,7 +814,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -822,7 +822,7 @@ jobs:
           version: 8
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: 'pnpm'
@@ -841,7 +841,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: playwright-report
           path: playwright-report/
@@ -849,7 +849,7 @@ jobs:
 
       - name: Upload test screenshots
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-screenshots
           path: test-results/

@@ -54,8 +54,8 @@ jobs:
     name: Lint & Format Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -67,8 +67,8 @@ jobs:
     name: TypeScript Type Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -79,14 +79,14 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
       - run: npm run build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: dist
           path: dist/
@@ -95,8 +95,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -107,8 +107,8 @@ jobs:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -123,8 +123,8 @@ jobs:
     name: Dead Code Detection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -488,6 +488,131 @@ Add scripts:
 
 ## Deployment Automation
 
+### Fly.io Deployment
+
+**Workflow**: `.github/workflows/fly-deploy.yml`
+
+**Triggers:**
+
+- Manual workflow dispatch only (no automatic deployments)
+
+**Configuration:**
+
+The application is deployed to [Fly.io](https://fly.io) using a multi-stage Dockerfile that includes:
+
+- Node.js 20 Alpine base
+- pnpm package manager
+- Nuxt 4 build
+- Puppeteer with Chromium for PDF generation
+
+**Setup Requirements:**
+
+1. **Fly.io App**: Create app using `flyctl launch` or `flyctl apps create slappy`
+2. **GitHub Secret**: Add `FLY_API_TOKEN` to repository secrets
+   - Get token: `flyctl auth token`
+   - Add to: Repository Settings → Secrets and variables → Actions → New secret
+
+**Running Manual Deployment:**
+
+1. Go to Actions tab in GitHub
+2. Select "Fly Deploy" workflow
+3. Click "Run workflow"
+4. Choose environment (production or staging)
+5. Click "Run workflow" button
+
+**Configuration Files:**
+
+- `.github/workflows/fly-deploy.yml` - GitHub Actions workflow
+- `fly.toml` - Fly.io app configuration
+- `Dockerfile` - Multi-stage build with Puppeteer support
+
+**fly.toml highlights:**
+
+```toml
+app = 'slappy'
+primary_region = 'sjc'
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 3000
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+```
+
+**Features:**
+
+- Auto-stop/auto-start machines to minimize costs
+- 1GB RAM for Puppeteer/Chromium operations
+- HTTPS enforced
+- Concurrency control (only one deployment at a time)
+
+**Deployed URL:** https://slappy.fly.dev
+
+**Deployment Behavior:**
+
+The workflow handles both scenarios automatically:
+
+- **New Deployment**: If the app doesn't exist, `flyctl deploy` creates it with the configuration from `fly.toml`
+- **Existing Deployment**: If the app exists, `flyctl deploy` updates it with zero-downtime rolling deployment
+
+A status check step runs before deployment to verify the app state and provide visibility.
+
+### Fly.io Teardown
+
+**Workflow**: `.github/workflows/fly-teardown.yml`
+
+**Purpose:** Safely destroy a Fly.io deployment when no longer needed.
+
+**⚠️ WARNING:** This is a destructive operation that permanently deletes the deployment. Use with caution.
+
+**Running Manual Teardown:**
+
+1. Go to Actions tab in GitHub
+2. Select "Fly Teardown" workflow
+3. Click "Run workflow"
+4. Choose environment (production or staging)
+5. Type `DESTROY` exactly in the confirmation field
+6. Click "Run workflow" button
+
+**Safety Features:**
+
+- Manual trigger only (workflow_dispatch)
+- Requires explicit `DESTROY` confirmation
+- Environment-specific (targets production or staging)
+- Pre-flight check to verify app exists
+- Detailed summary of destruction in workflow output
+
+**When to Use:**
+
+- Removing staging environments after testing
+- Cleaning up old deployments
+- Reducing infrastructure costs
+- Decommissioning the application
+
+**What Gets Deleted:**
+
+- The Fly.io app and all its resources
+- All deployed machines/VMs
+- App configuration (can be recreated from `fly.toml`)
+- DNS entries for the app
+
+**What Persists:**
+
+- GitHub repository and code
+- Fly.io account and API tokens
+- Local configuration files (`fly.toml`, workflows)
+- Git history
+
+After teardown, you can redeploy anytime using the deployment workflow.
+
 ### Docker Image Build
 
 **Workflow**: `.github/workflows/docker.yml` (to be implemented)
@@ -503,7 +628,7 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -548,8 +673,8 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'

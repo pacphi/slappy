@@ -1,13 +1,79 @@
 <script setup lang="ts">
+/**
+ * Slappy Homepage
+ *
+ * Main landing page with dual-view state:
+ * - Features view: Landing page with hero and feature grid
+ * - Wizard view: Three-step name tag generation wizard
+ */
+
+// Enhanced SEO meta tags with social sharing support
 useSeoMeta({
+  // Basic meta tags
   title: 'Slappy - Professional Name Tags in 60 Seconds',
   description:
     'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
-  ogTitle: 'Slappy',
-  ogDescription: 'Generate print-ready name tags from CSV files or Google Sheets',
+  keywords:
+    'name tags, labels, CSV to PDF, TownStix, label maker, US-10 labels, Google Sheets, badge printing, event labels',
+  author: 'Slappy',
+
+  // Open Graph (Facebook, LinkedIn, etc.)
+  ogType: 'website',
+  ogUrl: 'https://slappy.cloud',
+  ogTitle: 'Slappy - Professional Name Tags in 60 Seconds',
+  ogDescription:
+    'Generate print-ready name tags from CSV files or Google Sheets. TownStix US-10 format, 10 labels per sheet.',
+  ogImage: 'https://slappy.cloud/og-image.png',
+  ogImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
+  ogImageWidth: '1200',
+  ogImageHeight: '630',
+  ogSiteName: 'Slappy',
+  ogLocale: 'en_US',
+
+  // Twitter Card
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'Slappy - Professional Name Tags in 60 Seconds',
+  twitterDescription: 'Generate print-ready name tags from CSV files or Google Sheets instantly.',
+  twitterImage: 'https://slappy.cloud/og-image.png',
+  twitterImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
+})
+
+// Canonical URL and structured data
+useHead({
+  link: [{ rel: 'canonical', href: 'https://slappy.cloud/' }],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: 'Slappy',
+        url: 'https://slappy.cloud',
+        description:
+          'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
+        applicationCategory: 'BusinessApplication',
+        operatingSystem: 'Any',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        featureList: [
+          'CSV file upload',
+          'Google Sheets integration',
+          'TownStix US-10 format (4×2" labels)',
+          'PDF and HTML export',
+          'Live preview with zoom',
+          'Intelligent column mapping',
+        ],
+      }),
+    },
+  ],
 })
 
 const { currentView, uploadMode } = useAppNavigation()
+const appConfig = useAppConfig()
+const isAdSenseEnabled = appConfig.features.adsense
 
 const isFeaturesExpanded = ref(true)
 
@@ -63,6 +129,13 @@ const features = [
           Transform your spreadsheets into print-ready labels instantly. No design skills required.
         </p>
       </div>
+
+      <!-- Google AdSense - Landing Page Ad (only shown when feature flag is enabled) -->
+      <MoleculesAdSenseAd
+        v-if="isAdSenseEnabled"
+        ad-slot="LANDING_HERO_AD_SLOT_ID"
+        format="horizontal"
+      />
 
       <div class="features-container">
         <button class="features-heading-button" @click="isFeaturesExpanded = !isFeaturesExpanded">

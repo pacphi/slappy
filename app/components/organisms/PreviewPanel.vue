@@ -12,6 +12,9 @@ const emit = defineEmits<{
   close: []
 }>()
 
+const appConfig = useAppConfig()
+const isAdSenseEnabled = appConfig.features.adsense
+
 const { generatedHtml, loading, error, generate, downloadHtml } = useNameTagGeneration()
 const zoom = ref(100)
 
@@ -147,6 +150,13 @@ defineShortcuts({
         title="Name Tags Preview"
       />
     </div>
+
+    <!-- Google AdSense - Preview Sidebar Ad (only shown when feature flag is enabled) -->
+    <MoleculesAdSenseAd
+      v-if="isAdSenseEnabled && !loading && !error"
+      ad-slot="PREVIEW_SIDEBAR_AD_SLOT_ID"
+      format="display"
+    />
 
     <!-- Actions -->
     <UButton color="error" class="w-full flex-shrink-0" @click="handleStartOver">

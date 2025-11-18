@@ -126,8 +126,10 @@ pnpm test:local path/to/custom.csv     # Uses custom CSV file
 - **[Run Guide](docs/RUN.md)** - Detailed usage instructions
 - **[Build Guide](docs/BUILD.md)** - Building from source
 - **[Architecture](docs/ARCHITECTURE.md)** - Technical architecture details
+- **[Continuous Integration](docs/CI.md)** - Continuous integration setup
 - **[Deployment](docs/DEPLOY.md)** - Deployment instructions (Fly.io, Vercel, Cloudflare, Netlify, Docker)
-- **[CI/CD](docs/CI.md)** - Continuous integration setup
+- **[Custom Domain Setup](docs/CUSTOM_DOMAIN_SETUP.md)** - Connect a custom domain to your Fly.io deployment with HTTPS
+- **[AdSense & SEO Setup](docs/ADSENSE_SEO_SETUP.md)** - Configure Google AdSense and SEO optimization
 - **[Project Overview](docs/PROJECT-OVERVIEW.md)** - High-level project information
 
 ## Requirements
@@ -176,6 +178,34 @@ pnpm test:local path/to/custom.csv     # Uses custom CSV file
 - ✅ **Customizable styling** - Fonts, colors, and layout
 - ✅ **Shared architecture** - CLI and web share core business logic in `lib/`
 - ✅ **Backwards compatible** - Existing workflows continue to work
+
+## Configuration
+
+### Feature Flags
+
+Configure application features via `app.config.ts`:
+
+```typescript
+// app.config.ts
+export default defineAppConfig({
+  ui: {
+    primary: 'purple',
+    gray: 'neutral',
+  },
+  features: {
+    // Enable/disable Google AdSense ads
+    // Set to false to completely disable all AdSense integration
+    adsense: false, // Change to true to enable AdSense
+  },
+})
+```
+
+**AdSense Feature Flag:**
+
+- When `adsense: false` (default): No AdSense scripts loaded, no ad components rendered, zero performance impact
+- When `adsense: true`: AdSense ads appear on landing page and preview panel
+
+For complete AdSense setup instructions, see [AdSense & SEO Setup Guide](docs/ADSENSE_SEO_SETUP.md).
 
 ## Technology Stack
 

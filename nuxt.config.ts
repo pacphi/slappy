@@ -2,8 +2,36 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: { compatibilityVersion: 4 },
-  modules: ['@nuxt/ui', '@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint'],
+  modules: ['@nuxt/ui', '@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxtjs/seo'],
   css: ['~/assets/css/main.css'],
+
+  // SEO Configuration
+  site: {
+    url: 'https://slappy.cloud',
+    name: 'Slappy',
+    description:
+      'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
+    defaultLocale: 'en',
+  },
+
+  // Sitemap configuration
+  sitemap: {
+    strictNuxtContentPaths: true,
+    // Only include the homepage for now (single-page app)
+    urls: ['https://slappy.cloud/'],
+    // Exclude API endpoints and internal routes
+    exclude: ['/api/**'],
+  },
+
+  // Robots.txt configuration
+  robots: {
+    // Allow all crawlers
+    allow: '/',
+    // Disallow API endpoints
+    disallow: ['/api/'],
+    // Reference sitemap
+    sitemap: 'https://slappy.cloud/sitemap.xml',
+  },
   ui: {
     colorMode: true, // Enable color mode support (default: true)
   },
