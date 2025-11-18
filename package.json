@@ -39,20 +39,20 @@
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
-    "@iconify-json/lucide": "^1.2.71",
-    "@iconify-json/simple-icons": "^1.2.55",
-    "@nuxt/eslint": "^1.9.0",
-    "@tailwindcss/vite": "^4.1.16",
-    "@types/node": "^24.9.1",
-    "eslint": "^9.38.0",
+    "@iconify-json/lucide": "^1.2.73",
+    "@iconify-json/simple-icons": "^1.2.58",
+    "@nuxt/eslint": "^1.10.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/node": "^24.10.0",
+    "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "knip": "^5.66.3",
+    "knip": "^5.68.0",
     "prettier": "^3.6.2",
-    "tailwindcss": "^4.1.16",
+    "tailwindcss": "^4.1.17",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.2"
+    "typescript-eslint": "^8.46.3"
   },
   "pnpm": {
     "overrides": {
