@@ -1,76 +1,75 @@
-# Deployment Guide
+I# Deployment Guide
 
 This guide provides instructions for deploying the Slappy in various environments, including distribution as an npm package, Docker container, or standalone executable.
 
-- [Deployment Guide](#deployment-guide)
-  - [Deployment Options](#deployment-options)
-  - [Prerequisites](#prerequisites)
-  - [NPM Package Distribution](#npm-package-distribution)
-    - [Publishing to npm Registry](#publishing-to-npm-registry)
-    - [Private npm Registry](#private-npm-registry)
-    - [GitHub Packages](#github-packages)
-  - [Docker Deployment](#docker-deployment)
-    - [Building Docker Image](#building-docker-image)
-    - [Running the Web Application](#running-the-web-application)
-    - [Docker Compose](#docker-compose)
-    - [Pushing to Container Registry](#pushing-to-container-registry)
-  - [Standalone Executable](#standalone-executable)
-    - [Using pkg](#using-pkg)
-    - [Using Bun](#using-bun)
-    - [Distribution](#distribution)
-  - [Web Application Deployment](#web-application-deployment)
-    - [Common Features](#common-features)
-  - [Fly.io Deployment](#flyio-deployment)
-    - [Prerequisites](#prerequisites-1)
-    - [Quick Deployment](#quick-deployment)
-    - [Configuration Details](#configuration-details)
-  - [Vercel Deployment](#vercel-deployment)
-    - [Prerequisites](#prerequisites-2)
-    - [Quick Deployment](#quick-deployment-1)
-    - [Configuration](#configuration)
-    - [PDF Generation on Vercel](#pdf-generation-on-vercel)
-    - [Environment Variables](#environment-variables)
-    - [Deployment Commands](#deployment-commands)
-    - [Custom Domain](#custom-domain)
-    - [Pros \& Cons](#pros--cons)
-  - [Cloudflare Pages Deployment](#cloudflare-pages-deployment)
-    - [Prerequisites](#prerequisites-3)
-    - [Quick Deployment](#quick-deployment-2)
-    - [Configuration](#configuration-1)
-    - [PDF Generation on Cloudflare](#pdf-generation-on-cloudflare)
-    - [Environment Variables](#environment-variables-1)
-    - [Custom Domain](#custom-domain-1)
-    - [Pros \& Cons](#pros--cons-1)
-    - [Recommendation](#recommendation)
-  - [Netlify Deployment](#netlify-deployment)
-    - [Prerequisites](#prerequisites-4)
-    - [Quick Deployment](#quick-deployment-3)
-    - [Configuration](#configuration-2)
-    - [PDF Generation on Netlify](#pdf-generation-on-netlify)
-    - [Environment Variables](#environment-variables-2)
-    - [Custom Domain](#custom-domain-2)
-    - [Pros \& Cons](#pros--cons-2)
-    - [Recommendation](#recommendation-1)
-  - [Fly.io Deployment Commands](#flyio-deployment-commands)
-    - [Environment Variables](#environment-variables-3)
-    - [Cost Optimization](#cost-optimization)
-    - [Custom Domain](#custom-domain-3)
-    - [Updating the App](#updating-the-app)
-    - [Troubleshooting Fly.io Deployment](#troubleshooting-flyio-deployment)
-      - [Build failures](#build-failures)
-      - [Out of memory errors](#out-of-memory-errors)
-      - [Slow startup](#slow-startup)
-  - [Troubleshooting](#troubleshooting)
-    - [npm Publish Errors](#npm-publish-errors)
-      - [Error: "403 Forbidden"](#error-403-forbidden)
-    - [Docker Build Failures](#docker-build-failures)
-      - [Error: "Cannot find module"](#error-cannot-find-module)
-      - [Error: "Permission denied"](#error-permission-denied)
-    - [Standalone Executable Issues](#standalone-executable-issues)
-      - [Error: "Module not found in snapshot"](#error-module-not-found-in-snapshot)
-      - [Large executable size](#large-executable-size)
-  - [Useful Commands Reference](#useful-commands-reference)
-  - [Next Steps](#next-steps)
+- [Deployment Options](#deployment-options)
+- [Prerequisites](#prerequisites)
+- [NPM Package Distribution](#npm-package-distribution)
+  - [Publishing to npm Registry](#publishing-to-npm-registry)
+  - [Private npm Registry](#private-npm-registry)
+  - [GitHub Packages](#github-packages)
+- [Docker Deployment](#docker-deployment)
+  - [Building Docker Image](#building-docker-image)
+  - [Running the Web Application](#running-the-web-application)
+  - [Docker Compose](#docker-compose)
+  - [Pushing to Container Registry](#pushing-to-container-registry)
+- [Standalone Executable](#standalone-executable)
+  - [Using pkg](#using-pkg)
+  - [Using Bun](#using-bun)
+  - [Distribution](#distribution)
+- [Web Application Deployment](#web-application-deployment)
+  - [Common Features](#common-features)
+- [Fly.io Deployment](#flyio-deployment)
+  - [Prerequisites](#prerequisites-1)
+  - [Quick Deployment](#quick-deployment)
+  - [Configuration Details](#configuration-details)
+- [Vercel Deployment](#vercel-deployment)
+  - [Prerequisites](#prerequisites-2)
+  - [Quick Deployment](#quick-deployment-1)
+  - [Configuration](#configuration)
+  - [PDF Generation on Vercel](#pdf-generation-on-vercel)
+  - [Environment Variables](#environment-variables)
+  - [Deployment Commands](#deployment-commands)
+  - [Custom Domain](#custom-domain)
+  - [Pros \& Cons](#pros--cons)
+- [Cloudflare Pages Deployment](#cloudflare-pages-deployment)
+  - [Prerequisites](#prerequisites-3)
+  - [Quick Deployment](#quick-deployment-2)
+  - [Configuration](#configuration-1)
+  - [PDF Generation on Cloudflare](#pdf-generation-on-cloudflare)
+  - [Environment Variables](#environment-variables-1)
+  - [Custom Domain](#custom-domain-1)
+  - [Pros \& Cons](#pros--cons-1)
+  - [Recommendation](#recommendation)
+- [Netlify Deployment](#netlify-deployment)
+  - [Prerequisites](#prerequisites-4)
+  - [Quick Deployment](#quick-deployment-3)
+  - [Configuration](#configuration-2)
+  - [PDF Generation on Netlify](#pdf-generation-on-netlify)
+  - [Environment Variables](#environment-variables-2)
+  - [Custom Domain](#custom-domain-2)
+  - [Pros \& Cons](#pros--cons-2)
+  - [Recommendation](#recommendation-1)
+- [Fly.io Deployment Commands](#flyio-deployment-commands)
+  - [Environment Variables](#environment-variables-3)
+  - [Cost Optimization](#cost-optimization)
+  - [Custom Domain](#custom-domain-3)
+  - [Updating the App](#updating-the-app)
+  - [Troubleshooting Fly.io Deployment](#troubleshooting-flyio-deployment)
+    - [Build failures](#build-failures)
+    - [Out of memory errors](#out-of-memory-errors)
+    - [Slow startup](#slow-startup)
+- [Troubleshooting](#troubleshooting)
+  - [npm Publish Errors](#npm-publish-errors)
+    - [Error: "403 Forbidden"](#error-403-forbidden)
+  - [Docker Build Failures](#docker-build-failures)
+    - [Error: "Cannot find module"](#error-cannot-find-module)
+    - [Error: "Permission denied"](#error-permission-denied)
+  - [Standalone Executable Issues](#standalone-executable-issues)
+    - [Error: "Module not found in snapshot"](#error-module-not-found-in-snapshot)
+    - [Large executable size](#large-executable-size)
+- [Useful Commands Reference](#useful-commands-reference)
+- [Next Steps](#next-steps)
 
 ## Deployment Options
 
@@ -483,7 +482,7 @@ The deployment will:
 
 ### Configuration Details
 
-The included **fly.toml** configuration:
+The included **fly.toml** configuration provides base settings:
 
 ```toml
 app = "slappy"
@@ -505,14 +504,23 @@ primary_region = "sjc"
   NODE_ENV = "production"
 ```
 
+**GitHub Actions Workflow**: The `.github/workflows/fly-deploy.yml` workflow allows you to override deployment configuration via inputs:
+
+- **Region**: Choose from [all Fly.io regions](https://fly.io/docs/reference/regions/) (default: `sjc` - San Jose)
+- **VM CPUs**: 1, 2, 4, or 8 (default: `1`)
+- **VM CPU Kind**: `shared` or `performance` (default: `shared`)
+- **VM Memory**: 256MB to 8192MB (default: `1024`)
+
+These inputs are passed as command-line parameters to `flyctl deploy`, allowing flexible deployment configurations without modifying `fly.toml`.
+
 **Key features**:
 
 - **Auto-scaling**: Machines start on demand and stop when idle (saves costs)
 - **Force HTTPS**: All traffic redirected to secure connection
-- **1GB memory**: Sufficient for Next.js application with Puppeteer PDF generation
-- **Production mode**: Optimized build with Turbopack
+- **1GB memory**: Sufficient for Nuxt application with Puppeteer PDF generation
+- **Production mode**: Optimized Nuxt build
 
-**Note on PDF Generation**: PDF generation uses Puppeteer (headless Chrome), which requires additional memory. The configured 1GB RAM is adequate for typical usage. For high-volume PDF generation, consider scaling to 2GB (`flyctl scale memory 2048`).
+**Note on PDF Generation**: PDF generation uses Puppeteer (headless Chrome), which requires additional memory. The configured 1GB RAM is adequate for typical usage. For high-volume PDF generation, use the workflow to deploy with 2GB (`vm_memory: 2048`) or scale manually (`flyctl scale memory 2048`).
 
 ## Vercel Deployment
 

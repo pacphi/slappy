@@ -12,6 +12,60 @@ on:
         options:
           - production
           - staging
+      region:
+        description: 'Fly.io region'
+        required: false
+        default: 'sjc'
+        type: choice
+        options:
+          - ams  # Amsterdam, Netherlands
+          - arn  # Stockholm, Sweden
+          - bom  # Mumbai, India
+          - cdg  # Paris, France
+          - dfw  # Dallas, Texas
+          - ewr  # Secaucus, NJ
+          - fra  # Frankfurt, Germany
+          - gru  # Sao Paulo, Brazil
+          - iad  # Ashburn, Virginia
+          - jnb  # Johannesburg, South Africa
+          - lax  # Los Angeles, California
+          - lhr  # London, United Kingdom
+          - nrt  # Tokyo, Japan
+          - ord  # Chicago, Illinois
+          - sin  # Singapore
+          - sjc  # San Jose, California (default)
+          - syd  # Sydney, Australia
+          - yyz  # Toronto, Canada
+      vm_cpus:
+        description: 'Number of CPUs'
+        required: false
+        default: '1'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '4'
+          - '8'
+      vm_cpu_kind:
+        description: 'CPU kind'
+        required: false
+        default: 'shared'
+        type: choice
+        options:
+          - shared
+          - performance
+      vm_memory:
+        description: 'Memory (MB)'
+        required: false
+        default: '1024'
+        type: choice
+        options:
+          - '256'
+          - '512'
+          - '1024'
+          - '2048'
+          - '4096'
+          - '8192'
 
 jobs:
   setup:
@@ -38,7 +92,7 @@ jobs:
     needs: setup
     concurrency: deploy-group    # Ensure only one deployment runs at a time
     environment:
-      name: ${{ inputs.environment || 'production' }}
+      name: ${{ inputs.environment }}
       url: ${{ needs.setup.outputs.app_url }}
     steps:
       - name: Checkout code
@@ -47,13 +101,36 @@ jobs:
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Check deployment status
-        run: flyctl status --app ${{ needs.setup.outputs.app_name }} || echo "App does not exist yet - will create new deployment"
+      - name: Check if app exists
+        id: check_app
+        run: |
+          if flyctl status --app ${{ needs.setup.outputs.app_name }} 2>/dev/null; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "✅ App exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  App does not exist - will create"
+          fi
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         continue-on-error: true
 
+      - name: Create app if needed
+        if: steps.check_app.outputs.exists == 'false'
+        run: |
+          flyctl apps create ${{ needs.setup.outputs.app_name }} \
+            --org personal \
+            --region ${{ inputs.region }}
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
       - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only --app ${{ needs.setup.outputs.app_name }}
+        run: |
+          flyctl deploy --remote-only \
+            --app ${{ needs.setup.outputs.app_name }} \
+            --primary-region ${{ inputs.region }} \
+            --vm-cpus ${{ inputs.vm_cpus }} \
+            --vm-cpu-kind ${{ inputs.vm_cpu_kind }} \
+            --vm-memory ${{ inputs.vm_memory }}
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
