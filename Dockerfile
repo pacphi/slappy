@@ -25,6 +25,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Accept build arguments for Google AdSense configuration
+ARG NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT
+ARG NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED
+
+# Export as environment variables for Nuxt build
+ENV NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=${NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT}
+ENV NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=${NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED}
+
 # Build the Nuxt application
 RUN pnpm build
 

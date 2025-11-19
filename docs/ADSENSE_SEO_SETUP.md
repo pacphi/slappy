@@ -6,42 +6,24 @@ This guide will help you complete the Google AdSense integration and SEO optimiz
 
 ## Environment-Based Configuration
 
-AdSense integration is controlled by **environment variables** and the `nuxt-feature-flags` module. This allows you to configure different settings for local development, staging, and production environments.
-
-### Environment Variables
-
-AdSense configuration uses two environment variables:
-
-1. **`NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT`** - Your Google AdSense Publisher ID (e.g., `ca-pub-1234567890123456` for illustrative purposes)
-2. **`NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED`** - Enable/disable AdSense (`true` or `false`)
-
-### Environment Files
-
-**`.env` (Local Development)**
-
-```env
-NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-xxx
-NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
-```
-
-**`.env.staging` (Staging Environment)**
-
-```env
-NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-xxx
-NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
-```
-
-**`.env.production` (Production Environment)**
-
-```env
-# NOTE: Replace with your actual Publisher ID (shown here for illustrative purposes)
-NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-1234567890123456
-NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=true
-```
+AdSense integration is controlled by the `nuxt-feature-flags` module, with values provided at **build time** via Docker build arguments.
 
 ### How It Works
 
-The feature flag in `/feature-flags.config.ts` reads from the environment variable:
+**Local Development:**
+
+Use `.env` file for testing AdSense locally:
+
+```env
+NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-xxx
+NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
+```
+
+**Production Deployment:**
+
+AdSense configuration is managed entirely through the GitHub Actions workflow. No `.env.production` file needed!
+
+The feature flag in `/feature-flags.config.ts` reads from environment variables set during the Docker build:
 
 ```typescript
 export default defineFeatureFlags(() => ({
@@ -67,12 +49,12 @@ export default defineFeatureFlags(() => ({
 
 ### GitHub Actions Deployment
 
-When deploying via the `fly-deploy` GitHub workflow, you can control AdSense configuration:
+When deploying via the `fly-deploy` GitHub workflow, AdSense is configured through build arguments:
 
-**New Workflow Input:** `google_adsense_enabled` (boolean, default: `false`)
+**Workflow Input:** `google_adsense_enabled` (boolean, default: `false`)
 
-- **When `true` + `environment=production`:** Sets AdSense as enabled using the `GOOGLE_ADSENSE_ACCOUNT` GitHub secret
-- **When `false` OR `environment≠production`:** Disables AdSense
+- **When `true` + `environment=production`:** Builds app with AdSense enabled using the `GOOGLE_ADSENSE_ACCOUNT` GitHub secret
+- **When `false` OR `environment≠production`:** Builds app with AdSense disabled
 - **GitHub Secret Required:** `GOOGLE_ADSENSE_ACCOUNT` (your Publisher ID)
 
 **To configure the GitHub secret:**
@@ -83,12 +65,16 @@ When deploying via the `fly-deploy` GitHub workflow, you can control AdSense con
 4. Value: Your actual Publisher ID from Google AdSense (e.g., `ca-pub-1234567890123456`)
 5. Click "Add secret"
 
+**How it works:**
+
+The workflow passes your Publisher ID as Docker build arguments (`--build-arg`), which are available during `pnpm build`. Nuxt embeds these values into the client-side bundle, so they appear in the HTML `<meta>` tag and AdSense script URL.
+
 **Example deployment:**
 
 - Navigate to Actions → Fly Deploy → Run workflow
 - Select `environment: production`
 - Check `google_adsense_enabled: true`
-- This will deploy with AdSense enabled using your GitHub secret
+- This will build and deploy with AdSense enabled using your GitHub secret
 
 ---
 
@@ -132,9 +118,9 @@ Once your AdSense account is approved:
    - Ad type: **Display ad** (Responsive or 300x250 Medium Rectangle)
    - Copy the **Ad Slot ID**
 
-### Step 3: Configure Environment Variables
+### Step 3: Configure GitHub Secret
 
-**No code changes needed!** The Publisher ID is now managed through environment variables.
+**No code changes needed!** The Publisher ID is managed through GitHub Actions workflow.
 
 **For local development:**
 The `.env` file already has a placeholder. Keep it disabled for local dev:
@@ -145,16 +131,7 @@ NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
 ```
 
 **For production deployment:**
-Update the `.env.production` file with your actual Publisher ID:
-
-```env
-# NOTE: Replace with your actual Publisher ID (shown here for illustrative purposes)
-NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-1234567890123456
-NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=true
-```
-
-**For GitHub Actions deployment:**
-Set the `GOOGLE_ADSENSE_ACCOUNT` secret in your repository (see GitHub Actions Deployment section above).
+Set the `GOOGLE_ADSENSE_ACCOUNT` secret in your repository (see [GitHub Actions Deployment](#github-actions-deployment) section above). The workflow will automatically pass this value as a build argument when you check `google_adsense_enabled: true`.
 
 **File: `/app/pages/index.vue` (line 68)**
 
@@ -334,8 +311,9 @@ Already configured in `/app/app.vue` for:
 
 ### AdSense Testing
 
-- [ ] Environment variables configured in `.env.production`
 - [ ] GitHub secret `GOOGLE_ADSENSE_ACCOUNT` set in repository settings
+- [ ] Deploy with `google_adsense_enabled: true` via GitHub Actions workflow
+- [ ] Verify `ca-pub-xxx` value appears in HTML source at https://slappy.cloud
 - [ ] Landing Hero Ad slot ID added to `index.vue` (if applicable)
 - [ ] Preview Sidebar Ad slot ID added to `PreviewPanel.vue` (if applicable)
 - [ ] Ads render on landing page (between hero and features)
@@ -471,8 +449,12 @@ Already configured in `/app/app.vue` for:
 
 7. **`/.github/workflows/fly-deploy.yml`**
    - Added `google_adsense_enabled` boolean input
-   - Added steps to configure/disable AdSense via Fly.io secrets
+   - Pass AdSense values as Docker build arguments (`--build-arg`)
    - Conditional logic for production-only AdSense enablement
+
+8. **`/Dockerfile`**
+   - Added `ARG` declarations for AdSense build arguments
+   - Export as environment variables for Nuxt build process
 
 ### Dependencies Added
 

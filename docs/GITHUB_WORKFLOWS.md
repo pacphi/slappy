@@ -206,10 +206,17 @@ When triggering the workflow, you can configure:
 1. **Setup** - Determines target (production or staging)
 2. **App Check** - Verifies if Fly.io app exists
 3. **Create App** - Creates app if it doesn't exist
-4. **Configure AdSense** (optional) - Sets Google AdSense secrets if enabled for production
-5. **Deploy** - Builds Docker image and deploys to Fly.io
+4. **Deploy** - Builds Docker image with AdSense build args (if enabled) and deploys to Fly.io
 
 **Duration**: 5-8 minutes (first deploy may take longer for Puppeteer)
+
+**How AdSense Configuration Works:**
+
+When `google_adsense_enabled: true` and `environment: production`:
+- The workflow passes your `GOOGLE_ADSENSE_ACCOUNT` GitHub secret as Docker build arguments
+- These values are available during `pnpm build` and get embedded in the client bundle
+- The Publisher ID appears in the HTML `<meta>` tag and AdSense script URL
+- No Fly.io runtime secrets needed (these are public values)
 
 ### Deployment Targets
 
@@ -699,7 +706,7 @@ open sample/sample-roster-tags.html
 
 #### Missing GOOGLE_ADSENSE_ACCOUNT (AdSense Enabled)
 
-**Symptom**: Deployment fails when `google_adsense_enabled=true` with missing secret error
+**Symptom**: Deployment succeeds but AdSense Publisher ID is missing from HTML when `google_adsense_enabled=true`
 
 **Solution**:
 
@@ -711,7 +718,9 @@ open sample/sample-roster-tags.html
    - Name: `GOOGLE_ADSENSE_ACCOUNT`
    - Value: Your Publisher ID (e.g., `ca-pub-1234567890123456`)
 
-**Note**: This secret is only required if you enable AdSense during deployment
+3. Redeploy with `google_adsense_enabled: true`
+
+**Note**: This secret is only required if you enable AdSense during deployment. The workflow passes it as a Docker build argument, so it gets embedded in the client-side bundle.
 
 #### App Creation Failures
 
