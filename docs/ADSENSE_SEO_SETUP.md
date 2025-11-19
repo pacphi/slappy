@@ -409,7 +409,7 @@ Already configured in `/app/app.vue` for:
 
 ## Next Steps
 
-1. **Enable AdSense feature flag** in `/app.config.ts` (set `features.adsense: true`)
+1. **Enable AdSense feature flag** in `/feature-flags.config.ts` (set `adsense.enabled: true`)
 2. **Create AdSense account** and get Publisher ID
 3. **Create ad units** and get slot IDs
 4. **Update code** with Publisher ID and slot IDs (4 locations)

@@ -19,7 +19,7 @@ This guide provides detailed instructions for running the Slappy in various scen
 Before running the application, ensure you have:
 
 1. **Node.js 20+** installed
-2. **pnpm** installed (see [pnpm.io](https://pnpm.io))
+2. **pnpm** installed (version enforced via `packageManager` field in package.json - see [pnpm.io](https://pnpm.io))
 3. **Dependencies installed**: Run `pnpm install`
 4. **For PDF generation**: Puppeteer will install Chromium automatically (may take several minutes on first install)
 
@@ -686,4 +686,3 @@ For questions or issues, refer to:
 
 - [User Guide](USER.md) - Non-technical user instructions
 - [Quick Start](QUICKSTART.md) - Getting started quickly
-- [Project Overview](PROJECT-OVERVIEW.md) - High-level project information

@@ -89,7 +89,7 @@ Slappy provides both a **Nuxt web application** with multi-step wizard and **CLI
 
 Before deploying, ensure you have completed the build process (see [BUILD.md](BUILD.md)) and have:
 
-- **Node.js 20+** and **pnpm** installed
+- **Node.js 20+** and **pnpm** installed (version enforced via `packageManager` field in package.json)
 - **Nuxt built** (`pnpm build` creates `.output/` directory)
 - **Puppeteer 24+** (for PDF generation - installed via pnpm)
 - **Git** for version control

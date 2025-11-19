@@ -2,7 +2,9 @@
 
 [![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy.fly.dev/)
 
-Generate print-ready name tags in TownStix US-10 format (4" x 2" labels) from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
+Generate print-ready name tags in TownStix US-10 format (4" × 2" labels, 10 per sheet) from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
+
+**Perfect for**: Conferences, choir groups, school events, workshops, and volunteer programs.
 
 ## 🌐 Web Application
 
@@ -17,24 +19,11 @@ pnpm dev
 
 Open [http://localhost:3000](http://localhost:3000) and follow the **3-step wizard**:
 
-### Step 1: Upload Data
+1. **Upload** - Drag & drop CSV or paste Google Sheets URL
+2. **Map Columns** - Select which columns appear on each line
+3. **Preview & Download** - Get HTML or PDF output
 
-- **Drag & drop** a CSV file or click to browse
-- **OR** paste a Google Sheets URL (must be published to the web)
-
-### Step 2: Map Columns
-
-- Choose which columns map to each line of your name tags
-- Toggle "Has headers" if your first row contains column names
-- Preview your data (first 5 rows) to verify mapping
-- Optionally skip lines (e.g., use only 2 lines per tag)
-
-### Step 3: Preview & Download
-
-- Review generated name tags with live preview
-- **Download as HTML** for browser-based printing
-- **Download as PDF** for easy sharing and professional printing
-- **Print directly** from the preview
+See **[Quick Start Guide](docs/QUICKSTART.md)** for detailed walkthrough.
 
 The app features:
 
@@ -63,61 +52,22 @@ flyctl launch
 
 ## 🖥️ CLI Usage
 
-The CLI supports advanced column mapping and PDF generation for automated workflows:
-
-### Basic Usage
+For automated workflows and scripting:
 
 ```bash
-pnpm install
-pnpm cli <SPREADSHEET_ID> <GID> [output-file]
-```
+# Basic usage
+pnpm cli <SPREADSHEET_ID> <GID>
 
-**Example:**
-
-```bash
-# Generates name-tags.html with default column mapping (0,1,2)
-pnpm cli 3kR9mN-2pQxWvY_bZdH8sLf4jTcUgEoAnV7iM5wKqX1yBe 428391756
-```
-
-### Advanced Usage with Column Mapping
-
-Map any columns to any lines on your name tags:
-
-```bash
-# Use columns 0, 2, 3 for lines 1, 2, 3
-pnpm cli SHEET_ID GID \
-  --line1-col=0 --line2-col=2 --line3-col=3
-
-# Skip the third line (only use 2 lines per tag)
-pnpm cli SHEET_ID GID \
-  --line1-col=0 --line2-col=1
-
-# With headers and PDF output
+# Advanced: Custom column mapping and PDF
 pnpm cli SHEET_ID GID output.pdf \
+  --line1-col=0 --line2-col=2 --line3-col=3 \
   --has-headers --format=pdf
+
+# Local testing
+pnpm test:local
 ```
 
-### CLI Options
-
-| Option            | Description                                      | Example         |
-| ----------------- | ------------------------------------------------ | --------------- |
-| `--line1-col=N`   | Column index (0-based) for line 1                | `--line1-col=0` |
-| `--line2-col=N`   | Column index (0-based) for line 2                | `--line2-col=1` |
-| `--line3-col=N`   | Column index (0-based) for line 3                | `--line3-col=2` |
-| `--has-headers`   | First row contains headers (skip it)             | `--has-headers` |
-| `--format=FORMAT` | Output format: `html` or `pdf` (default: `html`) | `--format=pdf`  |
-
-**For HTML output:** Open the generated file in a browser and print using US Letter paper with 0.5" margins.
-**For PDF output:** Ready to print directly or share electronically.
-
-### Local CSV Testing
-
-Test with local CSV files:
-
-```bash
-pnpm test:local                        # Uses sample/sample-roster.csv
-pnpm test:local path/to/custom.csv     # Uses custom CSV file
-```
+See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 
 ## Documentation
 
@@ -126,16 +76,16 @@ pnpm test:local path/to/custom.csv     # Uses custom CSV file
 - **[Run Guide](docs/RUN.md)** - Detailed usage instructions
 - **[Build Guide](docs/BUILD.md)** - Building from source
 - **[Architecture](docs/ARCHITECTURE.md)** - Technical architecture details
-- **[Continuous Integration](docs/CI.md)** - Continuous integration setup
+- **[GitHub Workflows](docs/GITHUB_WORKFLOWS.md)** - Using GitHub Actions workflows (CI, Deploy, Teardown)
+- **[Continuous Integration](docs/CI.md)** - CI/CD technical implementation details
 - **[Deployment](docs/DEPLOY.md)** - Deployment instructions (Fly.io, Vercel, Cloudflare, Netlify, Docker)
 - **[Custom Domain Setup](docs/CUSTOM_DOMAIN_SETUP.md)** - Connect a custom domain to your Fly.io deployment with HTTPS
 - **[AdSense & SEO Setup](docs/ADSENSE_SEO_SETUP.md)** - Configure Google AdSense and SEO optimization
-- **[Project Overview](docs/PROJECT-OVERVIEW.md)** - High-level project information
 
 ## Requirements
 
 - Node.js 20+
-- pnpm 9+ (package manager - enforced via `packageManager` field)
+- pnpm (package manager - version enforced via `packageManager` field in package.json)
 - Puppeteer 24+ (for PDF generation - installed automatically)
 - A published Google Sheet or CSV file with your data
 
@@ -183,42 +133,11 @@ pnpm test:local path/to/custom.csv     # Uses custom CSV file
 
 ### Feature Flags
 
-Feature flags are managed using the `nuxt-feature-flags` module for type-safe, centralized feature management:
+Feature flags use the `nuxt-feature-flags` module for type-safe, centralized feature management.
 
-```typescript
-// feature-flags.config.ts
-import { defineFeatureFlags } from '#feature-flags/handler'
-
-export default defineFeatureFlags(() => ({
-  adsense: {
-    enabled: false, // Change to true to enable AdSense
-    description: 'Google AdSense integration for monetization',
-  },
-}))
-```
-
-**Usage in components:**
-
-```typescript
-const { isEnabled } = useFeatureFlags()
-if (isEnabled('adsense')) {
-  // Render AdSense component
-}
-```
-
-**AdSense Feature Flag:**
-
-- When `enabled: false` (default): No AdSense scripts loaded, no ad components rendered, zero performance impact
-- When `enabled: true`: AdSense ads appear on landing page and preview panel
-
-**Benefits:**
-
-- Full TypeScript support with autocomplete
-- Build-time validation catches undefined flags
-- Supports A/B testing and variants
-- Context-aware evaluation
-
-For complete AdSense setup instructions, see [AdSense & SEO Setup Guide](docs/ADSENSE_SEO_SETUP.md).
+- **AdSense Integration**: Controlled via `feature-flags.config.ts` (disabled by default)
+- **Configuration**: See `/feature-flags.config.ts` for all available flags
+- **Setup Guide**: [AdSense & SEO Setup](docs/ADSENSE_SEO_SETUP.md) for monetization configuration
 
 ## Technology Stack
 

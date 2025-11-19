@@ -1,15 +1,15 @@
 # Building Slappy
 
-This guide explains how to build the Slappy from source for development and distribution.
+This guide explains how to build Slappy from source for development and production deployment.
 
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
 - [Development Setup](#development-setup)
-- [Building from Source](#building-from-source)
-- [Build Outputs](#build-outputs)
-- [Build Configurations](#build-configurations)
-- [Platform-Specific Builds](#platform-specific-builds)
+- [Building the Web Application](#building-the-web-application)
+- [CLI Tools (No Build Required)](#cli-tools-no-build-required)
+- [Build Output](#build-output)
+- [Docker Build](#docker-build)
 - [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
@@ -20,7 +20,7 @@ This guide explains how to build the Slappy from source for development and dist
   - Check version: `node --version`
   - Download: [nodejs.org](https://nodejs.org/)
 
-- **pnpm**: Version 9.0.0 or higher (package manager)
+- **pnpm**: Package manager (version enforced via `packageManager` field in package.json)
   - Check version: `pnpm --version`
   - Install: `npm install -g pnpm` or visit [pnpm.io](https://pnpm.io/)
 
@@ -28,13 +28,10 @@ This guide explains how to build the Slappy from source for development and dist
   - Check version: `git --version`
   - Download: [git-scm.com](https://git-scm.com/)
 
-- **TypeScript**: Installed as dev dependency
-  - Version 5.3.3 or higher
-
 ### Optional Software
 
-- **Docker**: For containerized builds (optional)
-- **VSCode**: Recommended IDE with TypeScript support
+- **Docker**: For containerized builds
+- **VSCode**: Recommended IDE with Vue/Nuxt support
 
 ## Development Setup
 
@@ -53,12 +50,9 @@ pnpm install
 
 This installs:
 
-- **Runtime dependencies**: Nuxt, Vue, Pinia, Puppeteer, etc.
-- **Dev dependencies**:
-  - `tsx` - TypeScript execution for CLI
-  - `@types/node` - Node.js type definitions
-  - `eslint`, `prettier` - Code quality tools
-  - `knip` - Dead code detection
+- **Runtime dependencies**: Nuxt, Vue, Pinia, Puppeteer, @nuxt/ui, etc.
+- **Dev dependencies**: ESLint, Prettier, Knip, TypeScript types
+- **Puppeteer's Chromium**: Downloaded automatically (~300MB, may take several minutes)
 
 ### Verify Installation
 
@@ -66,18 +60,18 @@ This installs:
 # Check pnpm version
 pnpm --version
 
-# Check tsx (CLI runner)
-pnpm tsx --version
-
 # List installed packages
 pnpm list --depth=0
+
+# Start dev server to verify
+pnpm dev
 ```
 
-## Building from Source
+## Building the Web Application
 
-### Nuxt Build
+### Nuxt Build Process
 
-Build the Nuxt web application:
+Build the Nuxt application for production:
 
 ```bash
 pnpm build
@@ -85,320 +79,283 @@ pnpm build
 
 This executes: `nuxt build`
 
-**Compilation process:**
+**What happens during build:**
 
-1. Reads `nuxt.config.ts` configuration
-2. Compiles Vue components, TypeScript, and server code
-3. Outputs built application to `.output/` directory
-4. Generates optimized production bundle
+1. **TypeScript Compilation**: All `.ts` and `.vue` files are type-checked and compiled
+2. **Vue Component Processing**: SFCs are compiled to optimized JavaScript
+3. **Nitro Server Build**: Server API routes and middleware are bundled
+4. **Client Bundle**: JavaScript, CSS, and assets are optimized and code-split
+5. **Static Asset Processing**: Images, fonts, and public files are copied
+6. **SSR Preparation**: Server-side rendering infrastructure is configured
 
-### Output Location
+**Build configuration:**
 
-Compiled files are written to `.output/`:
+- Source: `nuxt.config.ts`
+- Vite config: CSS minification with `lightningcss`
+- Output target: `.output/` directory
+
+### Build Output Structure
+
+After `pnpm build`, the `.output/` directory contains:
 
 ```text
 .output/
-├── server/       # Nitro server bundle
-├── public/       # Static assets
-└── nitro.json    # Server configuration
+├── server/              # Nitro server bundle
+│   ├── index.mjs       # Server entry point
+│   └── chunks/         # Server code chunks
+├── public/             # Client-side assets (to be served statically)
+│   ├── _nuxt/         # JavaScript, CSS bundles
+│   └── ...            # Other static assets
+└── nitro.json         # Nitro configuration metadata
 ```
 
-### CLI Tools
+**Key files:**
 
-CLI tools run directly with tsx (no build step needed):
+- `.output/server/index.mjs` - Node.js server that handles SSR and API routes
+- `.output/public/` - Static files served by the web server
+- `.output/public/_nuxt/` - Optimized client bundles with content hashes
+
+### Preview Production Build
+
+Test the production build locally:
 
 ```bash
-pnpm cli          # Run main CLI
-pnpm test:local   # Run local CSV test
+pnpm preview
 ```
+
+This starts the Nitro server on http://localhost:3000 serving the production build.
 
 ### Clean Build
 
 Remove previous build artifacts before rebuilding:
 
 ```bash
-# Remove .output directory
+# Remove build output
 rm -rf .output/
+
+# Remove Nuxt cache
+rm -rf .nuxt/
 
 # Rebuild
 pnpm build
 ```
 
-Or use pnpm script:
+**When to clean:**
+
+- After major dependency updates
+- Build errors or inconsistencies
+- Switching between branches with different configurations
+
+## CLI Tools (No Build Required)
+
+The CLI tools use **tsx** to execute TypeScript directly - no build step needed.
+
+### Running CLI Tools
 
 ```bash
-pnpm clean && pnpm build
+# Main CLI (Google Sheets support)
+pnpm cli <SPREADSHEET_ID> <GID> [options]
+
+# Local CSV testing
+pnpm test:local [path/to/file.csv]
 ```
 
-## Build Outputs
+**How it works:**
 
-### JavaScript Output
+- `tsx` is a TypeScript execution engine (like ts-node but faster)
+- Scripts in `cli/` directory run directly from source
+- Imports from `lib/` are resolved dynamically
+- No compilation to `dist/` directory needed
 
-The build generates ES2020 JavaScript with CommonJS modules:
+**CLI entry points:**
+
+- `cli/nametag-generator.ts` - Main CLI with column mapping
+- `cli/test-local.ts` - Local CSV file testing utility
+
+## Build Output
+
+### JavaScript Modules
+
+Nuxt generates **ES modules** (`.mjs` files) for the server:
 
 **Input (TypeScript):**
 
 ```typescript
-// nametag-generator.ts
-interface NameTagRow {
-  line1: string
-  line2: string
-  line3: string
-}
-
-export async function generateNameTags(spreadsheetId: string, gid: string): Promise<void> {
-  // Implementation
-}
+// server/api/generate.post.ts
+export default defineEventHandler(async event => {
+  const body = await readBody(event)
+  return { success: true }
+})
 ```
 
 **Output (JavaScript):**
 
 ```javascript
-// dist/nametag-generator.js
-'use strict'
-Object.defineProperty(exports, '__esModule', { value: true })
-exports.generateNameTags = void 0
-
-async function generateNameTags(spreadsheetId, gid) {
-  // Compiled implementation
-}
-exports.generateNameTags = generateNameTags
+// .output/server/chunks/...generate.post.mjs
+export default defineEventHandler(async event => {
+  const body = await readBody(event)
+  return { success: true }
+})
 ```
+
+### Client Bundles
+
+Client code is bundled and optimized:
+
+- **Code splitting**: Automatic route-based splitting
+- **Tree shaking**: Unused code removed
+- **Minification**: JavaScript and CSS compressed
+- **Asset hashing**: Cache-busting via content hashes (e.g., `app.abc123.js`)
 
 ### Type Declarations
 
-Type declaration files (`.d.ts`) allow TypeScript consumers to use your library with full type safety:
+Type checking occurs during build, but `.d.ts` files are not generated for the Nuxt app (only used for validation).
 
-```typescript
-// dist/nametag-generator.d.ts
-export declare function generateNameTags(
-  spreadsheetId: string,
-  gid: string,
-  outputPath?: string
-): Promise<void>
-```
+For the shared `lib/` directory, types are inferred from source files.
 
-### Source Maps
+## Docker Build
 
-Source maps (`.js.map`) enable debugging TypeScript source in Node.js:
+Build a production Docker image with all dependencies included.
+
+### Using the Dockerfile
+
+The project includes a multi-stage `Dockerfile` optimized for Nuxt:
 
 ```bash
-# Run with source map support
-node --enable-source-maps dist/nametag-generator.js
+# Build image
+docker build -t slappy:latest .
+
+# Run container
+docker run -p 3000:3000 slappy:latest
 ```
 
-## Build Configurations
+### Dockerfile Stages
 
-### TypeScript Configuration (tsconfig.json)
+**Stage 1: Dependencies**
 
-Current configuration:
+- Installs Node.js and pnpm
+- Copies `package.json` and `pnpm-lock.yaml`
+- Installs dependencies (including Puppeteer's Chromium)
 
-```json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
-    "lib": ["ES2020"],
-    "outDir": "./dist",
-    "rootDir": "./",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
-  },
-  "include": ["*.ts"],
-  "exclude": ["node_modules", "dist"]
-}
-```
+**Stage 2: Build**
 
-**Key settings:**
+- Copies source code
+- Runs `pnpm build`
+- Generates `.output/` directory
 
-- **target**: ES2020 (supports modern JavaScript features)
-- **module**: CommonJS (Node.js compatibility)
-- **strict**: Enabled (maximum type safety)
-- **outDir**: Compiled output goes to `dist/`
-- **sourceMap**: Enables debugging support
-- **declaration**: Generates `.d.ts` files
+**Stage 3: Production**
 
-### Package Configuration (package.json)
+- Lightweight runtime image
+- Copies only `.output/` and runtime dependencies
+- Runs as non-root user (`nuxt`)
+- Exposes port 3000
 
-```json
-{
-  "name": "slappy",
-  "version": "1.0.0",
-  "main": "dist/nametag-generator.js",
-  "types": "dist/nametag-generator.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "dev": "ts-node --watch nametag-generator.ts",
-    "test": "ts-node test-local.ts"
-  }
-}
-```
+**Build features:**
 
-## Platform-Specific Builds
+- Multi-stage build reduces final image size
+- Alpine Linux base for minimal footprint
+- Puppeteer/Chromium included for PDF generation
+- Security: runs as non-root user
 
-### macOS
+### Docker Compose
 
-No special configuration required:
+Alternative: Use `docker-compose.yml` for development and production:
 
 ```bash
-npm install
-npm run build
-```
+# Production build
+docker-compose up web -d
 
-### Linux
+# Development with hot reload
+docker-compose up dev
 
-Same as macOS:
-
-```bash
-npm install
-npm run build
-```
-
-### Windows
-
-Use PowerShell or Command Prompt:
-
-```powershell
-npm install
-npm run build
-```
-
-**Windows-specific notes:**
-
-- Use `\` or `/` for paths (both work)
-- TypeScript compiler handles path normalization
-
-### Docker Build
-
-Build inside a Docker container for consistent environments:
-
-**Dockerfile:**
-
-```dockerfile
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-COPY package*.json tsconfig.json ./
-RUN npm ci
-
-COPY *.ts ./
-RUN npm run build
-
-# Production image
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY package*.json ./
-RUN npm ci --only=production
-
-CMD ["node", "dist/nametag-generator.js"]
-```
-
-**Build:**
-
-```bash
-docker build -t slappy-builder .
+# View logs
+docker-compose logs -f web
 ```
 
 ## Build Modes
 
 ### Development Build
 
-For active development with fast rebuilds:
+For active development with fast rebuilds and HMR:
 
 ```bash
-# Watch mode (rebuilds on file changes)
-npm run dev
+pnpm dev
 ```
 
-This runs TypeScript in watch mode with ts-node.
+**Features:**
+
+- Hot Module Replacement (HMR)
+- Source maps enabled
+- No minification (faster builds)
+- Detailed error messages
+- Auto-restart on file changes
 
 ### Production Build
 
 Optimized build for deployment:
 
 ```bash
-npm run build
+pnpm build
+pnpm preview
 ```
 
-**Production optimizations:**
+**Optimizations:**
 
-- Source maps can be disabled (set `sourceMap: false` in tsconfig.json)
-- Type declarations always generated
+- Minified JavaScript and CSS
+- Code splitting and tree shaking
+- Asset optimization (images, fonts)
+- Source maps optional (configurable)
 - Strict type checking enforced
 
-### Test Build
+### Static Generation (SSG)
 
-Verify build works before distribution:
+Generate a fully static site:
 
 ```bash
-# Build
-npm run build
-
-# Test compiled output
-node dist/nametag-generator.js --help
-
-# Run local test
-npm test
+pnpm generate
 ```
+
+**Output:** `.output/public/` contains static HTML files
+
+**Note:** Slappy uses SSR and API routes, so full SSG may not include dynamic functionality. Use `pnpm build` for production deployment.
 
 ## Troubleshooting
 
-### Error: "Cannot find module 'typescript'"
+### Error: "Cannot find module 'nuxt'"
 
-**Cause**: TypeScript not installed
+**Cause**: Dependencies not installed
 
 **Solution**:
 
 ```bash
-npm install --save-dev typescript
+pnpm install
 ```
 
-### Error: "error TS2307: Cannot find module '@types/node'"
+### Error: "Port 3000 is already in use"
 
-**Cause**: Node.js type definitions missing
-
-**Solution**:
-
-```bash
-npm install --save-dev @types/node
-```
-
-### Error: "tsc: command not found"
-
-**Cause**: TypeScript not in PATH
+**Cause**: Another process is using port 3000
 
 **Solution**:
 
 ```bash
-# Use npx to run local TypeScript
-npx tsc
+# Find process using port 3000
+lsof -i :3000
 
-# Or install globally (not recommended)
-npm install -g typescript
+# Kill the process or use different port
+PORT=3001 pnpm dev
 ```
 
 ### Build Succeeds but Runtime Errors
 
-**Cause**: Mismatch between TypeScript source and JavaScript output
+**Cause**: Mismatch between dependencies or cached builds
 
 **Solution**:
 
 ```bash
-# Clean build
-rm -rf dist/
-npm run build
-
-# Verify no stale files
-git clean -fdx -e node_modules
-npm install
-npm run build
+# Clean everything and rebuild
+rm -rf .output/ .nuxt/ node_modules/
+pnpm install
+pnpm build
 ```
 
 ### "Out of Memory" During Build
@@ -409,21 +366,41 @@ npm run build
 
 ```bash
 # Increase Node.js memory limit
-NODE_OPTIONS=--max_old_space_size=4096 npm run build
+NODE_OPTIONS=--max_old_space_size=4096 pnpm build
 ```
 
-### TypeScript Version Conflicts
+### Puppeteer/Chromium Issues
 
-**Cause**: Global vs local TypeScript version mismatch
+**Error**: "Failed to launch the browser process"
+
+**Solutions**:
+
+1. **Missing dependencies** (Linux):
+
+   ```bash
+   # Debian/Ubuntu
+   sudo apt-get install -y chromium-browser
+
+   # Or install dependencies for bundled Chromium
+   sudo apt-get install -y libnss3 libatk-bridge2.0-0 libx11-xcb1
+   ```
+
+2. **Docker**: Use the provided Dockerfile which includes all dependencies
+
+3. **Development**: Puppeteer downloads Chromium automatically - ensure sufficient disk space (~300MB)
+
+### TypeScript Type Errors
+
+**Cause**: Type mismatches or missing type definitions
 
 **Solution**:
 
 ```bash
-# Always use local version
-npx tsc --version
+# Type-check without building
+npx nuxi typecheck
 
-# Update local TypeScript
-npm install --save-dev typescript@latest
+# Check for specific issues
+pnpm lint
 ```
 
 ## Build Verification
@@ -433,49 +410,57 @@ npm install --save-dev typescript@latest
 Check compiled files:
 
 ```bash
-# List built files
-ls -lh dist/
+# List build output
+ls -lh .output/
 
-# Verify main entry point exists
-test -f dist/nametag-generator.js && echo "Build successful"
+# Verify server entry point exists
+test -f .output/server/index.mjs && echo "Server build successful"
 
-# Check for type declarations
-test -f dist/nametag-generator.d.ts && echo "Types generated"
+# Check public assets
+ls .output/public/_nuxt/
 ```
 
-### Run Compiled Code
+### Run Production Build
 
-Test the compiled JavaScript:
+Test the compiled application:
 
 ```bash
-# Run directly with Node.js
-node dist/nametag-generator.js
+# Preview production build
+pnpm preview
 
-# Should display usage information
+# Should start server on http://localhost:3000
+# Test in browser to verify functionality
 ```
 
-### Validate TypeScript Types
+### Validate Bundle Size
 
-Check types with tsc:
+Check bundle sizes:
 
 ```bash
-# Type-check without emitting
-npx tsc --noEmit
+# Use nuxi to analyze build
+npx nuxi analyze
 
-# Should output no errors
+# Or manually check bundle sizes
+du -sh .output/public/_nuxt/*
 ```
+
+**Targets:**
+
+- Server bundle: < 5MB (typical: 2-3MB)
+- Client JavaScript: < 500KB initial load
+- CSS: < 100KB
 
 ---
 
 ## Next Steps
 
 - **Run the application**: See [RUN.md](RUN.md)
-- **Deploy**: See [DEPLOY.md](DEPLOY.md) for distribution
+- **Deploy**: See [DEPLOY.md](DEPLOY.md) for deployment platforms
 - **Development**: See [ARCHITECTURE.md](ARCHITECTURE.md) for code structure
 - **Automation**: See [CI.md](CI.md) for automated builds
 
 For questions or issues, refer to:
 
-- [TypeScript Documentation](https://www.typescriptlang.org/docs/)
-- [Node.js Documentation](https://nodejs.org/docs/)
-- [npm Documentation](https://docs.npmjs.com/)
+- [Nuxt Documentation](https://nuxt.com/docs/getting-started/deployment)
+- [Nitro Documentation](https://nitro.unjs.io/deploy)
+- [Vite Build Documentation](https://vitejs.dev/guide/build.html)

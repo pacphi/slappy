@@ -27,9 +27,11 @@ The CI/CD pipeline ensures code quality, security, and consistency through autom
 
 ## GitHub Actions Workflows
 
+> **💡 User Guide**: For instructions on **using** these workflows (triggering from web UI or CLI), see **[GitHub Workflows Guide](GITHUB_WORKFLOWS.md)**. This document covers the **implementation** details.
+
 ### Main CI Workflow
 
-**File**: `.github/workflows/ci.yml` (to be implemented)
+**File**: `.github/workflows/ci.yml`
 
 **Triggers:**
 

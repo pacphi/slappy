@@ -8,12 +8,10 @@ Slappy - A Nuxt 4 application for generating printable name tag labels in the To
 
 **Key Technologies:**
 
-- **Nuxt 4** with Vue 3 Composition API
-- **@nuxt/ui** (Tailwind CSS-based component library)
-- **nuxt-feature-flags** for type-safe feature management
-- **Pinia** for state management
-- **Puppeteer** for server-side PDF generation
-- **pnpm** as the package manager (enforced via `packageManager` field)
+- **Nuxt 4** + Vue 3, **@nuxt/ui** (Tailwind), **nuxt-feature-flags**, **Pinia**, **Puppeteer**
+- **pnpm** (version enforced via `packageManager` field)
+
+See [README.md](README.md#technology-stack) for complete stack details.
 
 ## Development Commands
 
