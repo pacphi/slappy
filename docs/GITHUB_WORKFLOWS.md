@@ -213,6 +213,7 @@ When triggering the workflow, you can configure:
 **How AdSense Configuration Works:**
 
 When `google_adsense_enabled: true` and `environment: production`:
+
 - The workflow passes your `GOOGLE_ADSENSE_ACCOUNT` GitHub secret as Docker build arguments
 - These values are available during `pnpm build` and get embedded in the client bundle
 - The Publisher ID appears in the HTML `<meta>` tag and AdSense script URL
