@@ -119,8 +119,7 @@ jobs:
         if: steps.check_app.outputs.exists == 'false'
         run: |
           flyctl apps create ${{ needs.setup.outputs.app_name }} \
-            --org personal \
-            --region ${{ inputs.region }}
+            --org personal
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
