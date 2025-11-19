@@ -18,6 +18,14 @@ const isAdSenseEnabled = isEnabled('adsense')
 const { generatedHtml, loading, error, generate, downloadHtml } = useNameTagGeneration()
 const zoom = ref(100)
 
+// Calculate tag count from CSV content
+const tagCount = computed(() => {
+  if (!props.csvContent) return 0
+  const lines = props.csvContent.trim().split('\n')
+  const dataLines = props.hasHeaders ? lines.length - 1 : lines.length
+  return Math.max(0, dataLines)
+})
+
 // Generate preview on mount
 onMounted(async () => {
   await generate(props.csvContent, props.mapping, props.hasHeaders, 'html')
@@ -157,6 +165,9 @@ defineShortcuts({
       ad-slot="PREVIEW_SIDEBAR_AD_SLOT_ID"
       format="display"
     />
+
+    <!-- Social Share -->
+    <MoleculesSocialShare v-if="!loading && !error" :tag-count="tagCount" />
 
     <!-- Actions -->
     <UButton color="error" class="w-full flex-shrink-0" @click="handleStartOver">

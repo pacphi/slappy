@@ -212,6 +212,7 @@ if (isEnabled('adsense')) {
 - When `enabled: true`: AdSense ads appear on landing page and preview panel
 
 **Benefits:**
+
 - Full TypeScript support with autocomplete
 - Build-time validation catches undefined flags
 - Supports A/B testing and variants

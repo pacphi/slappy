@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { isValidCSVFile } from '~/utils/validators'
+
 const emit = defineEmits<{
   fileSelected: [file: File]
   error: [message: string]
@@ -17,8 +19,8 @@ interface ValidationResult {
 }
 
 const validateFile = (file: File): ValidationResult => {
-  // Check file extension (more reliable than MIME type)
-  if (!file.name.toLowerCase().endsWith('.csv')) {
+  // Check file extension using validator utility
+  if (!isValidCSVFile(file)) {
     return {
       valid: false,
       error: 'Please upload a CSV file (.csv extension required)',

@@ -180,6 +180,7 @@ const isAdSenseEnabled = isEnabled('adsense')
 ```
 
 **Key Benefits:**
+
 - Full TypeScript support with autocomplete
 - Build-time validation (catches undefined flags)
 - Supports A/B testing with variants
