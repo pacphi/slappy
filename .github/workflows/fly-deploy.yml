@@ -104,20 +104,20 @@ jobs:
       - name: Check if app exists
         id: check_app
         run: |
-          if flyctl status --app ${{ needs.setup.outputs.app_name }} 2>/dev/null; then
+          if flyctl apps list --json | jq -e --arg name "${{ needs.setup.outputs.app_name }}" '.[] | select(.Name == $name)' > /dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "✅ App exists"
+            echo "✅ App '${{ needs.setup.outputs.app_name }}' exists"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "ℹ️  App does not exist - will create"
+            echo "ℹ️  App '${{ needs.setup.outputs.app_name }}' does not exist - will create"
           fi
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        continue-on-error: true
 
       - name: Create app if needed
         if: steps.check_app.outputs.exists == 'false'
         run: |
+          echo "Creating app '${{ needs.setup.outputs.app_name }}'..."
           flyctl apps create ${{ needs.setup.outputs.app_name }} \
             --org personal
         env:
