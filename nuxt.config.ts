@@ -21,6 +21,20 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
 
+  // Global head configuration
+  app: {
+    head: {
+      meta: [
+        // Google AdSense site verification meta tag
+        // This verifies site ownership for Google AdSense
+        {
+          name: 'google-adsense-account',
+          content: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT,
+        },
+      ],
+    },
+  },
+
   // Sitemap configuration
   sitemap: {
     strictNuxtContentPaths: true,

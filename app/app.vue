@@ -2,8 +2,11 @@
 /**
  * Root App Component
  *
- * Configures global head meta tags, scripts, and resource hints for the entire application.
- * Includes Google AdSense integration (when enabled) and performance optimizations.
+ * Configures dynamic head elements based on feature flags and runtime configuration.
+ *
+ * Note: The Google AdSense verification meta tag is configured in nuxt.config.ts
+ * for site ownership verification. This component only handles the conditional
+ * loading of AdSense scripts and performance optimizations when ads are enabled.
  */
 
 const config = useRuntimeConfig()
@@ -18,11 +21,6 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     // Theme color for mobile browsers and PWA
     { name: 'theme-color', content: '#8646F4' },
-    // Google AdSense verification meta tag
-    // Only added when AdSense is enabled and Publisher ID is configured
-    ...(isAdSenseEnabled && publisherId
-      ? [{ name: 'google-adsense-account', content: publisherId }]
-      : []),
   ],
   link: [
     { rel: 'icon', href: '/favicon.ico' },

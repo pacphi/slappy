@@ -78,6 +78,35 @@ The workflow passes your Publisher ID as Docker build arguments (`--build-arg`),
 
 ---
 
+## AdSense Meta Tag Architecture
+
+The Google AdSense verification uses the **meta-tag method** as specified by Google:
+
+```html
+<meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX" />
+```
+
+### Implementation Details
+
+**Location:** `/nuxt.config.ts` → `app.head.meta` configuration
+
+**Why this approach:**
+
+- **Always present:** Meta tag appears in `<head>` on ALL pages for site ownership verification
+- **Build-time injection:** Nuxt embeds the meta tag during SSR, ensuring Google can verify ownership
+- **Environment-based:** Publisher ID comes from `NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT` environment variable
+- **Separation of concerns:**
+  - `nuxt.config.ts` handles the verification meta tag (always present)
+  - `app.vue` handles conditional AdSense script loading (only when feature flag enabled)
+
+**Verification vs. Ad Display:**
+
+- **Verification meta tag:** Always present (in `nuxt.config.ts`)
+- **AdSense script:** Only loaded when `adsense` feature flag is enabled (in `app.vue`)
+- This allows you to verify site ownership before enabling ads
+
+---
+
 ## Part 1: Google AdSense Setup
 
 ### Step 1: Create AdSense Account
@@ -88,14 +117,15 @@ The workflow passes your Publisher ID as Docker build arguments (`--build-arg`),
    - Fill out the application form with your domain: `slappy.cloud`
 
 2. **Add the verification code**
-   - After signing up, AdSense will provide a verification `<meta>` tag
-   - Uncomment and update line 17 in `/app/app.vue`:
+   - After signing up, AdSense will provide a verification `<meta>` tag in the format:
 
-     ```vue
-     { name: 'google-adsense-account', content: 'ca-pub-XXXXXXXXXXXXXXXX' }
+     ```html
+     <meta name="google-adsense-account" content="ca-pub-XXXXXXXXXXXXXXXX" />
      ```
 
-   - Replace `ca-pub-XXXXXXXXXXXXXXXX` with your actual Publisher ID
+   - This meta tag is automatically added to the `<head>` of every page via `nuxt.config.ts`
+   - The Publisher ID comes from the `NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT` environment variable
+   - **No code changes needed** - just configure the environment variable (see Step 3)
 
 3. **Deploy and verify**
    - Deploy your site to production (`slappy.cloud`)
@@ -418,41 +448,47 @@ Already configured in `/app/app.vue` for:
 
 ### Files Modified
 
-1. **`/app/app.vue`**
+1. **`/nuxt.config.ts`**
+   - Added `app.head.meta` configuration with `google-adsense-account` meta tag
+   - Meta tag uses `NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT` environment variable
+   - Applied to ALL pages automatically for site ownership verification
+
+2. **`/app/app.vue`**
    - Added viewport meta tag (critical for mobile SEO)
    - Added theme-color meta tag
-   - Updated to use runtime config for AdSense Publisher ID
-   - Added DNS prefetch/preconnect for AdSense domains
+   - Added DNS prefetch/preconnect for AdSense domains (when feature flag enabled)
    - Conditional AdSense script loading based on feature flag
+   - **Note:** AdSense verification meta tag moved to `nuxt.config.ts`
 
-2. **`/app/components/molecules/AdSenseAd.vue`**
+3. **`/app/components/molecules/AdSenseAd.vue`**
    - Updated to use runtime config for Publisher ID (no hardcoded values)
 
-3. **`/app/pages/index.vue`**
+4. **`/app/pages/index.vue`**
    - Added landing page ad placement (between hero and features)
    - Added enhanced SEO meta tags (Open Graph, Twitter Card, keywords)
    - Added canonical URL
    - Added JSON-LD structured data (WebApplication schema)
 
-4. **`/app/components/organisms/PreviewPanel.vue`**
+5. **`/app/components/organisms/PreviewPanel.vue`**
    - Added preview sidebar ad placement (after preview, before "Start Over")
 
-5. **`/nuxt.config.ts`**
+6. **`/nuxt.config.ts`**
    - Added `@nuxtjs/seo` module
    - Configured site metadata (URL, name, description)
    - Configured sitemap.xml generation
    - Configured robots.txt with sitemap reference
    - Added runtime config for AdSense environment variables
+   - **Added `app.head.meta` with `google-adsense-account` verification tag**
 
-6. **`/feature-flags.config.ts`**
+7. **`/feature-flags.config.ts`**
    - Updated to use environment variable (NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED)
 
-7. **`/.github/workflows/fly-deploy.yml`**
+8. **`/.github/workflows/fly-deploy.yml`**
    - Added `google_adsense_enabled` boolean input
    - Pass AdSense values as Docker build arguments (`--build-arg`)
    - Conditional logic for production-only AdSense enablement
 
-8. **`/Dockerfile`**
+9. **`/Dockerfile`**
    - Added `ARG` declarations for AdSense build arguments
    - Export as environment variables for Nuxt build process
 

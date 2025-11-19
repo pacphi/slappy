@@ -186,11 +186,34 @@ const isAdSenseEnabled = isEnabled('adsense')
 
 **Documentation:** See `docs/ADSENSE_SEO_SETUP.md` for AdSense flag details
 
+### Google AdSense Integration
+
+**Two-layer approach for AdSense:**
+
+1. **Site Verification (Always Present):**
+   - Location: `nuxt.config.ts` → `app.head.meta` configuration
+   - Adds `<meta name="google-adsense-account" content="ca-pub-xxx">` to `<head>` on ALL pages
+   - Uses `NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT` environment variable
+   - Required for Google to verify site ownership (meta-tag verification method)
+
+2. **Ad Display (Feature Flag Controlled):**
+   - Location: `app/app.vue` → `useHead()` script configuration
+   - Conditionally loads AdSense script only when `adsense` feature flag is enabled
+   - Adds DNS prefetch/preconnect for performance optimization
+   - Controlled by `NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED` environment variable
+
+**Why this separation:**
+
+- Verification meta tag is always present (Google requirement for ownership verification)
+- AdSense scripts only load when ads are enabled (performance/control)
+- Allows site verification before enabling ad display
+
 ### Configuration Files
 
 - `nuxt.config.ts` - Nuxt config with modules (@nuxt/ui, @pinia/nuxt, @pinia/colada-nuxt, nuxt-feature-flags)
   - **Important:** `cssMinify: 'lightningcss'` to suppress esbuild warnings for @apply directives
   - Default color mode: dark
+  - **AdSense verification:** `app.head.meta` with `google-adsense-account` meta tag
 - `app.config.ts` - UI theme (primary: purple, gray: neutral)
 - `feature-flags.config.ts` - Feature flag definitions (replaces app.config features section)
 - `eslint.config.mjs` - ESLint config (disables vue/multi-word-component-names, warns on @typescript-eslint/no-explicit-any)
