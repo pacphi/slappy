@@ -73,7 +73,7 @@ useHead({
 
 const { currentView, uploadMode } = useAppNavigation()
 const appConfig = useAppConfig()
-const isAdSenseEnabled = appConfig.features.adsense
+const isAdSenseEnabled = appConfig.features?.adsense ?? false
 
 const isFeaturesExpanded = ref(true)
 
