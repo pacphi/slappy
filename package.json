@@ -42,10 +42,8 @@
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.73",
-    "@iconify-json/simple-icons": "^1.2.59",
     "@nuxt/eslint": "^1.10.0",
     "@nuxtjs/seo": "^3.2.2",
-    "@tailwindcss/vite": "^4.1.17",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",

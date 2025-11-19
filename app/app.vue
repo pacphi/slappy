@@ -6,8 +6,10 @@
  * Includes Google AdSense integration (when enabled) and performance optimizations.
  */
 
+const config = useRuntimeConfig()
 const { isEnabled } = useFeatureFlags()
 const isAdSenseEnabled = isEnabled('adsense')
+const publisherId = config.public.googleAdSenseAccount
 
 useHead({
   htmlAttrs: { lang: 'en' },
@@ -16,9 +18,11 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     // Theme color for mobile browsers and PWA
     { name: 'theme-color', content: '#8646F4' },
-    // Google AdSense verification (replace with your verification code after signup)
-    // Only added when AdSense is enabled
-    // ...(isAdSenseEnabled ? [{ name: 'google-adsense-account', content: 'ca-pub-XXXXXXXXXXXXXXXX' }] : []),
+    // Google AdSense verification meta tag
+    // Only added when AdSense is enabled and Publisher ID is configured
+    ...(isAdSenseEnabled && publisherId
+      ? [{ name: 'google-adsense-account', content: publisherId }]
+      : []),
   ],
   link: [
     { rel: 'icon', href: '/favicon.ico' },
@@ -34,12 +38,11 @@ useHead({
   ],
   script: [
     // Google AdSense async script
-    // NOTE: Replace ca-pub-XXXXXXXXXXXXXXXX with your actual AdSense Publisher ID
-    // Only loaded when AdSense is enabled
-    ...(isAdSenseEnabled
+    // Only loaded when AdSense is enabled and Publisher ID is configured
+    ...(isAdSenseEnabled && publisherId
       ? [
           {
-            src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX',
+            src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`,
             async: true,
             crossorigin: 'anonymous',
           },

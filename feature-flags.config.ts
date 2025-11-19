@@ -25,7 +25,7 @@ export default defineFeatureFlags(() => ({
    * - Ad slots render on landing page and preview panel
    */
   adsense: {
-    enabled: false, // Set to true when ready to enable ads
+    enabled: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED === 'true',
     description: 'Google AdSense integration for monetization',
   },
 

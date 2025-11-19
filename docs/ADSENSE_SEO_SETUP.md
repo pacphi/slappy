@@ -4,20 +4,49 @@ This guide will help you complete the Google AdSense integration and SEO optimiz
 
 ---
 
-## Feature Flag: Enable/Disable AdSense
+## Environment-Based Configuration
 
-AdSense integration is controlled by the `nuxt-feature-flags` module in `/feature-flags.config.ts`. This provides type-safe feature management with support for A/B testing and advanced capabilities.
+AdSense integration is controlled by **environment variables** and the `nuxt-feature-flags` module. This allows you to configure different settings for local development, staging, and production environments.
 
-### How to Enable/Disable AdSense
+### Environment Variables
 
-**File: `/feature-flags.config.ts`**
+AdSense configuration uses two environment variables:
+
+1. **`NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT`** - Your Google AdSense Publisher ID (e.g., `ca-pub-1234567890123456` for illustrative purposes)
+2. **`NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED`** - Enable/disable AdSense (`true` or `false`)
+
+### Environment Files
+
+**`.env` (Local Development)**
+
+```env
+NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-xxx
+NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
+```
+
+**`.env.staging` (Staging Environment)**
+
+```env
+NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-xxx
+NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
+```
+
+**`.env.production` (Production Environment)**
+
+```env
+# NOTE: Replace with your actual Publisher ID (shown here for illustrative purposes)
+NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-1234567890123456
+NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=true
+```
+
+### How It Works
+
+The feature flag in `/feature-flags.config.ts` reads from the environment variable:
 
 ```typescript
-import { defineFeatureFlags } from '#feature-flags/handler'
-
 export default defineFeatureFlags(() => ({
   adsense: {
-    enabled: false, // Change to true to enable AdSense
+    enabled: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED === 'true',
     description: 'Google AdSense integration for monetization',
   },
 }))
@@ -32,11 +61,34 @@ export default defineFeatureFlags(() => ({
 
 **When `enabled: true`:**
 
-- AdSense script loads asynchronously
+- AdSense script loads asynchronously with your Publisher ID
 - DNS prefetch/preconnect optimizations enabled
 - Ad slots render on landing page and preview panel
 
-**Important:** Changes to feature flags require a rebuild (`pnpm build`) in production. In development with `pnpm dev`, changes are detected automatically with HMR.
+### GitHub Actions Deployment
+
+When deploying via the `fly-deploy` GitHub workflow, you can control AdSense configuration:
+
+**New Workflow Input:** `google_adsense_enabled` (boolean, default: `false`)
+
+- **When `true` + `environment=production`:** Sets AdSense as enabled using the `GOOGLE_ADSENSE_ACCOUNT` GitHub secret
+- **When `false` OR `environment≠production`:** Disables AdSense
+- **GitHub Secret Required:** `GOOGLE_ADSENSE_ACCOUNT` (your Publisher ID)
+
+**To configure the GitHub secret:**
+
+1. Go to your repository → Settings → Secrets and variables → Actions
+2. Click "New repository secret"
+3. Name: `GOOGLE_ADSENSE_ACCOUNT`
+4. Value: Your actual Publisher ID from Google AdSense (e.g., `ca-pub-1234567890123456`)
+5. Click "Add secret"
+
+**Example deployment:**
+
+- Navigate to Actions → Fly Deploy → Run workflow
+- Select `environment: production`
+- Check `google_adsense_enabled: true`
+- This will deploy with AdSense enabled using your GitHub secret
 
 ---
 
@@ -52,9 +104,11 @@ export default defineFeatureFlags(() => ({
 2. **Add the verification code**
    - After signing up, AdSense will provide a verification `<meta>` tag
    - Uncomment and update line 17 in `/app/app.vue`:
+
      ```vue
      { name: 'google-adsense-account', content: 'ca-pub-XXXXXXXXXXXXXXXX' }
      ```
+
    - Replace `ca-pub-XXXXXXXXXXXXXXXX` with your actual Publisher ID
 
 3. **Deploy and verify**
@@ -78,24 +132,29 @@ Once your AdSense account is approved:
    - Ad type: **Display ad** (Responsive or 300x250 Medium Rectangle)
    - Copy the **Ad Slot ID**
 
-### Step 3: Update Code with Ad Slot IDs
+### Step 3: Configure Environment Variables
 
-**File: `/app/app.vue` (line 30)**
+**No code changes needed!** The Publisher ID is now managed through environment variables.
 
-```vue
-src:
-'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX',
+**For local development:**
+The `.env` file already has a placeholder. Keep it disabled for local dev:
+
+```env
+NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-xxx
+NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false
 ```
 
-Replace `ca-pub-XXXXXXXXXXXXXXXX` with your **Publisher ID**.
+**For production deployment:**
+Update the `.env.production` file with your actual Publisher ID:
 
-**File: `/app/components/molecules/AdSenseAd.vue` (line 53)**
-
-```vue
-data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+```env
+# NOTE: Replace with your actual Publisher ID (shown here for illustrative purposes)
+NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT=ca-pub-1234567890123456
+NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=true
 ```
 
-Replace `ca-pub-XXXXXXXXXXXXXXXX` with your **Publisher ID**.
+**For GitHub Actions deployment:**
+Set the `GOOGLE_ADSENSE_ACCOUNT` secret in your repository (see GitHub Actions Deployment section above).
 
 **File: `/app/pages/index.vue` (line 68)**
 
@@ -275,14 +334,15 @@ Already configured in `/app/app.vue` for:
 
 ### AdSense Testing
 
-- [ ] Publisher ID added to `app.vue` (line 30)
-- [ ] Publisher ID added to `AdSenseAd.vue` (line 53)
-- [ ] Landing Hero Ad slot ID added to `index.vue` (line 68)
-- [ ] Preview Sidebar Ad slot ID added to `PreviewPanel.vue` (line 152)
+- [ ] Environment variables configured in `.env.production`
+- [ ] GitHub secret `GOOGLE_ADSENSE_ACCOUNT` set in repository settings
+- [ ] Landing Hero Ad slot ID added to `index.vue` (if applicable)
+- [ ] Preview Sidebar Ad slot ID added to `PreviewPanel.vue` (if applicable)
 - [ ] Ads render on landing page (between hero and features)
 - [ ] Ads render in preview panel (after iframe, before "Start Over")
 - [ ] Ads don't break layout or glassmorphism styling
 - [ ] Ads are responsive on mobile/tablet/desktop
+- [ ] AdSense disabled in local dev (NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=false)
 
 ### SEO Testing
 
@@ -383,23 +443,36 @@ Already configured in `/app/app.vue` for:
 1. **`/app/app.vue`**
    - Added viewport meta tag (critical for mobile SEO)
    - Added theme-color meta tag
-   - Added AdSense script and Publisher ID placeholder
+   - Updated to use runtime config for AdSense Publisher ID
    - Added DNS prefetch/preconnect for AdSense domains
+   - Conditional AdSense script loading based on feature flag
 
-2. **`/app/pages/index.vue`**
+2. **`/app/components/molecules/AdSenseAd.vue`**
+   - Updated to use runtime config for Publisher ID (no hardcoded values)
+
+3. **`/app/pages/index.vue`**
    - Added landing page ad placement (between hero and features)
    - Added enhanced SEO meta tags (Open Graph, Twitter Card, keywords)
    - Added canonical URL
    - Added JSON-LD structured data (WebApplication schema)
 
-3. **`/app/components/organisms/PreviewPanel.vue`**
+4. **`/app/components/organisms/PreviewPanel.vue`**
    - Added preview sidebar ad placement (after preview, before "Start Over")
 
-4. **`/nuxt.config.ts`**
+5. **`/nuxt.config.ts`**
    - Added `@nuxtjs/seo` module
    - Configured site metadata (URL, name, description)
    - Configured sitemap.xml generation
    - Configured robots.txt with sitemap reference
+   - Added runtime config for AdSense environment variables
+
+6. **`/feature-flags.config.ts`**
+   - Updated to use environment variable (NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED)
+
+7. **`/.github/workflows/fly-deploy.yml`**
+   - Added `google_adsense_enabled` boolean input
+   - Added steps to configure/disable AdSense via Fly.io secrets
+   - Conditional logic for production-only AdSense enablement
 
 ### Dependencies Added
 
@@ -409,12 +482,12 @@ Already configured in `/app/app.vue` for:
 
 ## Next Steps
 
-1. **Enable AdSense feature flag** in `/feature-flags.config.ts` (set `adsense.enabled: true`)
-2. **Create AdSense account** and get Publisher ID
-3. **Create ad units** and get slot IDs
-4. **Update code** with Publisher ID and slot IDs (4 locations)
+1. **Create AdSense account** and get Publisher ID (if you haven't already)
+2. **Create ad units** and get slot IDs
+3. **Configure GitHub secret** `GOOGLE_ADSENSE_ACCOUNT` in repository settings
+4. **Update ad slot IDs** in `index.vue` and `PreviewPanel.vue` (if using ad components)
 5. **Create OG image** (1200×630px) and save to `/public/og-image.png`
-6. **Deploy to production** (`slappy.cloud`)
+6. **Deploy to production** via GitHub Actions workflow with `google_adsense_enabled: true`
 7. **Verify sitemap** and robots.txt are accessible
 8. **Test meta tags** with Facebook/Twitter validators
 9. **Submit sitemap** to Google Search Console

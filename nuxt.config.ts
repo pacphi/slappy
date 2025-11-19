@@ -52,6 +52,8 @@ export default defineNuxtConfig({
       appName: 'Slappy',
       version: '2.0.0',
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'https://slappy.cloud',
+      googleAdSenseAccount: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT || '',
+      googleAdSenseEnabled: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED === 'true',
     },
   },
   vite: {

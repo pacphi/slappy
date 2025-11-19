@@ -66,6 +66,11 @@ on:
           - '2048'
           - '4096'
           - '8192'
+      google_adsense_enabled:
+        description: 'Enable Google AdSense (production only)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   setup:
@@ -120,6 +125,35 @@ jobs:
           echo "Creating app '${{ needs.setup.outputs.app_name }}'..."
           flyctl apps create ${{ needs.setup.outputs.app_name }} \
             --org personal
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Configure Google AdSense
+        if: inputs.google_adsense_enabled && inputs.environment == 'production'
+        run: |
+          echo "🔧 Configuring Google AdSense for production..."
+
+          # Set Fly.io secrets for persistent configuration
+          flyctl secrets set \
+            NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT="${{ secrets.GOOGLE_ADSENSE_ACCOUNT }}" \
+            NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED="true" \
+            --app ${{ needs.setup.outputs.app_name }}
+
+          echo "✅ Google AdSense configuration complete"
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      - name: Disable Google AdSense
+        if: ${{ !inputs.google_adsense_enabled || inputs.environment != 'production' }}
+        run: |
+          echo "🔧 Disabling Google AdSense..."
+
+          # Set AdSense to disabled (keep account value for future use)
+          flyctl secrets set \
+            NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED="false" \
+            --app ${{ needs.setup.outputs.app_name }}
+
+          echo "✅ Google AdSense disabled"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 

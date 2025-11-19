@@ -40,6 +40,11 @@ The repository includes three GitHub Actions workflows:
   - Add to GitHub: Repository Settings → Secrets and variables → Actions → New repository secret
   - Name: `FLY_API_TOKEN`
   - Value: Your Fly.io API token
+- **GOOGLE_ADSENSE_ACCOUNT secret** (optional): For Google AdSense integration
+  - Get your Publisher ID from Google AdSense dashboard
+  - Add to GitHub: Repository Settings → Secrets and variables → Actions → New repository secret
+  - Name: `GOOGLE_ADSENSE_ACCOUNT`
+  - Value: Your Publisher ID (e.g., `ca-pub-1234567890123456`)
 
 ### For GitHub CLI Usage
 
@@ -168,13 +173,14 @@ The Fly Deploy workflow deploys the Nuxt application to Fly.io infrastructure wi
 
 When triggering the workflow, you can configure:
 
-| Option          | Description       | Default        | Options                           |
-| --------------- | ----------------- | -------------- | --------------------------------- |
-| **environment** | Deployment target | production     | production, staging               |
-| **region**      | Fly.io region     | sjc (San Jose) | See [regions](#available-regions) |
-| **vm_cpus**     | Number of CPUs    | 1              | 1, 2, 4, 8                        |
-| **vm_cpu_kind** | CPU type          | shared         | shared, performance               |
-| **vm_memory**   | Memory (MB)       | 1024           | 256, 512, 1024, 2048, 4096, 8192  |
+| Option                     | Description                       | Default        | Options                           |
+| -------------------------- | --------------------------------- | -------------- | --------------------------------- |
+| **environment**            | Deployment target                 | production     | production, staging               |
+| **region**                 | Fly.io region                     | sjc (San Jose) | See [regions](#available-regions) |
+| **vm_cpus**                | Number of CPUs                    | 1              | 1, 2, 4, 8                        |
+| **vm_cpu_kind**            | CPU type                          | shared         | shared, performance               |
+| **vm_memory**              | Memory (MB)                       | 1024           | 256, 512, 1024, 2048, 4096, 8192  |
+| **google_adsense_enabled** | Enable Google AdSense (prod only) | false          | true, false                       |
 
 ### Available Regions
 
@@ -200,7 +206,8 @@ When triggering the workflow, you can configure:
 1. **Setup** - Determines target (production or staging)
 2. **App Check** - Verifies if Fly.io app exists
 3. **Create App** - Creates app if it doesn't exist
-4. **Deploy** - Builds Docker image and deploys to Fly.io
+4. **Configure AdSense** (optional) - Sets Google AdSense secrets if enabled for production
+5. **Deploy** - Builds Docker image and deploys to Fly.io
 
 **Duration**: 5-8 minutes (first deploy may take longer for Puppeteer)
 
@@ -338,9 +345,10 @@ This is the easiest method for manual workflows.
    - **VM CPUs**: 1, 2, 4, or 8 (default: 1)
    - **VM CPU Kind**: shared or performance (default: shared)
    - **VM Memory**: 256-8192 MB (default: 1024)
+   - **Google AdSense Enabled**: Check to enable AdSense (production only)
 6. Click **Run workflow**
 
-**Example Configuration**:
+**Example Configuration (with AdSense)**:
 
 ```
 Environment: production
@@ -348,6 +356,18 @@ Region: sjc (San Jose, California)
 VM CPUs: 1
 VM CPU Kind: shared
 VM Memory: 1024
+Google AdSense Enabled: ✓ (checked)
+```
+
+**Example Configuration (without AdSense)**:
+
+```
+Environment: production
+Region: sjc (San Jose, California)
+VM CPUs: 1
+VM CPU Kind: shared
+VM Memory: 1024
+Google AdSense Enabled: ☐ (unchecked)
 ```
 
 #### Triggering Fly Teardown Workflow
@@ -410,7 +430,7 @@ gh run list --workflow=ci.yml
 gh workflow run fly-deploy.yml
 ```
 
-**Production deployment with defaults**:
+**Production deployment with defaults (AdSense disabled)**:
 
 ```bash
 gh workflow run fly-deploy.yml \
@@ -418,7 +438,20 @@ gh workflow run fly-deploy.yml \
   -f region=sjc \
   -f vm_cpus=1 \
   -f vm_cpu_kind=shared \
-  -f vm_memory=1024
+  -f vm_memory=1024 \
+  -f google_adsense_enabled=false
+```
+
+**Production deployment with AdSense enabled**:
+
+```bash
+gh workflow run fly-deploy.yml \
+  -f environment=production \
+  -f region=sjc \
+  -f vm_cpus=1 \
+  -f vm_cpu_kind=shared \
+  -f vm_memory=1024 \
+  -f google_adsense_enabled=true
 ```
 
 **Staging deployment**:
@@ -663,6 +696,22 @@ open sample/sample-roster-tags.html
    - New repository secret
    - Name: `FLY_API_TOKEN`
    - Value: (paste token)
+
+#### Missing GOOGLE_ADSENSE_ACCOUNT (AdSense Enabled)
+
+**Symptom**: Deployment fails when `google_adsense_enabled=true` with missing secret error
+
+**Solution**:
+
+1. Get your Google AdSense Publisher ID from your AdSense dashboard
+
+2. Add to GitHub secrets:
+   - Repository Settings → Secrets and variables → Actions
+   - New repository secret
+   - Name: `GOOGLE_ADSENSE_ACCOUNT`
+   - Value: Your Publisher ID (e.g., `ca-pub-1234567890123456`)
+
+**Note**: This secret is only required if you enable AdSense during deployment
 
 #### App Creation Failures
 

@@ -32,12 +32,9 @@ output/
 sample/*-tags.html
 
 # Environment variables
+# Ignore all .env files except .env.example
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.*.local
+.env.*
 !.env.example
 
 # IDE/Editor

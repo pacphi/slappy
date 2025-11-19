@@ -34,6 +34,9 @@ withDefaults(defineProps<Props>(), {
   responsive: true,
 })
 
+const config = useRuntimeConfig()
+const publisherId = config.public.googleAdSenseAccount
+
 // Extend window type for AdSense
 interface WindowWithAdsByGoogle extends Window {
   adsbygoogle?: Array<Record<string, unknown>>
@@ -58,7 +61,7 @@ onMounted(() => {
     <ins
       class="adsbygoogle"
       style="display: block"
-      data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+      :data-ad-client="publisherId"
       :data-ad-slot="adSlot"
       :data-ad-format="responsive ? 'auto' : format"
       :data-full-width-responsive="responsive ? 'true' : 'false'"
