@@ -183,27 +183,39 @@ pnpm test:local path/to/custom.csv     # Uses custom CSV file
 
 ### Feature Flags
 
-Configure application features via `app.config.ts`:
+Feature flags are managed using the `nuxt-feature-flags` module for type-safe, centralized feature management:
 
 ```typescript
-// app.config.ts
-export default defineAppConfig({
-  ui: {
-    primary: 'purple',
-    gray: 'neutral',
+// feature-flags.config.ts
+import { defineFeatureFlags } from '#feature-flags/handler'
+
+export default defineFeatureFlags(() => ({
+  adsense: {
+    enabled: false, // Change to true to enable AdSense
+    description: 'Google AdSense integration for monetization',
   },
-  features: {
-    // Enable/disable Google AdSense ads
-    // Set to false to completely disable all AdSense integration
-    adsense: false, // Change to true to enable AdSense
-  },
-})
+}))
+```
+
+**Usage in components:**
+
+```typescript
+const { isEnabled } = useFeatureFlags()
+if (isEnabled('adsense')) {
+  // Render AdSense component
+}
 ```
 
 **AdSense Feature Flag:**
 
-- When `adsense: false` (default): No AdSense scripts loaded, no ad components rendered, zero performance impact
-- When `adsense: true`: AdSense ads appear on landing page and preview panel
+- When `enabled: false` (default): No AdSense scripts loaded, no ad components rendered, zero performance impact
+- When `enabled: true`: AdSense ads appear on landing page and preview panel
+
+**Benefits:**
+- Full TypeScript support with autocomplete
+- Build-time validation catches undefined flags
+- Supports A/B testing and variants
+- Context-aware evaluation
 
 For complete AdSense setup instructions, see [AdSense & SEO Setup Guide](docs/ADSENSE_SEO_SETUP.md).
 
@@ -278,7 +290,8 @@ slappy/
 │   └── test-local.ts         # Local testing
 ├── types/                    # Global TypeScript definitions
 ├── nuxt.config.ts            # Nuxt configuration
-└── app.config.ts             # App theme configuration
+├── app.config.ts             # App theme configuration
+└── feature-flags.config.ts   # Feature flag definitions
 ```
 
 **Shared Architecture:** The `lib/` directory contains runtime-agnostic business logic used by both the Nuxt web app and CLI tools, ensuring consistency and maintainability.

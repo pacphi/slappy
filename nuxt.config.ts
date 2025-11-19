@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: { compatibilityVersion: 4 },
-  modules: ['@nuxt/ui', '@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxtjs/seo'],
+  modules: ['@nuxt/ui', '@pinia/nuxt', '@pinia/colada-nuxt', '@nuxt/eslint', '@nuxtjs/seo', 'nuxt-feature-flags'],
   css: ['~/assets/css/main.css'],
 
   // SEO Configuration
@@ -44,6 +44,9 @@ export default defineNuxtConfig({
     public: {
       appName: 'Slappy',
       version: '2.0.0',
+      features: {
+        adsense: false, // Enable/disable Google AdSense integration
+      },
     },
   },
   vite: {

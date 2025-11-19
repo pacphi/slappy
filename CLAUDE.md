@@ -10,6 +10,7 @@ Slappy - A Nuxt 4 application for generating printable name tag labels in the To
 
 - **Nuxt 4** with Vue 3 Composition API
 - **@nuxt/ui** (Tailwind CSS-based component library)
+- **nuxt-feature-flags** for type-safe feature management
 - **Pinia** for state management
 - **Puppeteer** for server-side PDF generation
 - **pnpm** as the package manager (enforced via `packageManager` field)
@@ -154,12 +155,45 @@ All core types are in `types/index.d.ts`:
 
 **Global styles:** `app/assets/css/main.css` - Plus Jakarta Sans font, scrollbar styling.
 
+### Feature Flags
+
+Feature flags are managed via `nuxt-feature-flags` module for type-safe, centralized feature management.
+
+**Configuration:** `feature-flags.config.ts`
+
+```typescript
+import { defineFeatureFlags } from '#feature-flags/handler'
+
+export default defineFeatureFlags(() => ({
+  adsense: {
+    enabled: false,
+    description: 'Google AdSense integration',
+  },
+}))
+```
+
+**Usage in components:**
+
+```typescript
+const { isEnabled } = useFeatureFlags()
+const isAdSenseEnabled = isEnabled('adsense')
+```
+
+**Key Benefits:**
+- Full TypeScript support with autocomplete
+- Build-time validation (catches undefined flags)
+- Supports A/B testing with variants
+- Context-aware evaluation (user roles, environment, etc.)
+
+**Documentation:** See `docs/ADSENSE_SEO_SETUP.md` for AdSense flag details
+
 ### Configuration Files
 
-- `nuxt.config.ts` - Nuxt config with modules (@nuxt/ui, @pinia/nuxt, @pinia/colada-nuxt)
+- `nuxt.config.ts` - Nuxt config with modules (@nuxt/ui, @pinia/nuxt, @pinia/colada-nuxt, nuxt-feature-flags)
   - **Important:** `cssMinify: 'lightningcss'` to suppress esbuild warnings for @apply directives
   - Default color mode: dark
 - `app.config.ts` - UI theme (primary: purple, gray: neutral)
+- `feature-flags.config.ts` - Feature flag definitions (replaces app.config features section)
 - `eslint.config.mjs` - ESLint config (disables vue/multi-word-component-names, warns on @typescript-eslint/no-explicit-any)
 
 ## Working with This Codebase

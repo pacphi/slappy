@@ -12,8 +12,8 @@ const emit = defineEmits<{
   close: []
 }>()
 
-const appConfig = useAppConfig()
-const isAdSenseEnabled = appConfig.features?.adsense ?? false
+const { isEnabled } = useFeatureFlags()
+const isAdSenseEnabled = isEnabled('adsense')
 
 const { generatedHtml, loading, error, generate, downloadHtml } = useNameTagGeneration()
 const zoom = ref(100)

@@ -6,8 +6,8 @@
  * Includes Google AdSense integration (when enabled) and performance optimizations.
  */
 
-const appConfig = useAppConfig()
-const isAdSenseEnabled = appConfig.features?.adsense ?? false
+const { isEnabled } = useFeatureFlags()
+const isAdSenseEnabled = isEnabled('adsense')
 
 useHead({
   htmlAttrs: { lang: 'en' },

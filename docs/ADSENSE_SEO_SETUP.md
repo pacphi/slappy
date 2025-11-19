@@ -6,40 +6,37 @@ This guide will help you complete the Google AdSense integration and SEO optimiz
 
 ## Feature Flag: Enable/Disable AdSense
 
-AdSense integration is controlled by a feature flag in `/app.config.ts`. This allows you to completely disable all AdSense functionality with a single configuration change.
+AdSense integration is controlled by the `nuxt-feature-flags` module in `/feature-flags.config.ts`. This provides type-safe feature management with support for A/B testing and advanced capabilities.
 
 ### How to Enable/Disable AdSense
 
-**File: `/app.config.ts`**
+**File: `/feature-flags.config.ts`**
 
 ```typescript
-export default defineAppConfig({
-  ui: {
-    primary: 'purple',
-    gray: 'neutral',
+import { defineFeatureFlags } from '#feature-flags/handler'
+
+export default defineFeatureFlags(() => ({
+  adsense: {
+    enabled: false, // Change to true to enable AdSense
+    description: 'Google AdSense integration for monetization',
   },
-  features: {
-    // Enable/disable Google AdSense ads
-    // Set to false to completely disable all AdSense integration
-    adsense: false, // Change to true to enable AdSense
-  },
-})
+}))
 ```
 
-**When `adsense: false` (default):**
+**When `enabled: false` (default):**
 
 - AdSense script will NOT be loaded
 - No DNS prefetch/preconnect for AdSense domains
 - Ad components will NOT render (no blank containers)
 - Zero performance impact from AdSense
 
-**When `adsense: true`:**
+**When `enabled: true`:**
 
 - AdSense script loads asynchronously
 - DNS prefetch/preconnect optimizations enabled
 - Ad slots render on landing page and preview panel
 
-**Important:** After changing this flag, restart your dev server (`pnpm dev`) to see changes in development.
+**Important:** Changes to feature flags require a rebuild (`pnpm build`) in production. In development with `pnpm dev`, changes are detected automatically with HMR.
 
 ---
 
