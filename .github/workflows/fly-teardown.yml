@@ -19,9 +19,25 @@ on:
         type: string
 
 jobs:
+  setup:
+    name: Determine teardown target
+    runs-on: ubuntu-latest
+    outputs:
+      app_name: ${{ steps.set-target.outputs.app_name }}
+    steps:
+      - name: Set teardown target
+        id: set-target
+        run: |
+          if [ "${{ inputs.environment }}" == "staging" ]; then
+            echo "app_name=slappy-staging" >> $GITHUB_OUTPUT
+          else
+            echo "app_name=slappy" >> $GITHUB_OUTPUT
+          fi
+
   teardown:
     name: Destroy Fly.io deployment
     runs-on: ubuntu-latest
+    needs: setup
     environment:
       name: ${{ inputs.environment }}
     steps:
@@ -39,12 +55,12 @@ jobs:
       - name: Check if app exists
         id: check_app
         run: |
-          if flyctl status --app slappy 2>/dev/null; then
+          if flyctl status --app ${{ needs.setup.outputs.app_name }} 2>/dev/null; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "✅ App 'slappy' exists and will be destroyed"
+            echo "✅ App '${{ needs.setup.outputs.app_name }}' exists and will be destroyed"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
-            echo "ℹ️  App 'slappy' does not exist"
+            echo "ℹ️  App '${{ needs.setup.outputs.app_name }}' does not exist"
           fi
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -53,8 +69,8 @@ jobs:
       - name: Destroy Fly.io app
         if: steps.check_app.outputs.exists == 'true'
         run: |
-          echo "🗑️  Destroying Fly.io app 'slappy'..."
-          flyctl apps destroy slappy --yes
+          echo "🗑️  Destroying Fly.io app '${{ needs.setup.outputs.app_name }}'..."
+          flyctl apps destroy ${{ needs.setup.outputs.app_name }} --yes
           echo "✅ App destroyed successfully"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
@@ -64,7 +80,7 @@ jobs:
           echo "## Teardown Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment:** ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **App:** slappy" >> $GITHUB_STEP_SUMMARY
+          echo "- **App:** ${{ needs.setup.outputs.app_name }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Status:** Destroyed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "⚠️ The deployment has been permanently removed from Fly.io" >> $GITHUB_STEP_SUMMARY
