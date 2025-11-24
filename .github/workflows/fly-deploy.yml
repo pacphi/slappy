@@ -101,7 +101,7 @@ jobs:
       url: ${{ needs.setup.outputs.app_url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
