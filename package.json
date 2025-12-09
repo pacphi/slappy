@@ -41,19 +41,19 @@
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
-    "@iconify-json/lucide": "^1.2.73",
-    "@nuxt/eslint": "^1.10.0",
+    "@iconify-json/lucide": "^1.2.79",
+    "@nuxt/eslint": "^1.11.0",
     "@nuxtjs/seo": "^3.2.2",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "knip": "^5.70.0",
-    "prettier": "^3.6.2",
+    "knip": "^5.72.0",
+    "prettier": "^3.7.4",
     "tailwindcss": "^4.1.17",
-    "tsx": "^4.20.6",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.47.0"
+    "typescript-eslint": "^8.48.1"
   },
   "pnpm": {
     "overrides": {
