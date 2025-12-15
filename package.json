@@ -44,7 +44,7 @@
     "@iconify-json/lucide": "^1.2.79",
     "@nuxt/eslint": "^1.11.0",
     "@nuxtjs/seo": "^3.2.2",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.2",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
