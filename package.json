@@ -26,18 +26,18 @@
     "test:local": "tsx cli/test-local.ts"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.2.1",
-    "@pinia/colada": "^0.18.0",
-    "@pinia/colada-nuxt": "^0.2.4",
+    "@nuxt/ui": "^4.3.0",
+    "@pinia/colada": "^0.20.0",
+    "@pinia/colada-nuxt": "^0.3.0",
     "@pinia/nuxt": "^0.11.3",
     "date-fns": "^4.1.0",
-    "nuxt": "^4.2.1",
+    "nuxt": "^4.2.2",
     "nuxt-feature-flags": "1.1.7",
     "pinia": "^3.0.4",
-    "puppeteer": "^24.32.1",
-    "vue": "^3.5.25",
-    "vue-router": "^4.6.3",
-    "zod": "^4.1.13"
+    "puppeteer": "^24.34.0",
+    "vue": "^3.5.26",
+    "vue-router": "^4.6.4",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@iconify-json/heroicons": "^1.2.3",
