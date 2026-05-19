@@ -37,6 +37,8 @@ overrides:
   unimport>picomatch: ^4.0.4
   unplugin-utils>picomatch: ^4.0.4
   unplugin-auto-import>picomatch: ^4.0.4
+  unplugin-vue-components>picomatch: ^4.0.4
+  '@rollup/pluginutils>picomatch': ^4.0.4
 
 importers:
 
@@ -5511,10 +5513,6 @@ packages:
     resolution: {integrity: sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA==}
     engines: {node: '>=8.6'}
 
-  picomatch@4.0.3:
-    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
-    engines: {node: '>=12'}
-
   picomatch@4.0.4:
     resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
@@ -9116,7 +9114,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
-      picomatch: 4.0.3
+      picomatch: 4.0.4
     optionalDependencies:
       rollup: 4.60.4
 
@@ -12821,8 +12819,6 @@ snapshots:
 
   picomatch@2.3.2: {}
 
-  picomatch@4.0.3: {}
-
   picomatch@4.0.4: {}
 
   pinia@3.0.4(typescript@6.0.3)(vue@3.5.34(typescript@6.0.3)):
@@ -13833,7 +13829,7 @@ snapshots:
       magic-string: 0.30.21
       mlly: 1.8.2
       obug: 2.1.1
-      picomatch: 4.0.3
+      picomatch: 4.0.4
       tinyglobby: 0.2.16
       unplugin: 3.0.0
       unplugin-utils: 0.3.1

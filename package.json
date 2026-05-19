@@ -101,7 +101,9 @@
       "unplugin>picomatch": "^4.0.4",
       "unimport>picomatch": "^4.0.4",
       "unplugin-utils>picomatch": "^4.0.4",
-      "unplugin-auto-import>picomatch": "^4.0.4"
+      "unplugin-auto-import>picomatch": "^4.0.4",
+      "unplugin-vue-components>picomatch": "^4.0.4",
+      "@rollup/pluginutils>picomatch": "^4.0.4"
     }
   }
 }
