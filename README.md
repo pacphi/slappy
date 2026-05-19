@@ -84,7 +84,7 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 24+
 - pnpm (package manager - version enforced via `packageManager` field in package.json)
 - Puppeteer 25+ (for PDF generation - installed automatically)
 - A published Google Sheet or CSV file with your data

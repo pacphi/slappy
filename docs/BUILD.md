@@ -16,7 +16,7 @@ This guide explains how to build Slappy from source for development and producti
 
 ### Required Software
 
-- **Node.js**: Version 20.0.0 or higher
+- **Node.js**: Version 24.0.0 or higher
   - Check version: `node --version`
   - Download: [nodejs.org](https://nodejs.org/)
 

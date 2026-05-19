@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for Nuxt Application with Puppeteer support
 
 # Stage 1: Dependencies
-FROM node:20-alpine AS deps
+FROM node:24-alpine AS deps
 RUN apk add --no-cache libc6-compat
 
 # Install pnpm
@@ -14,7 +14,7 @@ COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.17.1 --activate
@@ -37,7 +37,7 @@ ENV NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED=${NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED}
 RUN pnpm build
 
 # Stage 3: Runner
-FROM node:20-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

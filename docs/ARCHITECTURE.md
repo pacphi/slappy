@@ -31,7 +31,7 @@ Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vu
 
 **Architecture type**: Shared-core architecture with `lib/` containing all runtime-agnostic business logic
 
-**Runtime**: Node.js 20+ with Nuxt 4 (Nitro server)
+**Runtime**: Node.js 24+ with Nuxt 4 (Nitro server)
 
 **Package Manager**: pnpm (enforced via `packageManager` field)
 
@@ -55,7 +55,7 @@ Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vu
 | Technology            | Version | Purpose                            |
 | --------------------- | ------- | ---------------------------------- |
 | **Nitro**             | 2.x     | Nuxt server engine                 |
-| **Node.js**           | 20.0.0+ | Runtime environment                |
+| **Node.js**           | 24.0.0+ | Runtime environment                |
 | **Puppeteer**         | 24.26+  | Headless Chrome for PDF generation |
 | **H3**                | Latest  | HTTP server framework (via Nitro)  |
 | **Nuxt Server Utils** | -       | Server-side utilities              |

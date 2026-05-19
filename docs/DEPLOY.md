@@ -360,7 +360,7 @@ docker push ghcr.io/username/slappy:latest
    {
      "bin": "dist/nametag-generator.js",
      "pkg": {
-       "targets": ["node20-macos-x64", "node20-linux-x64", "node20-win-x64"],
+       "targets": ["node24-macos-x64", "node24-linux-x64", "node24-win-x64"],
        "outputPath": "build"
      }
    }
@@ -702,7 +702,7 @@ Cloudflare Pages offers edge deployment with excellent global performance and ge
    - **Framework preset**: Nuxt.js
    - **Build command**: `pnpm build`
    - **Build output directory**: `.output/public`
-   - **Node version**: 20
+   - **Node version**: 24
 6. Click "Save and Deploy"
 
 **Deploy with Wrangler CLI:**
@@ -773,7 +773,7 @@ Cloudflare Pages/Workers have Node.js compatibility layers but **do not support 
 Set in Pages dashboard → Settings → Environment variables:
 
 ```
-NODE_VERSION=20
+NODE_VERSION=24
 ```
 
 ### Custom Domain
@@ -832,7 +832,7 @@ Netlify provides easy deployment with build plugins and edge functions.
 5. Configure build settings:
    - **Build command**: `pnpm build`
    - **Publish directory**: `.output/public`
-   - **Node version**: 20 (set in `netlify.toml`)
+   - **Node version**: 24 (set in `netlify.toml`)
 6. Click "Deploy site"
 
 **Deploy with Netlify CLI:**
@@ -861,7 +861,7 @@ Create `netlify.toml`:
   publish = ".output/public"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "24"
   NPM_FLAGS = "--version"  # Use pnpm
 
 [[redirects]]
@@ -917,7 +917,7 @@ const browser = await chromium.puppeteer.launch({
 Set in Netlify dashboard → Site settings → Environment variables:
 
 ```
-NODE_VERSION=20
+NODE_VERSION=24
 ```
 
 ### Custom Domain
