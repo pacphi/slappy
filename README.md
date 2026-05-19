@@ -86,7 +86,7 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 
 - Node.js 20+
 - pnpm (package manager - version enforced via `packageManager` field in package.json)
-- Puppeteer 24+ (for PDF generation - installed automatically)
+- Puppeteer 25+ (for PDF generation - installed automatically)
 - A published Google Sheet or CSV file with your data
 
 ## Features
@@ -141,10 +141,10 @@ Feature flags use the `nuxt-feature-flags` module for type-safe, centralized fea
 
 ## Technology Stack
 
-- **Frontend**: Nuxt 4, Vue 3, TypeScript 5, @nuxt/ui (Tailwind CSS)
+- **Frontend**: Nuxt 4, Vue 3, TypeScript 6, @nuxt/ui (Tailwind CSS)
 - **Backend**: Nitro server, H3 HTTP framework
 - **State Management**: Vue 3 Composables (Pinia available)
-- **PDF Generation**: Puppeteer 24 (headless Chrome)
+- **PDF Generation**: Puppeteer 25 (headless Chrome)
 - **Theming**: @nuxt/ui color modes with glassmorphism design
 - **Icons**: Heroicons, Lucide
 - **Package Manager**: pnpm (enforced)

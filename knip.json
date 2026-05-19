@@ -1,22 +1,10 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
-  "entry": ["app/app.vue", "app/pages/**/*.vue", "server/api/**/*.ts", "cli/**/*.ts"],
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["app/pages/**/*.vue", "server/api/**/*.ts", "cli/**/*.ts"],
   "project": ["app/**/*.{ts,vue}", "server/**/*.ts", "lib/**/*.ts", "cli/**/*.ts"],
-  "ignore": [
-    "**/*.md",
-    ".nuxt/**",
-    ".output/**",
-    "dist/**",
-    "node_modules/**",
-    "app/components/**",
-    "app/composables/**",
-    "app/layouts/**",
-    "app/utils/**",
-    "types/**"
-  ],
+  "ignore": ["app/components/**", "app/composables/**"],
   "ignoreExportsUsedInFile": true,
   "ignoreDependencies": [
-    "vue",
     "date-fns",
     "@iconify-json/heroicons",
     "@iconify-json/lucide",

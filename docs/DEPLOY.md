@@ -91,7 +91,7 @@ Before deploying, ensure you have completed the build process (see [BUILD.md](BU
 
 - **Node.js 20+** and **pnpm** installed (version enforced via `packageManager` field in package.json)
 - **Nuxt built** (`pnpm build` creates `.output/` directory)
-- **Puppeteer 24+** (for PDF generation - installed via pnpm)
+- **Puppeteer 25+** (for PDF generation - installed via pnpm)
 - **Git** for version control
 - **Docker** (optional, for container deployment)
 - **npm account** (optional, for CLI package publishing)

@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -69,7 +69,7 @@ jobs:
         run: pnpm build
 
       - name: Upload Nuxt build artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: nuxt-build
@@ -84,7 +84,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -122,7 +122,7 @@ jobs:
           echo "✅ Output file contains valid HTML structure"
 
       - name: Upload generated HTML as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-output-html
@@ -135,7 +135,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -150,13 +150,27 @@ jobs:
         run: pnpm audit --audit-level=high
         continue-on-error: true
 
+      - name: Shai Hulud CVE check
+        run: |
+          echo "Checking for Shai Hulud CVE (CVE-2026-45321) affected packages..."
+          AFFECTED=0
+          for pkg in "@tanstack/router-core" "@tanstack/react-router" "@tanstack/vue-router" "@tanstack/solid-router" "@mistralai/mistralai" "@uipath/cli" "@uipath/robot"; do
+            if grep -q "\"$pkg\"" pnpm-lock.yaml 2>/dev/null; then
+              echo "WARNING: Found $pkg in lockfile — verify version is not in compromised range"
+              AFFECTED=1
+            fi
+          done
+          if [ $AFFECTED -eq 0 ]; then
+            echo "OK: No Shai Hulud CVE-affected packages found in lockfile"
+          fi
+
   dead-code:
     name: Dead Code Detection
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

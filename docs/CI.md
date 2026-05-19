@@ -413,7 +413,7 @@ test-cli:
   steps:
     - uses: actions/checkout@v5
 
-    - uses: pnpm/action-setup@v4
+    - uses: pnpm/action-setup@v5
       with:
         version: 10
 
