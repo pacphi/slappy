@@ -1,5 +1,6 @@
 {
   "name": "slappy",
+  "version": "2.0.0",
   "type": "module",
   "private": true,
   "packageManager": "pnpm@12.3.4",

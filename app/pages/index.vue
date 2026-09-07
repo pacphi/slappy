@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { public: appConfig } = useRuntimeConfig()
+
 /**
  * Slappy Homepage
  *
@@ -164,6 +166,12 @@ const features = [
         <p class="footer-text">
           Built with <UIcon name="i-heroicons-heart-solid" class="h-4 w-4 text-red-500" /> using
           Nuxt & Vue
+        </p>
+        <p
+          class="mt-2 text-xs text-neutral-500 dark:text-neutral-400"
+          :aria-label="`Slappy version ${appConfig.version}`"
+        >
+          v{{ appConfig.version }}
         </p>
       </div>
     </footer>

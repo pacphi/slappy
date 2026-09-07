@@ -1,3 +1,5 @@
+import { version } from './package.json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -67,7 +69,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appName: 'Slappy',
-      version: '2.0.0',
+      version,
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'https://slappy.cloud',
       googleAdSenseAccount: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT || '',
       googleAdSenseEnabled: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED === 'true',
