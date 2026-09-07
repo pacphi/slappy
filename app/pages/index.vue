@@ -78,38 +78,36 @@ const { currentView, uploadMode } = useAppNavigation()
 const { isEnabled } = useFeatureFlags()
 const isAdSenseEnabled = isEnabled('adsense')
 
-const isFeaturesExpanded = ref(true)
-
 const features = [
   {
     icon: 'i-heroicons-bolt',
     title: 'Generate in Seconds',
-    description: 'Process hundreds of labels instantly. No waiting, no rendering delays.',
+    description: ['Process hundreds of labels instantly.', 'No waiting, no rendering delays.'],
   },
   {
     icon: 'i-heroicons-adjustments-horizontal',
     title: 'Intelligent Mapping',
-    description: 'Automatically detect columns or customize exactly how your data appears.',
+    description: ['Automatically detect columns or customize exactly how your data appears.'],
   },
   {
     icon: 'i-heroicons-document-duplicate',
     title: 'Export Your Way',
-    description: 'Download as HTML for quick edits or production-ready PDFs.',
+    description: ['Download as HTML for quick edits or production-ready PDFs.'],
   },
   {
     icon: 'i-heroicons-cloud',
     title: 'Google Sheets Ready',
-    description: 'Connect your live spreadsheets. Update once, regenerate instantly.',
+    description: ['Connect your live spreadsheets.', 'Update once, regenerate instantly.'],
   },
   {
     icon: 'i-heroicons-printer',
     title: 'Choose Your Label Stock',
-    description: 'TownStix US-10: 10 per sheet. Avery 5390: 8 per sheet.',
+    description: ['TownStix US-10: 10 per sheet.', 'Avery 5390: 8 per sheet.'],
   },
   {
     icon: 'i-heroicons-eye',
     title: 'Live Preview',
-    description: 'Interactive preview with zoom. Catch errors before they hit paper.',
+    description: ['Interactive preview with zoom.', 'Catch errors before they hit paper.'],
   },
 ]
 </script>
@@ -124,9 +122,9 @@ const features = [
       <OrganismsNameTagWizard :initial-upload-mode="uploadMode" />
     </section>
 
-    <!-- Features Grid (shown by default) -->
-    <section v-if="currentView === 'features'" class="features-section">
-      <div class="hero-text">
+    <!-- Marketing stays visible, including while using the wizard. -->
+    <section class="features-section">
+      <div v-if="currentView === 'features'" class="hero-text">
         <h1 class="hero-title">Professional Name Tags in 60 Seconds</h1>
         <p class="hero-description">
           Transform your spreadsheets into print-ready labels instantly. No design skills required.
@@ -141,14 +139,8 @@ const features = [
       />
 
       <div class="features-container">
-        <button class="features-heading-button" @click="isFeaturesExpanded = !isFeaturesExpanded">
-          <h2 class="features-heading">Why Choose Slappy?</h2>
-          <UIcon
-            :name="isFeaturesExpanded ? 'i-heroicons-chevron-up' : 'i-heroicons-chevron-down'"
-            class="chevron-icon"
-          />
-        </button>
-        <div v-show="isFeaturesExpanded" class="features-grid">
+        <h2 class="features-heading">Why Choose Slappy?</h2>
+        <div class="features-grid">
           <MoleculesFeatureCard
             v-for="feature in features"
             :key="feature.title"
@@ -213,28 +205,8 @@ const features = [
   @apply mx-auto max-w-6xl;
 }
 
-.features-heading-button {
-  @apply relative flex w-full cursor-pointer items-center justify-center gap-3;
-  padding: 5px;
-  @apply border-b border-white/10 bg-white/5 backdrop-blur-sm;
-  @apply font-semibold text-white/60 transition-all;
-  @apply hover:bg-white/10;
-  margin-bottom: 2rem;
-}
-
-.features-heading-button:hover {
-  @apply text-white;
-}
-
 .features-heading {
-  @apply text-2xl font-semibold;
-  margin-bottom: 0;
-}
-
-.chevron-icon {
-  width: 24px;
-  height: 24px;
-  transition: transform 0.3s ease;
+  @apply mb-8 text-center text-3xl font-semibold text-neutral-900 dark:text-white;
 }
 
 .features-grid {

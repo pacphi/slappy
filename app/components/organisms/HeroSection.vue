@@ -3,32 +3,32 @@ const features = [
   {
     icon: 'i-heroicons-bolt',
     title: 'Generate in Seconds',
-    description: 'Process hundreds of labels instantly. No waiting, no rendering delays.',
+    description: ['Process hundreds of labels instantly.', 'No waiting, no rendering delays.'],
   },
   {
     icon: 'i-heroicons-adjustments-horizontal',
     title: 'Intelligent Mapping',
-    description: 'Automatically detect columns or customize exactly how your data appears.',
+    description: ['Automatically detect columns or customize exactly how your data appears.'],
   },
   {
     icon: 'i-heroicons-document-duplicate',
     title: 'Export Your Way',
-    description: 'Download as HTML for quick edits or production-ready PDFs.',
+    description: ['Download as HTML for quick edits or production-ready PDFs.'],
   },
   {
     icon: 'i-heroicons-cloud',
     title: 'Google Sheets Ready',
-    description: 'Connect your live spreadsheets. Update once, regenerate instantly.',
+    description: ['Connect your live spreadsheets.', 'Update once, regenerate instantly.'],
   },
   {
     icon: 'i-heroicons-printer',
     title: 'Choose Your Label Stock',
-    description: 'TownStix US-10: 10 per sheet. Avery 5390: 8 per sheet.',
+    description: ['TownStix US-10: 10 per sheet.', 'Avery 5390: 8 per sheet.'],
   },
   {
     icon: 'i-heroicons-eye',
     title: 'Live Preview',
-    description: 'Interactive preview with zoom. Catch errors before they hit paper.',
+    description: ['Interactive preview with zoom.', 'Catch errors before they hit paper.'],
   },
 ]
 </script>

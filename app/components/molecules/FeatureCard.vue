@@ -2,7 +2,7 @@
 defineProps<{
   icon: string
   title: string
-  description: string
+  description: string[]
 }>()
 </script>
 
@@ -16,6 +16,8 @@ defineProps<{
       </div>
       <h3 class="font-semibold">{{ title }}</h3>
     </div>
-    <p class="pl-12 text-sm opacity-70">{{ description }}</p>
+    <div class="pl-12 text-sm opacity-70">
+      <p v-for="sentence in description" :key="sentence">{{ sentence }}</p>
+    </div>
   </UCard>
 </template>

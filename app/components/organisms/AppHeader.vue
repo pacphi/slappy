@@ -5,7 +5,10 @@ const { showWizard } = useAppNavigation()
 <template>
   <UHeader toggle-side="left">
     <template #title>
-      <span class="app-title">Slappy</span>
+      <span class="app-title">
+        <img src="/slappy-logo.png" alt="" width="44" height="44" class="h-11 w-11 shrink-0" />
+        Slappy
+      </span>
     </template>
 
     <template #default>
@@ -70,7 +73,7 @@ const { showWizard } = useAppNavigation()
 @reference '../../assets/css/main.css';
 
 .app-title {
-  @apply text-xl font-bold;
+  @apply inline-flex items-center gap-2 text-xl font-bold;
 }
 
 .nav-menu {
