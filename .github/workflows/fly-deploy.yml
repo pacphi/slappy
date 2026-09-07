@@ -18,24 +18,24 @@ on:
         default: 'sjc'
         type: choice
         options:
-          - ams  # Amsterdam, Netherlands
-          - arn  # Stockholm, Sweden
-          - bom  # Mumbai, India
-          - cdg  # Paris, France
-          - dfw  # Dallas, Texas
-          - ewr  # Secaucus, NJ
-          - fra  # Frankfurt, Germany
-          - gru  # Sao Paulo, Brazil
-          - iad  # Ashburn, Virginia
-          - jnb  # Johannesburg, South Africa
-          - lax  # Los Angeles, California
-          - lhr  # London, United Kingdom
-          - nrt  # Tokyo, Japan
-          - ord  # Chicago, Illinois
-          - sin  # Singapore
-          - sjc  # San Jose, California (default)
-          - syd  # Sydney, Australia
-          - yyz  # Toronto, Canada
+          - ams # Amsterdam, Netherlands
+          - arn # Stockholm, Sweden
+          - bom # Mumbai, India
+          - cdg # Paris, France
+          - dfw # Dallas, Texas
+          - ewr # Secaucus, NJ
+          - fra # Frankfurt, Germany
+          - gru # Sao Paulo, Brazil
+          - iad # Ashburn, Virginia
+          - jnb # Johannesburg, South Africa
+          - lax # Los Angeles, California
+          - lhr # London, United Kingdom
+          - nrt # Tokyo, Japan
+          - ord # Chicago, Illinois
+          - sin # Singapore
+          - sjc # San Jose, California (default)
+          - syd # Sydney, Australia
+          - yyz # Toronto, Canada
       vm_cpus:
         description: 'Number of CPUs'
         required: false
@@ -95,13 +95,13 @@ jobs:
     name: Deploy app to Fly.io
     runs-on: ubuntu-latest
     needs: setup
-    concurrency: deploy-group    # Ensure only one deployment runs at a time
+    concurrency: deploy-group # Ensure only one deployment runs at a time
     environment:
       name: ${{ inputs.environment }}
       url: ${{ needs.setup.outputs.app_url }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master

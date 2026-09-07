@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import {
+  labelTemplates,
+  defaultLabelTemplateId,
+  getLabelTemplate,
+  type LabelTemplateId,
+} from '#shared/label-templates'
 import type { ColumnMapping } from '~/types'
 
 const props = defineProps<{
@@ -15,21 +21,33 @@ const emit = defineEmits<{
 const { isEnabled } = useFeatureFlags()
 const isAdSenseEnabled = isEnabled('adsense')
 
-const { generatedHtml, loading, error, generate, downloadHtml } = useNameTagGeneration()
+const {
+  generatedHtml,
+  labelCount: tagCount,
+  sheetCount,
+  loading,
+  error,
+  generate,
+  downloadHtml,
+} = useNameTagGeneration()
 const zoom = ref(100)
+const labelTemplate = ref<LabelTemplateId>(defaultLabelTemplateId)
+const selectedTemplate = computed(() => getLabelTemplate(labelTemplate.value))
+const labelOptions = labelTemplates.map(template => ({
+  value: template.id,
+  label: `${template.name} — ${template.columns * template.rows} per sheet`,
+}))
+const previewFrame = ref<HTMLIFrameElement | null>(null)
+const labelsPerSheet = computed(() => selectedTemplate.value.columns * selectedTemplate.value.rows)
 
-// Calculate tag count from CSV content
-const tagCount = computed(() => {
-  if (!props.csvContent) return 0
-  const lines = props.csvContent.trim().split('\n')
-  const dataLines = props.hasHeaders ? lines.length - 1 : lines.length
-  return Math.max(0, dataLines)
-})
-
-// Generate preview on mount
-onMounted(async () => {
-  await generate(props.csvContent, props.mapping, props.hasHeaders, 'html')
-})
+// Regenerate both pagination and geometry whenever the selected stock or data changes.
+watch(
+  [labelTemplate, () => props.csvContent, () => props.mapping, () => props.hasHeaders],
+  async () => {
+    await generate(props.csvContent, props.mapping, props.hasHeaders, 'html', labelTemplate.value)
+  },
+  { immediate: true }
+)
 
 const iframeContent = computed(() => {
   if (!generatedHtml.value) return ''
@@ -37,11 +55,13 @@ const iframeContent = computed(() => {
 })
 
 const handleDownloadPDF = async () => {
-  await generate(props.csvContent, props.mapping, props.hasHeaders, 'pdf')
+  if (loading.value || error.value) return
+  await generate(props.csvContent, props.mapping, props.hasHeaders, 'pdf', labelTemplate.value)
 }
 
 const handlePrint = () => {
-  const iframe = document.querySelector('iframe')
+  if (loading.value || error.value) return
+  const iframe = previewFrame.value
   if (iframe?.contentWindow) {
     iframe.contentWindow.print()
   }
@@ -106,6 +126,23 @@ defineShortcuts({
 
 <template>
   <div class="preview-panel">
+    <UFormField label="Label stock" name="labelTemplate">
+      <USelect
+        v-model="labelTemplate"
+        :items="labelOptions"
+        :disabled="loading"
+        class="w-full"
+        aria-label="Label stock"
+      />
+    </UFormField>
+    <p class="text-sm text-muted">
+      {{ selectedTemplate.widthIn }}″ × {{ selectedTemplate.nominalHeightIn }}″ ·
+      {{ labelsPerSheet }} per sheet · {{ sheetCount }} sheet{{ sheetCount === 1 ? '' : 's' }}
+    </p>
+    <p class="text-sm text-muted">
+      Print on US Letter at 100% / Actual size. Turn off browser headers and footers.
+    </p>
+
     <!-- Error Display -->
     <UAlert v-if="error" color="error" variant="soft" :title="error" />
 
@@ -118,11 +155,23 @@ defineShortcuts({
     <!-- Preview Controls -->
     <div v-if="!loading && !error" class="preview-controls">
       <div class="zoom-controls">
-        <UButton size="sm" variant="outline" :disabled="zoom <= 50" @click="zoomOut">
+        <UButton
+          size="sm"
+          variant="outline"
+          aria-label="Zoom out"
+          :disabled="zoom <= 50"
+          @click="zoomOut"
+        >
           <UIcon name="i-heroicons-minus" class="h-4 w-4" />
         </UButton>
         <span class="zoom-display">{{ zoom }}%</span>
-        <UButton size="sm" variant="outline" :disabled="zoom >= 200" @click="zoomIn">
+        <UButton
+          size="sm"
+          variant="outline"
+          aria-label="Zoom in"
+          :disabled="zoom >= 200"
+          @click="zoomIn"
+        >
           <UIcon name="i-heroicons-plus" class="h-4 w-4" />
         </UButton>
         <UButton size="sm" variant="ghost" @click="resetZoom">Reset</UButton>
@@ -146,17 +195,26 @@ defineShortcuts({
 
     <!-- Preview Iframe -->
     <div v-if="!loading && !error" class="preview-card">
-      <iframe
-        :srcdoc="iframeContent"
+      <div
+        class="preview-sheet"
         :style="{
-          width: `${(8 * 96) / (zoom / 100)}px`,
-          height: `${(10.5 * 96) / (zoom / 100)}px`,
-          transform: `scale(${zoom / 100})`,
-          transformOrigin: 'top left',
+          width: `${8.5 * 96 * (zoom / 100)}px`,
+          height: `${Math.max(1, sheetCount) * 11 * 96 * (zoom / 100)}px`,
         }"
-        class="preview-iframe"
-        title="Name Tags Preview"
-      />
+      >
+        <iframe
+          ref="previewFrame"
+          :srcdoc="iframeContent"
+          :style="{
+            width: `${8.5 * 96}px`,
+            height: `${Math.max(1, sheetCount) * 11 * 96}px`,
+            transform: `scale(${zoom / 100})`,
+            transformOrigin: 'top left',
+          }"
+          class="preview-iframe"
+          title="Name Tags Preview"
+        />
+      </div>
     </div>
 
     <!-- Google AdSense - Preview Sidebar Ad (only shown when feature flag is enabled) -->
@@ -177,7 +235,9 @@ defineShortcuts({
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .preview-panel {
   @apply flex flex-1 flex-col gap-6;
   min-height: 0;
@@ -205,7 +265,7 @@ defineShortcuts({
 }
 
 .preview-card {
-  @apply flex flex-1 items-start justify-center overflow-auto;
+  @apply flex flex-1 items-start overflow-auto;
   min-height: 0;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.02);
@@ -213,7 +273,13 @@ defineShortcuts({
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.preview-sheet {
+  flex-shrink: 0;
+}
+
 .preview-iframe {
+  display: block;
+  max-width: none;
   @apply border-0;
   background: white;
   box-shadow:

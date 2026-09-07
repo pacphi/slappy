@@ -131,10 +131,6 @@ const labelCount = computed(() => {
   return count
 })
 
-const sheetsCount = computed(() => {
-  return Math.ceil(labelCount.value / 10) // 10 labels per sheet (TownStix US-10)
-})
-
 const handleSubmit = (event: FormSubmitEvent<z.infer<typeof mappingSchema>>) => {
   // Reconstruct CSV content from columns
   const rows = props.parsedData.columns.map(row => row.join(','))
@@ -274,7 +270,7 @@ defineShortcuts({
           <div class="flex flex-col gap-1">
             <p class="text-lg font-semibold">{{ labelCount }} name tags</p>
             <p class="text-sm opacity-70">
-              {{ sheetsCount }} sheet{{ sheetsCount !== 1 ? 's' : '' }} (10 labels per sheet)
+              Choose your label stock in Preview to see the sheet count.
             </p>
           </div>
         </div>
@@ -304,7 +300,9 @@ defineShortcuts({
   </UForm>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .column-mapper {
   @apply flex flex-col gap-8;
 }

@@ -16,13 +16,13 @@ This guide explains how to build Slappy from source for development and producti
 
 ### Required Software
 
-- **Node.js**: Version 24.0.0 or higher
+- **Node.js**: Version 26.x
   - Check version: `node --version`
   - Download: [nodejs.org](https://nodejs.org/)
 
-- **pnpm**: Package manager (version enforced via `packageManager` field in package.json)
+- **pnpm**: Version 12.3.4 (pinned via `packageManager` in package.json)
   - Check version: `pnpm --version`
-  - Install: `npm install -g pnpm` or visit [pnpm.io](https://pnpm.io/)
+  - Install: `npm install -g pnpm@12.3.4` or visit [pnpm.io](https://pnpm.io/)
 
 - **Git**: For cloning and version control
   - Check version: `git --version`
@@ -45,6 +45,8 @@ cd slappy
 ### Install Dependencies
 
 ```bash
+# Requires Node.js 26.x
+npm install -g pnpm@12.3.4
 pnpm install
 ```
 
@@ -75,13 +77,14 @@ Build the Nuxt application for production:
 
 ```bash
 pnpm build
+pnpm test:build
 ```
 
 This executes: `nuxt build`
 
 **What happens during build:**
 
-1. **TypeScript Compilation**: All `.ts` and `.vue` files are type-checked and compiled
+1. **TypeScript Compilation**: `.ts` and `.vue` files are compiled; run a separate type check when needed
 2. **Vue Component Processing**: SFCs are compiled to optimized JavaScript
 3. **Nitro Server Build**: Server API routes and middleware are bundled
 4. **Client Bundle**: JavaScript, CSS, and assets are optimized and code-split
@@ -91,7 +94,8 @@ This executes: `nuxt build`
 **Build configuration:**
 
 - Source: `nuxt.config.ts`
-- Vite config: CSS minification with `lightningcss`
+- Vite config: Tailwind compiles `@apply` using the component’s `@reference`; `lightningcss` minifies the resulting CSS
+- Build verification: `pnpm test:build` rejects uncompiled `@apply` and `@reference` in generated CSS
 - Output target: `.output/` directory
 
 ### Build Output Structure
@@ -209,7 +213,7 @@ Client code is bundled and optimized:
 
 ### Type Declarations
 
-Type checking occurs during build, but `.d.ts` files are not generated for the Nuxt app (only used for validation).
+Nuxt generates type support in `.nuxt/`; compilation alone is not a complete type check. Use `pnpm exec nuxt typecheck` for a separate check.
 
 For the shared `lib/` directory, types are inferred from source files.
 
@@ -233,20 +237,20 @@ docker run -p 3000:3000 slappy:latest
 
 **Stage 1: Dependencies**
 
-- Installs Node.js and pnpm
-- Copies `package.json` and `pnpm-lock.yaml`
-- Installs dependencies (including Puppeteer's Chromium)
+- Uses Node.js 26 Alpine and installs pnpm 12.3.4 with npm (Node 26 does not bundle Corepack)
+- Copies `package.json`, `pnpm-lock.yaml`, and `pnpm-workspace.yaml`
+- Installs dependencies with a frozen lockfile; browser downloads are skipped in this stage
 
 **Stage 2: Build**
 
 - Copies source code
-- Runs `pnpm build`
+- Runs `pnpm build && pnpm test:build`
 - Generates `.output/` directory
 
 **Stage 3: Production**
 
 - Lightweight runtime image
-- Copies only `.output/` and runtime dependencies
+- Copies `.output/` and installs Alpine Chromium for PDF generation
 - Runs as non-root user (`nuxt`)
 - Exposes port 3000
 
@@ -305,7 +309,7 @@ pnpm preview
 - Code splitting and tree shaking
 - Asset optimization (images, fonts)
 - Source maps optional (configurable)
-- Strict type checking enforced
+- TypeScript compilation
 
 ### Static Generation (SSG)
 
@@ -397,7 +401,7 @@ NODE_OPTIONS=--max_old_space_size=4096 pnpm build
 
 ```bash
 # Type-check without building
-npx nuxi typecheck
+pnpm exec nuxt typecheck
 
 # Check for specific issues
 pnpm lint
@@ -432,13 +436,17 @@ pnpm preview
 # Test in browser to verify functionality
 ```
 
+### Validate Deployment
+
+After starting the production server or Docker container, run `pnpm test:deployment`. It checks Node 26, the homepage, both label stocks’ HTML and PDF page counts, and invalid-stock rejection. The default target is `http://127.0.0.1:3000`; set `SLAPPY_SMOKE_URL` to test another address. Run `pnpm test` for shared behavior tests.
+
 ### Validate Bundle Size
 
 Check bundle sizes:
 
 ```bash
 # Use nuxi to analyze build
-npx nuxi analyze
+pnpm exec nuxt analyze
 
 # Or manually check bundle sizes
 du -sh .output/public/_nuxt/*

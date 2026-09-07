@@ -4,14 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Slappy - A Nuxt 4 application for generating printable name tag labels in the TownStix US-10 format (4×2" labels, 10 per sheet). This is a Vue 3/Nuxt migration of a Next.js application, using modern glassmorphism design patterns.
+Slappy - A Nuxt 4 application for generating printable name tag labels on TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet). This is a Vue 3/Nuxt migration of a Next.js application, using modern glassmorphism design patterns.
 
 **Key Technologies:**
 
 - **Nuxt 4** + Vue 3, **@nuxt/ui** (Tailwind), **nuxt-feature-flags**, **Pinia**, **Puppeteer**
-- **pnpm** (version enforced via `packageManager` field)
+- **pnpm 12.3.4** (pinned via `packageManager`) with **Node.js 26.x**
 
 See [README.md](README.md#technology-stack) for complete stack details.
+
+pnpm 12 project settings (engine enforcement, overrides, and allowed dependency builds) belong in `pnpm-workspace.yaml`, not the removed `package.json` pnpm section.
 
 ## Development Commands
 
@@ -27,6 +29,9 @@ pnpm lint                # Check with ESLint
 pnpm lint:fix            # Auto-fix ESLint issues
 pnpm format              # Format with Prettier
 pnpm format:check        # Check formatting
+pnpm test                 # Run shared behavior tests
+pnpm test:build           # Check compiled CSS after pnpm build
+pnpm test:deployment      # Smoke-test a running deployment
 pnpm deadcode            # Find unused code with Knip
 
 # Combined
@@ -85,7 +90,7 @@ CSV Data
   → parseCSVToPagesWithMapping() [column-mapper.ts]
     → NameTagPage[] { tags: NameTagRow[] }
   → generateNameTagsHTML() [html-generator.ts]
-    → HTML string (TownStix US-10 format, 10 labels/page)
+    → HTML string (selected stock: TownStix 10/page or Avery 5390 8/page)
   → generatePDF() [pdf-generator.ts]
     → PDF Buffer (via Puppeteer)
 ```
@@ -122,7 +127,7 @@ CSV Data
 All core types are in `types/index.d.ts`:
 
 - `NameTagRow` - Single tag with 3 lines (line1 is large/bold, line2/3 are smaller)
-- `NameTagPage` - Array of up to 10 tags (TownStix US-10 = 10 labels per sheet)
+- `NameTagPage` - Logical group of tags, split into physical sheets using the selected stock capacity
 - `ColumnMapping` - Maps each line to a column index (0-based) or null
 - `ParsedData` - Parsed CSV with metadata (headers, column count, preview)
 - `WizardStep` - Union type: 'upload' | 'mapping' | 'preview'
@@ -130,7 +135,7 @@ All core types are in `types/index.d.ts`:
 
 ### CSS Architecture
 
-**Component-scoped PostCSS** (not inline Tailwind):
+**Component-scoped CSS with Tailwind compilation** (example under `app/components/atoms/`):
 
 ```vue
 <template>
@@ -139,7 +144,9 @@ All core types are in `types/index.d.ts`:
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .glass-card {
   @apply relative overflow-hidden rounded-xl border;
   background: rgba(255, 255, 255, 0.05);
@@ -211,7 +218,7 @@ const isAdSenseEnabled = isEnabled('adsense')
 ### Configuration Files
 
 - `nuxt.config.ts` - Nuxt config with modules (@nuxt/ui, @pinia/nuxt, @pinia/colada-nuxt, nuxt-feature-flags)
-  - **Important:** `cssMinify: 'lightningcss'` to suppress esbuild warnings for @apply directives
+  - **CSS:** `cssMinify: 'lightningcss'` minifies compiled CSS; it does not compile Tailwind directives. Use plain `<style scoped>` with a relative `@reference` to `app/assets/css/main.css`. Run `pnpm test:build` after the production build to reject uncompiled `@apply` or `@reference` in output CSS.
   - Default color mode: dark
   - **AdSense verification:** `app.head.meta` with `google-adsense-account` meta tag
 - `app.config.ts` - UI theme (primary: purple, gray: neutral)
@@ -229,9 +236,9 @@ const isAdSenseEnabled = isEnabled('adsense')
 
 ### Modifying Label Format
 
-- **HTML template:** Edit `server/utils/html-generator.ts` - contains CSS for TownStix US-10 layout
+- **HTML template:** Edit `lib/html-generator.ts` and label-stock definitions - shared by web and CLI; preserve both TownStix US-10 and Avery 5390 layouts
 - **Line styling:** Line1 is 32pt bold, Line2/3 are 18pt regular (defined in HTML template)
-- **PDF settings:** Edit `server/utils/pdf-generator.ts` - margins, format (Letter), printBackground
+- **PDF settings:** Edit `lib/pdf-generator.ts` - preserve stock-specific HTML page margins and Letter sizing
 
 ### Google Sheets Integration
 
@@ -248,5 +255,5 @@ const isAdSenseEnabled = isEnabled('adsense')
 ## Deployment Notes
 
 - **Puppeteer requirement:** Server environment must support Chrome/Chromium for PDF generation
-- **Recommended platforms:** Vercel, Netlify, Cloudflare Pages (all support Puppeteer)
+- **Deployment baseline:** Docker/Fly.io using Node 26 and system Chromium. Managed/serverless alternatives need explicit Node 26 and browser-runtime compatibility checks.
 - **Build output:** `pnpm build` creates `.output/` directory with server and client bundles

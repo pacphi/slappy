@@ -1,4 +1,9 @@
 import type { NameTagRow, NameTagPage } from './types'
+import {
+  defaultLabelTemplateId,
+  getLabelTemplate,
+  type LabelTemplateId,
+} from '../shared/label-templates'
 
 /**
  * Escapes HTML special characters to prevent XSS
@@ -33,7 +38,7 @@ function generateTagHTML(tag: NameTagRow): string {
  * Generates HTML for one or more physical pages from a logical page
  * Splits into multiple physical pages if more than labelsPerPage tags
  */
-function generatePagesHTML(page: NameTagPage, _pageIndex: number, labelsPerPage = 10): string {
+function generatePagesHTML(page: NameTagPage, labelsPerPage: number): string {
   const tags = page.tags
   const physicalPages: string[] = []
 
@@ -60,22 +65,29 @@ ${paddedTags.map(tag => generateTagHTML(tag)).join('\n')}
 }
 
 /**
- * Generates complete HTML document for name tags in TownStix US-10 (4" x 2") format
+ * Generates a printable US Letter document for the selected label stock.
  * @param pages Array of pages with name tag data
- * @param labelsPerPage Number of labels per physical page (default: 10 for TownStix US-10)
+ * @param templateId Label stock identifier (defaults to TownStix US-10)
  * @returns HTML string ready for printing
  */
-export function generateNameTagsHTML(pages: NameTagPage[], labelsPerPage = 10): string {
+export function generateNameTagsHTML(
+  pages: NameTagPage[],
+  templateId: LabelTemplateId = defaultLabelTemplateId
+): string {
+  const template = getLabelTemplate(templateId)
+  const labelsPerPage = template.columns * template.rows
+  const gridWidth =
+    template.columns * template.widthIn + (template.columns - 1) * template.columnGapIn
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Name Tags - TownStix US-10</title>
+  <title>Name Tags - ${template.name}</title>
   <style>
     @page {
       size: letter;
-      margin: 0.5in 0.25in;
+      margin: 0;
     }
 
     * {
@@ -92,7 +104,10 @@ export function generateNameTagsHTML(pages: NameTagPage[], labelsPerPage = 10): 
 
     .page {
       page-break-after: always;
-      width: 8in;
+      break-inside: avoid;
+      width: 8.5in;
+      height: 11in;
+      padding: ${template.marginTopIn}in ${template.marginRightIn}in ${template.marginBottomIn}in ${template.marginLeftIn}in;
       margin: 0 auto;
     }
 
@@ -100,19 +115,19 @@ export function generateNameTagsHTML(pages: NameTagPage[], labelsPerPage = 10): 
       page-break-after: auto;
     }
 
-    /* TownStix US-10: 2 columns x 5 rows = 10 labels per sheet */
-    /* Each label is 4" x 2" */
+    /* ${template.name}: ${labelsPerPage} labels per sheet */
     .label-grid {
       display: grid;
-      grid-template-columns: repeat(2, 4in);
-      grid-template-rows: repeat(5, 2in);
-      gap: 0;
-      width: 8in;
+      grid-template-columns: repeat(${template.columns}, ${template.widthIn}in);
+      grid-template-rows: repeat(${template.rows}, ${template.heightIn}in);
+      column-gap: ${template.columnGapIn}in;
+      row-gap: ${template.rowGapIn}in;
+      width: ${gridWidth}in;
     }
 
     .name-tag {
-      width: 4in;
-      height: 2in;
+      width: ${template.widthIn}in;
+      height: ${template.heightIn}in;
       border: 1px dashed #ccc;
       display: flex;
       flex-direction: column;
@@ -157,7 +172,7 @@ export function generateNameTagsHTML(pages: NameTagPage[], labelsPerPage = 10): 
   </style>
 </head>
 <body>
-${pages.map((page, pageIndex) => generatePagesHTML(page, pageIndex, labelsPerPage)).join('\n')}
+${pages.map(page => generatePagesHTML(page, labelsPerPage)).join('\n')}
 </body>
 </html>`
 

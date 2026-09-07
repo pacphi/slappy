@@ -1,3 +1,5 @@
+import { version } from './package.json'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -12,12 +14,15 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/main.css'],
 
+  // Social previews use public/og-image.png; no dynamic image renderer is needed.
+  ogImage: { enabled: false },
+
   // SEO Configuration
   site: {
     url: 'https://slappy.cloud',
     name: 'Slappy',
     description:
-      'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
+      'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
     defaultLocale: 'en',
   },
 
@@ -64,7 +69,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       appName: 'Slappy',
-      version: '2.0.0',
+      version,
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'https://slappy.cloud',
       googleAdSenseAccount: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ACCOUNT || '',
       googleAdSenseEnabled: process.env.NUXT_PUBLIC_GOOGLE_ADSENSE_ENABLED === 'true',
@@ -72,7 +77,7 @@ export default defineNuxtConfig({
   },
   vite: {
     build: {
-      // Suppress esbuild CSS minifier warnings for PostCSS/Tailwind @apply directives
+      // Minify compiled CSS; component @apply rules are resolved by Tailwind first.
       cssMinify: 'lightningcss',
     },
     optimizeDeps: {

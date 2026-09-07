@@ -43,6 +43,8 @@ This file demonstrates:
 - Data rows starting from row 2
 - Blank rows to create page breaks
 
+For Avery 5390, upload this same CSV in the web app and choose **Avery 5390** in the Preview **Label stock** picker. Sample static HTML and styling configuration demonstrate the default TownStix format; the picker generates the stock-specific layout.
+
 ### `config.example.ts`
 
 **Purpose**: Example configuration templates for customizing label styles

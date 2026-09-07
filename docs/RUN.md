@@ -18,8 +18,8 @@ This guide provides detailed instructions for running the Slappy in various scen
 
 Before running the application, ensure you have:
 
-1. **Node.js 24+** installed
-2. **pnpm** installed (version enforced via `packageManager` field in package.json - see [pnpm.io](https://pnpm.io))
+1. **Node.js 26.x** installed
+2. **pnpm 12.3.4** installed (`npm install -g pnpm@12.3.4`)
 3. **Dependencies installed**: Run `pnpm install`
 4. **For PDF generation**: Puppeteer will install Chromium automatically (may take several minutes on first install)
 
@@ -136,7 +136,8 @@ Map your data columns to the three lines on each name tag:
 Preview and download your name tags:
 
 1. **Preview**: View your name tags in the browser
-   - TownStix US-10 format (4" × 2" labels, 2 columns × 5 rows)
+   - Choose **Label stock**: TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet)
+   - TownStix is the default; the selected stock applies to preview, HTML, PDF, and printing
    - Dashed borders visible on screen (hidden when printing)
    - Scroll to review all pages
 
@@ -147,7 +148,7 @@ Preview and download your name tags:
 
 3. **Print Settings** (when using Print button or opening HTML):
    - Paper size: US Letter (8.5" × 11")
-   - Margins: 0.5 inches on all sides
+   - Margins: use the generated template defaults; do not add custom margins
    - Scale: 100%
    - Disable headers/footers
 
@@ -178,8 +179,11 @@ pnpm cli <SPREADSHEET_ID> <GID> [OUTPUT_FILE] [OPTIONS]
 - `--line3-col=N`: Map column N to line 3 (default: 2)
 - `--has-headers`: Treat first row as headers (skip it)
 - `--format=FORMAT`: Output format: `html` or `pdf` (default: `html`)
+- `--label-template=STOCK`: Label stock: `avery-5390` (8 per sheet) or `townstix-us-10` (default, 10 per sheet)
 
 Column indices are 0-based (first column = 0, second = 1, etc.).
+
+The CLI uses the same stock definitions and print layout as the UI picker. The selected stock applies to both HTML and PDF output.
 
 ### CLI Examples
 
@@ -205,6 +209,15 @@ pnpm cli <SHEET_ID> <GID> output.html \
 pnpm cli <SHEET_ID> <GID> output.pdf \
   --has-headers --format=pdf
 ```
+
+**Avery 5390: Eight inserts per sheet**
+
+```bash
+pnpm cli SHEET_ID GID avery-5390.pdf \
+  --has-headers --format=pdf --label-template=avery-5390
+```
+
+Omit `--label-template` or use `--label-template=townstix-us-10` for the default TownStix layout.
 
 **Example 4: Partial mapping (2 lines only)**
 
@@ -282,7 +295,7 @@ To create **page breaks** (start a new sheet of labels):
 
 - Insert a completely **blank row** in your spreadsheet (all columns empty)
 - Blank rows separate groups into different physical pages
-- Each page holds up to 10 labels (2 columns × 5 rows, TownStix US-10 format)
+- Each physical page holds up to 10 labels for TownStix US-10 (2 × 5), or 8 for Avery 5390 (2 × 4)
 - Pages are automatically padded with empty labels to maintain the grid
 
 ## Column Mapping
@@ -391,12 +404,12 @@ pnpm cli <ID> <GID> output.pdf --format=pdf
 
 ### Print Settings
 
-For best results when printing to TownStix US-10 label sheets:
+Select the label stock matching your sheets before downloading or printing:
 
 **Required Settings:**
 
 - **Paper size**: US Letter (8.5" × 11")
-- **Margins**: 0.5 inches on all sides
+- **Margins**: use the generated template defaults; do not add custom margins
 - **Scale**: 100% (no shrinking or "fit to page")
 - **Headers/Footers**: Disabled
 - **Background graphics**: Enabled (optional, shows borders for alignment)
@@ -406,15 +419,15 @@ For best results when printing to TownStix US-10 label sheets:
 **Chrome/Edge:**
 
 1. Open HTML file or use web UI Print button
-2. More settings → Margins → Custom (0.5in all sides)
+2. More settings → Margins → Default (use the template margins)
 3. Uncheck "Headers and footers"
 4. Check "Background graphics" (to see alignment borders)
-5. Verify preview shows 2×5 grid per page
+5. Verify preview shows 2×5 for TownStix or 2×4 for Avery 5390
 
 **Firefox:**
 
 1. File → Print
-2. Page Setup → Margins (0.5in all sides)
+2. Page Setup → use the document’s template margins
 3. Format & Options → Uncheck headers/footers
 4. Use Print Preview to verify alignment
 
@@ -434,15 +447,15 @@ If you generated a PDF file:
 2. File → Print
 3. Select "Actual size" or "100%" scaling
 4. Ensure no "fit to page" or auto-rotate options are enabled
-5. Print to TownStix US-10 label sheets
+5. Print to sheets matching the selected label stock
 
 ### Test Print Procedure
 
 **Always test print on regular paper first** before using label sheets:
 
 1. Print one page on plain paper
-2. Hold up to light with TownStix label sheet behind it
-3. Verify alignment of all 10 label positions
+2. Hold up to light with matching label sheet behind it
+3. Verify alignment of all positions (10 for TownStix, 8 for Avery 5390)
 4. Check that borders (if visible) align with label edges
 5. If misaligned, adjust print settings and retest
 
@@ -450,9 +463,9 @@ If you generated a PDF file:
 
 The HTML output includes dashed borders visible on-screen (hidden in final print). These help verify:
 
-- Labels are exactly 4" wide × 2" tall
-- Grid is precisely 2 columns × 5 rows
-- Page margins are correct (0.5" all sides)
+- TownStix US-10: 4" × 2" labels in a 2 × 5 grid
+- Avery 5390: nominally 3½" × 2¼", in a 2 × 4 grid; actual template cells are 3½" × 2 7/32" with ¾" side margins and 1 1/16" top/bottom margins (see [template geometry](ARCHITECTURE.md#html-generation-with-label-stock-templates))
+- The generated template sets margins for the selected stock
 
 ## Troubleshooting
 
@@ -493,7 +506,7 @@ Solution:
 
 ```bash
 # Provide both spreadsheet ID and gid
-npx ts-node nametag-generator.ts <SPREADSHEET_ID> <GID>
+pnpm cli <SPREADSHEET_ID> <GID>
 ```
 
 **Error: "Failed to fetch Google Sheet"**
@@ -524,14 +537,14 @@ Solutions:
 
 ### Printing Issues
 
-**Issue: Labels don't align with TownStix sheet**
+**Issue: Labels don't align with the sheet**
 
 Cause: Incorrect print settings
 
 Solutions:
 
 1. Verify paper size: **US Letter** (not A4)
-2. Set margins to **exactly 0.5 inches** (not default)
+2. Use the generated template margins and confirm the **Label stock** picker matches the sheets
 3. Ensure scale is **100%** (not "fit to page")
 4. Disable "Shrink to fit" or auto-scaling options
 5. Test print on plain paper first
@@ -562,7 +575,7 @@ Solutions:
 
 This is expected behavior:
 
-- TownStix US-10 requires 10 labels per sheet (2×5 grid)
+- TownStix US-10 uses 10 labels per sheet (2×5); Avery 5390 uses 8 (2×4)
 - Pages are automatically padded to maintain the grid
 - Labels with no data display as empty spaces
 - This ensures proper label sheet alignment
@@ -631,7 +644,7 @@ declare -a events=(
 
 for event in "${events[@]}"; do
   read -r id gid output <<< "$event"
-  npx ts-node nametag-generator.ts "$id" "$gid" "$output" --has-headers --format=pdf
+  pnpm cli "$id" "$gid" "$output" --has-headers --format=pdf
 done
 ```
 
@@ -666,7 +679,7 @@ Enable verbose output:
 **CLI:**
 
 ```bash
-npx ts-node nametag-generator.ts <ID> <GID> 2>&1 | tee generation.log
+pnpm cli <ID> <GID> 2>&1 | tee generation.log
 ```
 
 Look for:

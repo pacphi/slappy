@@ -136,7 +136,9 @@ const nativeShare = async () => {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .social-share {
   @apply flex flex-col gap-3;
 }

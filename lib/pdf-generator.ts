@@ -1,7 +1,7 @@
 /**
  * Generates a PDF from HTML content using Puppeteer
  * This module provides PDF generation for name tags while preserving
- * the exact layout from the HTML template (TownStix US-10 format)
+ * the exact layout from the selected HTML label template
  */
 
 /**
@@ -31,12 +31,6 @@ export async function generatePDF(html: string): Promise<Buffer> {
     // Generate PDF with proper settings for US Letter
     const pdfBuffer = await page.pdf({
       format: 'Letter', // US Letter (8.5" x 11")
-      margin: {
-        top: '0.5in',
-        right: '0.5in',
-        bottom: '0.5in',
-        left: '0.5in',
-      },
       printBackground: true, // Include background colors/images
       preferCSSPageSize: true, // Use CSS @page settings
     })
@@ -49,9 +43,9 @@ export async function generatePDF(html: string): Promise<Buffer> {
       await browser.close()
     }
     if (error instanceof Error) {
-      throw new Error(`PDF generation failed: ${error.message}`)
+      throw new Error(`PDF generation failed: ${error.message}`, { cause: error })
     }
-    throw new Error('PDF generation failed with an unknown error')
+    throw new Error('PDF generation failed with an unknown error', { cause: error })
   }
 }
 

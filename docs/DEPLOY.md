@@ -1,6 +1,6 @@
 I# Deployment Guide
 
-This guide provides instructions for deploying the Slappy in various environments, including distribution as an npm package, Docker container, or standalone executable.
+The supported deployment baseline is Node.js 26.x with pnpm 12.3.4. Use the repository Docker image locally or on Fly.io to include Chromium for PDF generation. Other packaging and hosting examples below are reference approaches, not validated Node 26 deployment targets.
 
 - [Deployment Options](#deployment-options)
 - [Prerequisites](#prerequisites)
@@ -75,21 +75,19 @@ This guide provides instructions for deploying the Slappy in various environment
 
 Slappy provides both a **Nuxt web application** with multi-step wizard and **CLI tool** with column mapping for generating print-ready name tags in HTML or PDF format.
 
-| Method                     | Best For                         | Pros                                                           | Cons                                                           |
-| -------------------------- | -------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------- |
-| **Fly.io (Web App)**       | Non-technical users, teams       | Browser access, no installation, column mapping UI, PDF export | Requires hosting (~$0-5/mo), Puppeteer increases memory needs  |
-| **Vercel (Web App)**       | Zero-config deployment           | Instant deployment, edge network, serverless                   | Cold starts, Puppeteer requires pro plan for memory            |
-| **Cloudflare Pages**       | Edge-first deployment            | Global CDN, fast cold starts, generous free tier               | Limited Node.js APIs, may need Worker for some features        |
-| **Netlify (Web App)**      | JAMstack deployment              | Easy setup, build plugins, edge functions                      | Function timeouts, Puppeteer memory limits                     |
-| **Docker**                 | Isolated environments, CI/CD     | Consistent runtime, no local deps, includes Chromium           | Larger image size (~500MB with Puppeteer)                      |
-| **NPM Package (CLI only)** | Node.js users, development teams | Easy updates, standard tooling, CLI with mapping flags         | Requires Node.js + Puppeteer installed                         |
-| **Standalone Binary**      | End users, automation scripts    | No Node.js required, simple                                    | Very large with PDF support (200MB+), platform-specific builds |
+| Method                              | Support for this baseline                                                                                                     |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Docker / Fly.io**                 | Repository Node 26 image with system Chromium; primary deployment path                                                        |
+| **Self-hosted Node**                | Requires Node 26.x, pnpm 12.3.4 for builds, and a compatible Chrome/Chromium installation                                     |
+| **Vercel / Netlify**                | Reference only; validate build and function runtime Node 26 support, Chromium packaging, memory, and timeouts before adapting |
+| **Cloudflare Pages / Workers**      | Requires platform-specific adaptation; the Node/Puppeteer server cannot be assumed to run in an edge runtime                  |
+| **npm package / standalone binary** | Not provided by the current private package; requires a separate CLI packaging pipeline                                       |
 
 ## Prerequisites
 
 Before deploying, ensure you have completed the build process (see [BUILD.md](BUILD.md)) and have:
 
-- **Node.js 20+** and **pnpm** installed (version enforced via `packageManager` field in package.json)
+- **Node.js 26.x** and **pnpm 12.3.4** installed (`npm install -g pnpm@12.3.4`)
 - **Nuxt built** (`pnpm build` creates `.output/` directory)
 - **Puppeteer 25+** (for PDF generation - installed via pnpm)
 - **Git** for version control
@@ -102,6 +100,8 @@ Before deploying, ensure you have completed the build process (see [BUILD.md](BU
 
 ### Publishing to npm Registry
 
+Reference only: the current `package.json` is private and `pnpm build` produces the Nuxt server, not `dist/nametag-generator.js`. Implement and validate a separate CLI build and package manifest before publishing.
+
 **Public npm package** allows anyone to install via `npm install`:
 
 1. **Update package.json**:
@@ -109,8 +109,8 @@ Before deploying, ensure you have completed the build process (see [BUILD.md](BU
    ```json
    {
      "name": "slappy",
-     "version": "1.0.0",
-     "description": "Generate TownStix US-10 format name tags from Google Sheets",
+     "version": "2.0.0",
+     "description": "Generate printable name tags from Google Sheets",
      "main": "dist/nametag-generator.js",
      "bin": {
        "slappy": "./dist/nametag-generator.js"
@@ -124,7 +124,7 @@ Before deploying, ensure you have completed the build process (see [BUILD.md](BU
 2. **Build the project**:
 
    ```bash
-   npm run build
+   pnpm build
    ```
 
 3. **Login to npm**:
@@ -234,7 +234,7 @@ A production-ready **Dockerfile** is included in the project root ([`Dockerfile`
 
 - **Multi-stage build** - Separates deps, build, and runtime stages for efficiency
 - **Alpine Linux** - Lightweight Node.js distribution
-- **pnpm support** - Uses corepack for package management
+- **pnpm support** - Installs pnpm 12.3.4 using npm; Node 26 does not bundle Corepack
 - **Puppeteer/Chromium included** - Pre-installed for PDF generation
 - **Security best practices** - Runs as non-root user (`nuxt`)
 - **Optimized layers** - Efficient caching for faster rebuilds
@@ -346,70 +346,15 @@ docker push ghcr.io/username/slappy:latest
 
 ### Using pkg
 
-**[pkg](https://github.com/vercel/pkg)** bundles Node.js and your app into a single executable:
-
-1. **Install pkg**:
-
-   ```bash
-   npm install -g pkg
-   ```
-
-2. **Add to package.json**:
-
-   ```json
-   {
-     "bin": "dist/nametag-generator.js",
-     "pkg": {
-       "targets": ["node24-macos-x64", "node24-linux-x64", "node24-win-x64"],
-       "outputPath": "build"
-     }
-   }
-   ```
-
-3. **Build executables**:
-
-   ```bash
-   npm run build
-   pkg .
-   ```
-
-4. **Output** (in `build/` directory):
-   - `slappy-macos` (macOS Intel)
-   - `slappy-linux` (Linux x64)
-   - `slappy-win.exe` (Windows x64)
-
-5. **Distribute**: Share executables directly with users
+Standalone `pkg` binaries are not a supported Node 26 deployment path in this repository. Do not substitute a fictitious `node26-*` target into older packaging examples. Use the Docker image for the supported Node runtime and PDF browser dependencies.
 
 ### Using Bun
 
-**[Bun](https://bun.sh)** offers faster compilation:
-
-```bash
-# Install Bun
-curl -fsSL https://bun.sh/install | bash
-
-# Compile to standalone executable
-bun build nametag-generator.ts --compile --outfile slappy
-
-# Run (basic usage)
-./slappy <SPREADSHEET_ID> <GID>
-
-# Run (with column mapping and PDF)
-./slappy <SPREADSHEET_ID> <GID> output.pdf \
-  --line1-col=0 --line2-col=2 --has-headers --format=pdf
-```
-
-**Note**: Standalone executables with PDF generation require bundling Puppeteer and Chromium, which significantly increases file size (200MB+). Consider Docker distribution for PDF functionality.
+A Bun-compiled CLI would be a separate runtime and packaging project. It has not been validated here and is not a substitute for the Node 26 baseline.
 
 ### Distribution
 
-**GitHub Releases** is ideal for distributing executables:
-
-1. Create executables for each platform
-2. Tag a release: `git tag v1.0.0 && git push --tags`
-3. Create release on GitHub
-4. Upload executables as release assets
-5. Users download platform-specific binary
+No standalone binaries are built by the current CI workflow. Distribute the Docker image or run the CLI from source with Node 26 and pnpm 12.3.4.
 
 ## Web Application Deployment
 
@@ -417,7 +362,7 @@ Slappy Nuxt web application can be deployed to multiple platforms. Each platform
 
 ### Common Features
 
-All web deployments provide:
+The Docker/Fly.io deployment provides:
 
 - **Multi-step wizard** - Upload → Map Columns → Preview & Download
 - **Flexible column mapping** - Map any column to any tag line with data preview
@@ -432,7 +377,7 @@ All web deployments provide:
 
 ## Fly.io Deployment
 
-Fly.io provides full Node.js runtime support, making it ideal for Puppeteer-based PDF generation.
+Fly.io builds the repository Dockerfile, so all dependency, builder, and runtime stages use `node:26-alpine`. The build installs pnpm 12.3.4; the runtime installs system Chromium and runs the Nuxt server as the `nuxt` user. This avoids dependence on a managed platform’s Node version selector.
 
 **Official Documentation:**
 
@@ -523,6 +468,8 @@ These inputs are passed as command-line parameters to `flyctl deploy`, allowing 
 **Note on PDF Generation**: PDF generation uses Puppeteer (headless Chrome), which requires additional memory. The configured 1GB RAM is adequate for typical usage. For high-volume PDF generation, use the workflow to deploy with 2GB (`vm_memory: 2048`) or scale manually (`flyctl scale memory 2048`).
 
 ## Vercel Deployment
+
+**Reference only:** confirm this provider supports Node 26 in both builds and the deployed runtime before using these examples. The Docker/Fly.io configuration is the maintained deployment path. PDF generation additionally requires a compatible browser runtime; edge runtimes need a separate browser service or adaptation.
 
 Vercel offers zero-configuration Nuxt deployment with excellent performance, though Puppeteer PDF generation requires specific configuration.
 
@@ -676,6 +623,8 @@ vercel remove slappy
 
 ## Cloudflare Pages Deployment
 
+**Reference only:** confirm this provider supports Node 26 in both builds and the deployed runtime before using these examples. The Docker/Fly.io configuration is the maintained deployment path. PDF generation additionally requires a compatible browser runtime; edge runtimes need a separate browser service or adaptation.
+
 Cloudflare Pages offers edge deployment with excellent global performance and generous free tier.
 
 **Official Documentation:**
@@ -702,7 +651,7 @@ Cloudflare Pages offers edge deployment with excellent global performance and ge
    - **Framework preset**: Nuxt.js
    - **Build command**: `pnpm build`
    - **Build output directory**: `.output/public`
-   - **Node version**: 24
+   - **Node version**: 26 (requires provider support)
 6. Click "Save and Deploy"
 
 **Deploy with Wrangler CLI:**
@@ -773,7 +722,8 @@ Cloudflare Pages/Workers have Node.js compatibility layers but **do not support 
 Set in Pages dashboard → Settings → Environment variables:
 
 ```
-NODE_VERSION=24
+NODE_VERSION=26
+PNPM_VERSION=12.3.4
 ```
 
 ### Custom Domain
@@ -807,6 +757,8 @@ Cloudflare Pages is **excellent for HTML-only deployment**. For full PDF support
 
 ## Netlify Deployment
 
+**Reference only:** confirm this provider supports Node 26 in both builds and the deployed runtime before using these examples. The Docker/Fly.io configuration is the maintained deployment path. PDF generation additionally requires a compatible browser runtime; edge runtimes need a separate browser service or adaptation.
+
 Netlify provides easy deployment with build plugins and edge functions.
 
 **Official Documentation:**
@@ -832,7 +784,7 @@ Netlify provides easy deployment with build plugins and edge functions.
 5. Configure build settings:
    - **Build command**: `pnpm build`
    - **Publish directory**: `.output/public`
-   - **Node version**: 24 (set in `netlify.toml`)
+   - **Node version**: 26 (only if the provider supports it in build and function runtimes)
 6. Click "Deploy site"
 
 **Deploy with Netlify CLI:**
@@ -861,8 +813,8 @@ Create `netlify.toml`:
   publish = ".output/public"
 
 [build.environment]
-  NODE_VERSION = "24"
-  NPM_FLAGS = "--version"  # Use pnpm
+  NODE_VERSION = "26"
+  PNPM_VERSION = "12.3.4"
 
 [[redirects]]
   from = "/*"
@@ -917,7 +869,8 @@ const browser = await chromium.puppeteer.launch({
 Set in Netlify dashboard → Site settings → Environment variables:
 
 ```
-NODE_VERSION=24
+NODE_VERSION=26
+PNPM_VERSION=12.3.4
 ```
 
 ### Custom Domain
@@ -1041,7 +994,7 @@ flyctl scale memory 2048
 
 #### Slow startup
 
-- Next.js apps can take 10-20 seconds for cold starts
+- Inspect Nuxt startup logs and health-check timing after deployment
 - Consider keeping `min_machines_running = 1` for frequently used apps
 
 > **Note**: The web app is **stateless** - no persistent storage or database required. All processing happens in-memory.
@@ -1073,7 +1026,7 @@ npm search slappy
 
 ```bash
 # Ensure dist/ is built before Docker
-npm run build
+pnpm build
 
 # Check .dockerignore doesn't exclude dist/
 cat .dockerignore
@@ -1127,7 +1080,7 @@ USER node
 | `wrangler pages deploy`  | Deploy to Cloudflare Pages               |
 | `netlify deploy --prod`  | Deploy to Netlify production             |
 | `npm publish`            | Publish CLI tool to npm registry         |
-| `npm version patch`      | Bump CLI package version (1.0.0 → 1.0.1) |
+| `npm version patch`      | Bump CLI package version (2.0.0 → 2.0.1) |
 
 ---
 

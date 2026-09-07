@@ -1,0 +1,51 @@
+# pnpm 12 reads project settings here, not from package.json or .npmrc.
+engineStrict: true
+peerDependencyRules:
+  allowedVersions:
+    eslint: '10'
+allowBuilds:
+  '@parcel/watcher': true
+  'esbuild': true
+  'puppeteer': true
+  'sharp': true
+  'unrs-resolver': true
+  'vue-demi': true
+overrides:
+  'fontless>esbuild': '^0.28.2'
+  '@types/parse-path': 'npm:empty-npm-package@^1.0.0'
+  '@vue/devtools-kit': '8.0.3'
+  '@vue/devtools-api': '8.0.3'
+  '@vue/devtools-core': '8.0.3'
+  'node-forge': '^1.4.0'
+  'devalue': '^5.6.2'
+  'fast-xml-parser': '^5.3.5'
+  'simple-git': '^3.32.3'
+  'tar': '^7.5.21'
+  '@isaacs/brace-expansion': '^5.0.1'
+  'defu': '^6.1.5'
+  'diff': '^8.0.3'
+  'flatted': '^3.4.2'
+  'h3': '^1.15.9'
+  'lodash': '^4.18.0'
+  'postcss': '^8.5.23'
+  'rollup': '^4.59.0'
+  'smol-toml': '^1.6.1'
+  'ws': '^8.21.0'
+  'yaml': '^2.8.3'
+  'eslint-plugin-import-x>minimatch': '^10.2.3'
+  'readdir-glob>minimatch': '^5.1.8'
+  'glob>minimatch': '^9.0.7'
+  'tinyglobby>picomatch': '^4.0.4'
+  'anymatch>picomatch': '^2.3.2'
+  'micromatch>picomatch': '^2.3.2'
+  '@stylistic/eslint-plugin>picomatch': '^4.0.4'
+  'unplugin>picomatch': '^4.0.4'
+  'unimport>picomatch': '^4.0.4'
+  'unplugin-utils>picomatch': '^4.0.4'
+  'unplugin-auto-import>picomatch': '^4.0.4'
+  'unplugin-vue-components>picomatch': '^4.0.4'
+  '@rollup/pluginutils>picomatch': '^4.0.4'
+minimumReleaseAgeExclude:
+  - '@iconify-json/lucide@1.2.130'
+  - '@nuxt/ui@4.11.1'
+  - '@types/node@26.5.0'

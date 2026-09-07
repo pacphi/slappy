@@ -5,11 +5,13 @@ import { parseCSVToPagesWithMapping, getDefaultMapping } from '../lib/column-map
 import { generateNameTagsHTML } from '../lib/html-generator'
 import { generatePDFFile } from '../lib/pdf-generator'
 import type { ColumnMapping, OutputFormat } from '../lib/types'
+import { getLabelTemplate, type LabelTemplateId } from '../shared/label-templates'
 
 interface GenerateOptions {
   mapping?: ColumnMapping
   hasHeaders?: boolean
   format?: OutputFormat
+  labelTemplate?: LabelTemplateId
 }
 
 /**
@@ -22,7 +24,8 @@ export async function generateNameTags(
   options: GenerateOptions = {}
 ): Promise<void> {
   try {
-    const { mapping, hasHeaders = false, format = 'html' } = options
+    const { mapping, hasHeaders = false, format = 'html', labelTemplate } = options
+    const template = getLabelTemplate(labelTemplate)
 
     // Determine output path based on format if not provided
     const finalOutputPath = outputPath || `./name-tags.${format}`
@@ -42,7 +45,7 @@ export async function generateNameTags(
     console.log(`Found ${pages.length} page(s) of name tags`)
 
     console.log('Generating HTML...')
-    const html = generateNameTagsHTML(pages)
+    const html = generateNameTagsHTML(pages, template.id)
 
     // Generate output based on format
     if (format === 'pdf') {
@@ -55,7 +58,8 @@ export async function generateNameTags(
       fs.writeFileSync(finalOutputPath, html, 'utf-8')
       console.log('✅ Name tags HTML generated successfully!')
       console.log(`📄 Open ${finalOutputPath} in a browser and print to create your name tags.`)
-      console.log('   Print settings: US Letter, margins 0.5in, no headers/footers')
+      console.log(`   Label stock: ${template.name}`)
+      console.log('   Print settings: US Letter, 100% scale, no margins, no headers/footers')
     }
   } catch (error) {
     console.error('❌ Error generating name tags:', error)
@@ -104,6 +108,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log('  --line3-col=N    Column index (0-based) for line 3 (default: 2)')
     console.log('  --has-headers    First row contains headers (default: false)')
     console.log('  --format=FORMAT  Output format: html or pdf (default: html)')
+    console.log('  --label-template=ID  townstix-us-10 (default) or avery-5390')
     console.log('')
     console.log('Examples:')
     console.log('  Basic usage (default column mapping):')
@@ -147,6 +152,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     mapping: useCustomMapping ? mapping : getDefaultMapping(),
     hasHeaders: flags['has-headers'] === 'true',
     format: (flags['format'] as OutputFormat) || 'html',
+    labelTemplate: flags['label-template'] as LabelTemplateId | undefined,
   }
 
   generateNameTags(spreadsheetId, gid, outputPath, options)

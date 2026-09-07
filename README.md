@@ -1,8 +1,10 @@
 # Slappy
 
+Slappy 2.0 · Node.js 26 · pnpm 12
+
 [![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy.fly.dev/)
 
-Generate print-ready name tags in TownStix US-10 format (4" × 2" labels, 10 per sheet) from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
+Generate print-ready name tags on TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet) from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
 
 **Perfect for**: Conferences, choir groups, school events, workshops, and volunteer programs.
 
@@ -13,6 +15,8 @@ The easiest way to use Slappy is through our modern web interface:
 ### Quick Start - Web App
 
 ```bash
+# Requires Node.js 26.x
+npm install -g pnpm@12.3.4
 pnpm install
 pnpm dev
 ```
@@ -21,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000) and follow the **3-step wiza
 
 1. **Upload** - Drag & drop CSV or paste Google Sheets URL
 2. **Map Columns** - Select which columns appear on each line
-3. **Preview & Download** - Get HTML or PDF output
+3. **Preview & Download** - Choose label stock, then get HTML or PDF output
 
 See **[Quick Start Guide](docs/QUICKSTART.md)** for detailed walkthrough.
 
@@ -63,6 +67,10 @@ pnpm cli SHEET_ID GID output.pdf \
   --line1-col=0 --line2-col=2 --line3-col=3 \
   --has-headers --format=pdf
 
+# Avery 5390: 8 inserts per sheet
+pnpm cli SHEET_ID GID avery-5390.pdf \
+  --has-headers --format=pdf --label-template=avery-5390
+
 # Local testing
 pnpm test:local
 ```
@@ -78,14 +86,14 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 - **[Architecture](docs/ARCHITECTURE.md)** - Technical architecture details
 - **[GitHub Workflows](docs/GITHUB_WORKFLOWS.md)** - Using GitHub Actions workflows (CI, Deploy, Teardown)
 - **[Continuous Integration](docs/CI.md)** - CI/CD technical implementation details
-- **[Deployment](docs/DEPLOY.md)** - Deployment instructions (Fly.io, Vercel, Cloudflare, Netlify, Docker)
+- **[Deployment](docs/DEPLOY.md)** - Deployment instructions (Docker/Fly.io and hosting compatibility)
 - **[Custom Domain Setup](docs/CUSTOM_DOMAIN_SETUP.md)** - Connect a custom domain to your Fly.io deployment with HTTPS
 - **[AdSense & SEO Setup](docs/ADSENSE_SEO_SETUP.md)** - Configure Google AdSense and SEO optimization
 
 ## Requirements
 
-- Node.js 24+
-- pnpm (package manager - version enforced via `packageManager` field in package.json)
+- Node.js 26.x
+- pnpm 12.3.4 (pinned in the `packageManager` field in package.json)
 - Puppeteer 25+ (for PDF generation - installed automatically)
 - A published Google Sheet or CSV file with your data
 
@@ -104,11 +112,12 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 - ✅ **Light/dark mode** theme toggle with glassmorphism design
 - ✅ **Live preview** with iframe rendering and zoom controls
 - ✅ **Responsive** mobile-friendly design
-- ✅ **Deploy anywhere** - Fly.io, Vercel, Cloudflare Pages, Netlify, Docker
+- ✅ **Docker and Fly.io deployment** - Node.js 26 with Chromium for PDF generation
 
 ### CLI Tool
 
 - ✅ **Command-line interface** - Automated workflows and scripting
+- ✅ **Label stock selection** - `--label-template=avery-5390` or `townstix-us-10` (default)
 - ✅ **Google Sheets integration** - Direct CSV export from published sheets
 - ✅ **Flexible column mapping** - Custom column-to-line mapping via flags
 - ✅ **Dual output formats** - HTML or PDF generation
@@ -121,13 +130,17 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 - ✅ **Partial mapping** - Use 1, 2, or 3 lines per tag
 - ✅ **Headers support** - Optional header row handling
 - ✅ **PDF generation** - High-fidelity PDF via Puppeteer
-- ✅ **TownStix US-10 format** - 2 columns × 5 rows = 10 labels per sheet
+- ✅ **Label stock picker** - TownStix US-10 (default, 2 × 5) or Avery 5390 (2 × 4), used for preview, HTML, PDF, and printing
 - ✅ **Google Sheets integration** - Direct CSV export API access
 - ✅ **Automatic page breaks** - Blank rows create new pages
 - ✅ **Print-ready output** - HTML or PDF ready for professional printing
 - ✅ **Customizable styling** - Fonts, colors, and layout
 - ✅ **Shared architecture** - CLI and web share core business logic in `lib/`
 - ✅ **Backwards compatible** - Existing workflows continue to work
+
+### Printing and label stock
+
+Choose the stock matching your sheets in Preview, then print on US Letter at **Actual size / 100%** using the template defaults. Avery 5390 is sold as 3½" × 2¼"; Slappy follows [Avery’s official 5390 PDF template](https://s3.amazonaws.com/avery.dpp.projects.s3uspdownloadables/CA_en/Downloadables/pdf/U-0119-01.pdf) for precise placement: its printed cells are 3½" × 2 7/32", with ¾" side margins and 1 1/16" top/bottom margins. Test on plain paper before printing label stock.
 
 ## Configuration
 
@@ -147,8 +160,8 @@ Feature flags use the `nuxt-feature-flags` module for type-safe, centralized fea
 - **PDF Generation**: Puppeteer 25 (headless Chrome)
 - **Theming**: @nuxt/ui color modes with glassmorphism design
 - **Icons**: Heroicons, Lucide
-- **Package Manager**: pnpm (enforced)
-- **Deployment**: Docker, Fly.io, Vercel, Cloudflare Pages, Netlify
+- **Package Manager**: pnpm 12.3.4 (pinned)
+- **Deployment**: Docker and Fly.io; other hosting requires Node.js 26 and browser-runtime validation
 
 ## Development
 
@@ -175,6 +188,9 @@ pnpm lint          # Check code with ESLint
 pnpm lint:fix      # Auto-fix ESLint issues
 pnpm format        # Format code with Prettier
 pnpm format:check  # Check code formatting
+pnpm test                 # Run shared behavior tests
+pnpm test:build           # Check compiled CSS after pnpm build
+pnpm test:deployment      # Smoke-test a running deployment
 pnpm deadcode      # Find unused code with Knip
 
 # Combined checks
@@ -228,7 +244,9 @@ Follow atomic design principles:
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .my-component {
   @apply relative overflow-hidden rounded-xl;
   /* Component-specific styles */
