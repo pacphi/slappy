@@ -115,6 +115,10 @@ jobs:
             libgbm1 \
             libasound2t64
 
+      # pnpm's restored package cache does not include Puppeteer's browser cache.
+      - name: Install Chrome for Puppeteer tests
+        run: pnpm exec puppeteer browsers install chrome
+
       - name: Test label templates
         run: pnpm test
 

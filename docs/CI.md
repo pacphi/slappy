@@ -27,7 +27,7 @@ pnpm audit --audit-level=low
 ```
 
 - ESLint and Prettier check code and formatting.
-- `pnpm test` runs the Node test runner through tsx (`tsx --test tests/*.test.ts`) for the shared label generation behavior.
+- `pnpm test` runs the Node test runner through tsx (`tsx --test tests/*.test.ts`) for the shared label generation behavior. CI explicitly runs `pnpm exec puppeteer browsers install chrome` before these tests: restoring pnpm's package cache does not restore Puppeteer's separate browser cache or guarantee its install hook runs again.
 - The CLI sample test generates `sample/sample-roster-tags.html`; CI checks that it exists, is substantial, and contains an HTML doctype.
 - `pnpm test:build` runs `node scripts/check-build.mjs` after the build and rejects any uncompiled `@apply` or `@reference` directive in output CSS.
 - The Nuxt build produces `.output/`. A successful build alone does not prove PDF browser launch or physical label alignment.
