@@ -22,7 +22,7 @@ This document describes the technical architecture, design decisions, and implem
 
 ## Overview
 
-Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vue 3** that generates print-ready name tags in TownStix US-10 format (4" × 2" labels, 2 columns × 5 rows = 10 labels per sheet).
+Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vue 3** that generates print-ready name tags on TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet).
 
 **Two interfaces to one implementation:**
 
@@ -31,9 +31,9 @@ Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vu
 
 **Architecture type**: Shared-core architecture with `lib/` containing all runtime-agnostic business logic
 
-**Runtime**: Node.js 24+ with Nuxt 4 (Nitro server)
+**Runtime**: Node.js 26.x with Nuxt 4 (Nitro server)
 
-**Package Manager**: pnpm (enforced via `packageManager` field)
+**Package Manager**: pnpm 12.3.4 (pinned via `packageManager`; settings in `pnpm-workspace.yaml`)
 
 **Build system**: Nuxt 4 with Nitro for web app, tsx for CLI execution
 
@@ -43,20 +43,20 @@ Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vu
 
 | Technology       | Version | Purpose                                |
 | ---------------- | ------- | -------------------------------------- |
-| **Nuxt**         | 4.2.0+  | Vue meta-framework with server support |
-| **Vue**          | 3.5.22+ | Progressive JavaScript framework       |
-| **TypeScript**   | 5.x     | Type-safe development                  |
-| **@nuxt/ui**     | 4.1.0+  | Tailwind CSS-based component library   |
+| **Nuxt**         | 4.5.2+  | Vue meta-framework with server support |
+| **Vue**          | 3.5.42+ | Progressive JavaScript framework       |
+| **TypeScript**   | 6.x     | Type-safe development                  |
+| **@nuxt/ui**     | 4.11.1+ | Tailwind CSS-based component library   |
 | **Pinia**        | Latest  | State management (via composables)     |
-| **Tailwind CSS** | 3.x     | Utility-first CSS (via @nuxt/ui)       |
+| **Tailwind CSS** | 4.x     | Utility-first CSS (via @nuxt/ui)       |
 
 ### Backend (Server)
 
 | Technology            | Version | Purpose                            |
 | --------------------- | ------- | ---------------------------------- |
 | **Nitro**             | 2.x     | Nuxt server engine                 |
-| **Node.js**           | 24.0.0+ | Runtime environment                |
-| **Puppeteer**         | 24.26+  | Headless Chrome for PDF generation |
+| **Node.js**           | 26.x    | Runtime environment                |
+| **Puppeteer**         | 25.10+  | Headless Chrome for PDF generation |
 | **H3**                | Latest  | HTTP server framework (via Nitro)  |
 | **Nuxt Server Utils** | -       | Server-side utilities              |
 
@@ -64,15 +64,15 @@ Slappy is a **full-stack TypeScript application** built with **Nuxt 4** and **Vu
 
 Runtime-agnostic business logic used by both web and CLI:
 
-| Module                | Purpose                                    |
-| --------------------- | ------------------------------------------ |
-| **types.ts**          | Shared TypeScript interfaces               |
-| **csv-parser.ts**     | CSV parsing with quote handling            |
-| **column-mapper.ts**  | Apply column mapping to parsed data        |
-| **html-generator.ts** | HTML generation with TownStix US-10 layout |
-| **pdf-generator.ts**  | PDF generation using Puppeteer             |
-| **sheets-fetcher.ts** | Google Sheets CSV fetching                 |
-| **data-parser.ts**    | Raw data extraction & column detection     |
+| Module                | Purpose                                        |
+| --------------------- | ---------------------------------------------- |
+| **types.ts**          | Shared TypeScript interfaces                   |
+| **csv-parser.ts**     | CSV parsing with quote handling                |
+| **column-mapper.ts**  | Apply column mapping to parsed data            |
+| **html-generator.ts** | HTML generation using the selected label stock |
+| **pdf-generator.ts**  | PDF generation using Puppeteer                 |
+| **sheets-fetcher.ts** | Google Sheets CSV fetching                     |
+| **data-parser.ts**    | Raw data extraction & column detection         |
 
 ### CLI Tools
 
@@ -420,7 +420,9 @@ Example: `Card.vue`
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .glass-card {
   @apply relative overflow-hidden rounded-xl border;
   background: rgba(255, 255, 255, 0.05);
@@ -884,7 +886,7 @@ pnpm test:local path/to/custom.csv     # Uses custom CSV file
          │  ┌────────────────────────────────┐  │
          │  │ generateNameTagsHTML()         │  │
          │  │ - Generate HTML with CSS       │  │
-         │  │ - TownStix US-10 layout        │  │
+         │  │ - Selected label-stock layout        │  │
          │  │ - Return HTML string           │  │
          │  └────────────────────────────────┘  │
          └───────────────┬──────────────────────┘
@@ -1014,126 +1016,36 @@ export function parseCSVToPagesWithMapping(
 - Validates that at least one line has content
 - Respects header row flag
 
-### HTML Generation with TownStix US-10 Layout
+### HTML Generation with Label Stock Templates
 
 **File**: `lib/html-generator.ts`
 
-Generates print-ready HTML with precise CSS layout:
+The shared generator renders US Letter pages from the selected stock definition. TownStix US-10 is the backward-compatible default (4" × 2", 2 columns × 5 rows, 10 per sheet). Avery 5390 is marketed as 3½" × 2¼" inserts, with 2 columns × 4 rows and 8 per sheet; the physical print geometry follows its official PDF template rather than the rounded product dimensions.
 
-```typescript
-export function generateNameTagsHTML(pages: NameTagPage[], labelsPerPage = 10): string {
-  // Generate HTML with:
-  // - @page CSS for print settings
-  // - CSS Grid: 2 columns × 5 rows
-  // - Each cell: 4" × 2" (TownStix US-10 format)
-  // - line1: 32pt bold
-  // - line2/line3: 18pt regular
-  // - Padding tags to fill sheet (empty cells)
-  // - Page breaks between sheets
+The Preview **Label stock** picker controls pagination, dimensions, and margins for preview, HTML download, PDF download, and browser printing. Each physical sheet is padded with empty cells where needed. Explicit blank-row page breaks are preserved. Text is HTML-escaped, and print CSS hides the on-screen guides.
 
-  const html = `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    @page {
-      size: letter;
-      margin: 0.5in 0.25in;
-    }
+Avery geometry is measured from [Avery’s official 5390 PDF template](https://s3.amazonaws.com/avery.dpp.projects.s3uspdownloadables/CA_en/Downloadables/pdf/U-0119-01.pdf), a 612 × 792 point US Letter page. Vertical boundaries are x = 54, 306, 558 points; horizontal boundaries are y = 76.5, 236.25, 396, 555.75, 715.5 points. At 72 points per inch, this produces:
 
-    .label-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 4in);
-      grid-template-rows: repeat(5, 2in);
-      gap: 0;
-      width: 8in;
-    }
+| Property           | Avery 5390 print geometry |
+| ------------------ | ------------------------- |
+| Cell width         | 3.5 inches                |
+| Cell height        | 2.21875 inches (2 7/32")  |
+| Left/right margins | 0.75 inches               |
+| Top/bottom margins | 1.0625 inches (1 1/16")   |
+| Row/column gaps    | 0                         |
+| Capacity           | 2 columns × 4 rows = 8    |
 
-    .name-tag {
-      width: 4in;
-      height: 2in;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 0.25in;
-    }
+The shared stock definition keeps the nominal height (`nominalHeightIn: 2.25`) for product descriptions separate from the physical cell height (`heightIn: 2.21875`). Do not replace the measured height with the rounded marketing size. Generated HTML uses `@page` with zero margins and a full physical page padded by the stock margins, so HTML and PDF share the same placement.
 
-    .line1 {
-      font-size: 32pt;
-      font-weight: bold;
-      line-height: 1.2;
-    }
-
-    .line2, .line3 {
-      font-size: 18pt;
-      line-height: 1.3;
-    }
-  </style>
-</head>
-<body>
-  ${generatePagesHTML()}
-</body>
-</html>`
-
-  return html
-}
-```
-
-**Key features:**
-
-- CSS Grid for precise 2×5 layout
-- Padding empty cells to fill sheet
-- Page breaks for multi-page printing
-- Print-optimized CSS (@page)
-- Line1 is large/bold, Line2/3 are smaller
+Keep stock geometry in the shared definitions so these output paths cannot diverge. Print on US Letter at 100% without overriding the generated template margins.
 
 ### PDF Generation with Puppeteer
 
 **File**: `lib/pdf-generator.ts`
 
-Converts HTML to high-fidelity PDF:
+Converts the same HTML used by the preview into a PDF with Puppeteer. US Letter sizing and margins come from the selected stock’s CSS; do not add a second set of hard-coded PDF margins. The browser executable is configured by `PUPPETEER_EXECUTABLE_PATH` in Docker, which supplies system Chromium.
 
-```typescript
-export async function generatePDF(html: string): Promise<Buffer> {
-  const puppeteer = await import('puppeteer')
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  })
-
-  const page = await browser.newPage()
-
-  await page.setContent(html, {
-    waitUntil: 'networkidle0',
-  })
-
-  const pdfBuffer = await page.pdf({
-    format: 'Letter', // US Letter (8.5" × 11")
-    margin: {
-      top: '0.5in',
-      right: '0.5in',
-      bottom: '0.5in',
-      left: '0.5in',
-    },
-    printBackground: true,
-    preferCSSPageSize: true,
-  })
-
-  await browser.close()
-
-  return Buffer.from(pdfBuffer)
-}
-```
-
-**Key features:**
-
-- Headless Chrome rendering
-- Preserves CSS layout exactly
-- Print background graphics
-- US Letter page size
-- Returns binary Buffer
+The implementation returns a binary Buffer and closes the browser after generation. Changes must preserve both TownStix and Avery page geometry, including multiple sheets and partially filled sheets.
 
 ## CSS Architecture
 
@@ -1146,9 +1058,9 @@ The application uses a modern **glassmorphism** design with:
 - Subtle borders
 - Dark/light mode support
 
-### Component-Scoped PostCSS
+### Component-Scoped CSS
 
-**Pattern**: Semantic CSS classes with Tailwind `@apply`:
+**Pattern**: Semantic CSS classes with Tailwind `@apply`. The example below belongs under `app/components/atoms/`; adjust the `@reference` path relative to the component. Use plain `<style scoped>` so the Tailwind Vite integration compiles the directives:
 
 ```vue
 <template>
@@ -1159,7 +1071,9 @@ The application uses a modern **glassmorphism** design with:
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .glass-card {
   @apply relative overflow-hidden rounded-xl border;
   background: rgba(255, 255, 255, 0.05);
@@ -1294,7 +1208,7 @@ export default defineNuxtConfig({
 
 ### 5. Why Component-Scoped CSS Over Inline Tailwind?
 
-**Chosen**: PostCSS with Tailwind `@apply` in `<style scoped>`
+**Chosen**: Tailwind `@apply` in `<style scoped>`, with an `@reference` to the shared CSS entry point
 
 **Reasoning**:
 

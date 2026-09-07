@@ -270,7 +270,9 @@ Henry Clark,AppStudio,Mobile Developer`
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .wizard-container {
   @apply mx-auto w-full p-4 md:p-8;
   max-width: 1600px;

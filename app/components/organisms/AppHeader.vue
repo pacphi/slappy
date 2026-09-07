@@ -66,7 +66,9 @@ const { showWizard } = useAppNavigation()
   </UHeader>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .app-title {
   @apply text-xl font-bold;
 }

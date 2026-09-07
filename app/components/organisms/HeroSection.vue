@@ -22,8 +22,8 @@ const features = [
   },
   {
     icon: 'i-heroicons-printer',
-    title: 'TownStix Precision',
-    description: 'Exact 4×2" format for US-10 labels. First print perfect.',
+    title: 'Choose Your Label Stock',
+    description: 'TownStix US-10: 10 per sheet. Avery 5390: 8 per sheet.',
   },
   {
     icon: 'i-heroicons-eye',
@@ -58,7 +58,9 @@ const features = [
   </section>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .hero-section {
   @apply mx-auto flex max-w-6xl flex-col items-center gap-12 px-6 py-16;
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'Slappy',
-  description: 'Generate print-ready name tags in TownStix US-10 format',
+  description: 'Generate print-ready name tags for TownStix US-10 and Avery 5390 stock',
   ogTitle: 'Slappy',
   ogDescription: 'Transform spreadsheets into print-ready labels instantly',
 })

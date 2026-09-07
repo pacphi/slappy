@@ -1,5 +1,7 @@
 # Testing Strategy, Roadmap & Implementation
 
+> Planning reference: proposed test infrastructure below is not a statement of current coverage or CI gates. Use Node.js 26.x and pnpm 12.3.4; see [CI.md](../CI.md) for implemented checks.
+
 **Document Version:** 1.0
 **Last Updated:** 2025-10-26
 **Owner:** Development Team
@@ -266,9 +268,7 @@ await page.route('**/api/parse', async route => {
         columns: ['Name', 'Company', 'Title'],
         headers: ['Name', 'Company', 'Title'],
         rowCount: 10,
-        preview: [
-          /* data rows */
-        ],
+        preview: [/* data rows */],
       }),
     })
   }
@@ -814,17 +814,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v6
         with:
-          version: 8
+          version: 12.3.4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 26
           cache: 'pnpm'
 
       - name: Install dependencies

@@ -88,7 +88,9 @@ const handleFileChange = (files: File[] | File | null) => {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .file-upload-wrapper {
   @apply relative min-h-[200px];
 }

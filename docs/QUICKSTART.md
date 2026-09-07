@@ -9,6 +9,8 @@ The fastest way to create name tags is through the web interface.
 ### Step 1: Start the App
 
 ```bash
+# Requires Node.js 26.x
+npm install -g pnpm@12.3.4
 pnpm install
 pnpm dev
 ```
@@ -44,7 +46,7 @@ You'll see a preview of your data with mapping options:
 
 ### Step 4: Preview & Download
 
-1. Review the generated name tags
+1. Choose **Label stock**: TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet), then review the generated name tags
 2. Choose your format:
    - **Download HTML** - For browser printing
    - **Download PDF** - Ready to print or share
@@ -55,11 +57,11 @@ You'll see a preview of your data with mapping options:
 **For HTML:**
 
 - Press Ctrl+P (Cmd+P on Mac)
-- Settings: US Letter, 0.5" margins, 100% scale, no headers/footers
+- Settings: US Letter, template default margins, 100% scale, no headers/footers
 
 **For PDF:**
 
-- Just open and print normally
+- Print at Actual size / 100%; disable fit-to-page scaling
 
 Done! 🎉
 

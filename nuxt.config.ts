@@ -12,12 +12,15 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/main.css'],
 
+  // Social previews use public/og-image.png; no dynamic image renderer is needed.
+  ogImage: { enabled: false },
+
   // SEO Configuration
   site: {
     url: 'https://slappy.cloud',
     name: 'Slappy',
     description:
-      'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
+      'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
     defaultLocale: 'en',
   },
 
@@ -72,7 +75,7 @@ export default defineNuxtConfig({
   },
   vite: {
     build: {
-      // Suppress esbuild CSS minifier warnings for PostCSS/Tailwind @apply directives
+      // Minify compiled CSS; component @apply rules are resolved by Tailwind first.
       cssMinify: 'lightningcss',
     },
     optimizeDeps: {

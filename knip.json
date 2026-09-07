@@ -1,7 +1,22 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["app/pages/**/*.vue", "server/api/**/*.ts", "cli/**/*.ts"],
-  "project": ["app/**/*.{ts,vue}", "server/**/*.ts", "lib/**/*.ts", "cli/**/*.ts"],
+  "entry": [
+    "app/pages/**/*.vue",
+    "server/api/**/*.ts",
+    "cli/**/*.ts",
+    "tests/*.test.ts",
+    "scripts/*.mjs"
+  ],
+  "project": [
+    "app/**/*.{ts,vue}",
+    "server/**/*.ts",
+    "lib/**/*.ts",
+    "cli/**/*.ts",
+    "shared/**/*.ts",
+    "tests/**/*.ts",
+    "scripts/**/*.mjs",
+    "app/**/*.css"
+  ],
   "ignore": ["app/components/**", "app/composables/**"],
   "ignoreExportsUsedInFile": true,
   "ignoreDependencies": [

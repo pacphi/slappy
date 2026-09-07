@@ -8,7 +8,7 @@ This guide is for non-technical users who want to create name tags using the web
 2. **Your data** - Either:
    - A CSV file with your roster
    - OR a Google Sheet with your roster (must be published to the web)
-3. **A printer** loaded with TownStix US-10 label sheets (for printing)
+3. **A printer** loaded with TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet) label sheets (for printing)
 
 ## Using the Web Interface
 
@@ -69,6 +69,8 @@ Now you'll see a preview of your data and options to map it to your name tags.
 
 You'll now see exactly how your name tags will look!
 
+Choose **Label stock** to match your sheets: TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet). TownStix is the default. Changing the picker updates the preview and all downloads.
+
 **What you can do:**
 
 - **Scroll** through the preview to check all your tags
@@ -85,16 +87,16 @@ You'll now see exactly how your name tags will look!
 2. Press **Ctrl+P** (Windows) or **Cmd+P** (Mac)
 3. Set these print options:
    - Paper size: **US Letter** (8.5" × 11")
-   - Margins: **0.5 inches** on all sides (or "Default")
+   - Margins: use the generated template defaults; do not add custom margins
    - Scale: **100%** (very important!)
    - Headers and footers: **OFF**
-4. Load your printer with TownStix US-10 label sheets
+4. Load your printer with sheets matching the **Label stock** picker
 5. Click **Print**
 
 **For PDF files:**
 
 1. The PDF is ready to print as-is
-2. Just open it and print (no special settings needed)
+2. Open it and print at **Actual size / 100%**, with no fit-to-page scaling
 3. Or share it electronically with others
 
 ## Example: Choir Roster
@@ -143,7 +145,7 @@ Your name tags will show:
 ### Printing
 
 - **Test print first** - Print one page on regular paper to check alignment
-- **Use the correct labels** - TownStix US-10 (4" x 2", 10 per sheet)
+- **Match the label stock picker** - TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet)
 - **Check your settings** - 100% scale is crucial for proper alignment
 
 ## Troubleshooting
@@ -177,7 +179,7 @@ Your name tags will show:
 For HTML:
 
 - Verify print settings: US Letter paper, 0.5" margins, 100% scale
-- Make sure you're using TownStix US-10 label sheets
+- Make sure your sheets match the **Label stock** picker (TownStix US-10 or Avery 5390)
 - Try the "Default" margin setting if 0.5" isn't available
 
 For PDF:

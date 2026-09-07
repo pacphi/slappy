@@ -59,12 +59,15 @@ The CI workflow runs automated quality checks on your code to ensure it meets pr
 
 **File**: `.github/workflows/ci.yml`
 
+All Node jobs use **Node.js 26.x** and **pnpm 12.3.4**, pinned by `packageManager`; installs use the frozen lockfile. pnpm settings and dependency overrides live in `pnpm-workspace.yaml`.
+
 **What it checks:**
 
 - ✅ **Linting** - ESLint code quality checks
 - ✅ **Formatting** - Prettier code style verification
 - ✅ **Build** - Nuxt web application build
-- ✅ **CLI Testing** - Test CLI tool with sample data
+- ✅ **Tests** - Shared behavior tests with `pnpm test`, plus CLI sample generation
+- ✅ **Deployment** - Build the Node 26 Docker image and smoke-test both label stocks through HTML and PDF
 - ✅ **Security** - pnpm audit for vulnerabilities
 - ✅ **Dead Code** - Knip for unused exports
 
@@ -95,6 +98,7 @@ Builds the Nuxt application with Puppeteer support:
 
 ```bash
 pnpm build         # Nuxt production build
+pnpm test:build    # Reject uncompiled Tailwind directives in output CSS
 ```
 
 **Artifacts**: Uploads `.output/` directory for inspection
@@ -106,6 +110,7 @@ pnpm build         # Nuxt production build
 Tests the CLI with sample CSV data:
 
 ```bash
+pnpm test          # Shared behavior tests via tsx and the Node test runner
 pnpm test:local    # Generate tags from sample/sample-roster.csv
 ```
 
@@ -121,23 +126,29 @@ pnpm test:local    # Generate tags from sample/sample-roster.csv
 
 #### 4. Security Audit
 
-Scans dependencies for vulnerabilities:
+Scans dependencies for vulnerabilities. This is a blocking gate at every reported severity:
 
 ```bash
-pnpm audit --audit-level=high
+pnpm audit --audit-level=low
 ```
 
 **Duration**: ~1 minute
 
 #### 5. Dead Code Detection
 
-Checks for unused exports:
+Checks for unused exports. Findings fail this blocking gate:
 
 ```bash
 pnpm deadcode      # Knip analysis
 ```
 
 **Duration**: ~1 minute
+
+#### 6. Docker Deployment Smoke Test
+
+Builds the repository Dockerfile, starts `slappy-smoke`, and runs `scripts/smoke-deployment.mjs` inside the container. It verifies Node 26, the homepage, HTML and PDF page counts for TownStix US-10 and Avery 5390, and HTTP 400 for an invalid stock.
+
+For a running local deployment, use `pnpm test:deployment`. Set `SLAPPY_SMOKE_URL` to override the default `http://127.0.0.1:3000`. See [CI.md](CI.md#deployment-validation) for commands.
 
 ### Viewing CI Results
 
@@ -206,7 +217,7 @@ When triggering the workflow, you can configure:
 1. **Setup** - Determines target (production or staging)
 2. **App Check** - Verifies if Fly.io app exists
 3. **Create App** - Creates app if it doesn't exist
-4. **Deploy** - Builds Docker image with AdSense build args (if enabled) and deploys to Fly.io
+4. **Deploy** - Builds the repository Node 26 Docker image with pnpm 12.3.4 and AdSense build args (if enabled), includes Chromium for PDF generation, and deploys to Fly.io
 
 **Duration**: 5-8 minutes (first deploy may take longer for Puppeteer)
 

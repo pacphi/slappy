@@ -12,14 +12,14 @@ jobs:
     name: Lint & Format Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -35,14 +35,14 @@ jobs:
     name: Build Nuxt Web App
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -68,6 +68,9 @@ jobs:
       - name: Build Nuxt
         run: pnpm build
 
+      - name: Verify compiled production styles
+        run: pnpm test:build
+
       - name: Upload Nuxt build artifacts
         uses: actions/upload-artifact@v7
         if: always()
@@ -82,18 +85,38 @@ jobs:
     name: Test CLI Tool with Sample CSV
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Install Puppeteer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 \
+            libatk1.0-0 \
+            libatk-bridge2.0-0 \
+            libcups2 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2t64
+
+      - name: Test label templates
+        run: pnpm test
 
       - name: Test CLI with sample/sample-roster.csv
         run: pnpm test:local
@@ -133,49 +156,34 @@ jobs:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run pnpm audit
-        run: pnpm audit --audit-level=high
-        continue-on-error: true
-
-      - name: Shai Hulud CVE check
-        run: |
-          echo "Checking for Shai Hulud CVE (CVE-2026-45321) affected packages..."
-          AFFECTED=0
-          for pkg in "@tanstack/router-core" "@tanstack/react-router" "@tanstack/vue-router" "@tanstack/solid-router" "@mistralai/mistralai" "@uipath/cli" "@uipath/robot"; do
-            if grep -q "\"$pkg\"" pnpm-lock.yaml 2>/dev/null; then
-              echo "WARNING: Found $pkg in lockfile — verify version is not in compromised range"
-              AFFECTED=1
-            fi
-          done
-          if [ $AFFECTED -eq 0 ]; then
-            echo "OK: No Shai Hulud CVE-affected packages found in lockfile"
-          fi
+        run: pnpm audit --audit-level=low
 
   dead-code:
     name: Dead Code Detection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
-          node-version: '24'
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -183,4 +191,26 @@ jobs:
 
       - name: Check for unused exports
         run: pnpm deadcode
-        continue-on-error: true
+
+  deployment:
+    name: Docker Deployment Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build production image
+        run: docker build -t slappy:ci .
+
+      - name: Start production server
+        run: docker run -d --name slappy-smoke slappy:ci
+
+      - name: Verify Node 26, both label formats, and Chromium PDF generation
+        run: docker exec -i slappy-smoke node --input-type=module < scripts/smoke-deployment.mjs
+
+      - name: Show server logs
+        if: always()
+        run: docker logs slappy-smoke
+
+      - name: Stop smoke container
+        if: always()
+        run: docker rm -f slappy-smoke

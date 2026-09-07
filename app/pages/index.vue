@@ -12,9 +12,9 @@ useSeoMeta({
   // Basic meta tags
   title: 'Slappy - Professional Name Tags in 60 Seconds',
   description:
-    'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
+    'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
   keywords:
-    'name tags, labels, CSV to PDF, TownStix, label maker, US-10 labels, Google Sheets, badge printing, event labels',
+    'name tags, labels, CSV to PDF, TownStix, Avery 5390, label maker, US-10 labels, Google Sheets, badge printing, event labels',
   author: 'Slappy',
 
   // Open Graph (Facebook, LinkedIn, etc.)
@@ -22,7 +22,7 @@ useSeoMeta({
   ogUrl: 'https://slappy.cloud',
   ogTitle: 'Slappy - Professional Name Tags in 60 Seconds',
   ogDescription:
-    'Generate print-ready name tags from CSV files or Google Sheets. TownStix US-10 format, 10 labels per sheet.',
+    'Generate print-ready name tags from CSV files or Google Sheets. TownStix US-10 (10 per sheet) and Avery 5390 (8 per sheet).',
   ogImage: 'https://slappy.cloud/og-image.png',
   ogImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
   ogImageWidth: '1200',
@@ -50,7 +50,7 @@ useHead({
         name: 'Slappy',
         url: 'https://slappy.cloud',
         description:
-          'Transform your spreadsheets into print-ready TownStix US-10 labels instantly. Free, fast, and easy to use.',
+          'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Any',
         offers: {
@@ -61,7 +61,8 @@ useHead({
         featureList: [
           'CSV file upload',
           'Google Sheets integration',
-          'TownStix US-10 format (4×2" labels)',
+          'TownStix US-10 (4×2" labels, 10 per sheet)',
+          'Avery 5390 (3½×2¼" inserts, 8 per sheet)',
           'PDF and HTML export',
           'Live preview with zoom',
           'Intelligent column mapping',
@@ -100,8 +101,8 @@ const features = [
   },
   {
     icon: 'i-heroicons-printer',
-    title: 'TownStix Precision',
-    description: 'Exact 4×2" format for US-10 labels. First print perfect.',
+    title: 'Choose Your Label Stock',
+    description: 'TownStix US-10: 10 per sheet. Avery 5390: 8 per sheet.',
   },
   {
     icon: 'i-heroicons-eye',
@@ -169,7 +170,9 @@ const features = [
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../assets/css/main.css';
+
 .home-page {
   @apply min-h-screen;
   padding: 50px;

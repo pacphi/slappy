@@ -69,7 +69,9 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="postcss" scoped>
+<style scoped>
+@reference '../../assets/css/main.css';
+
 .adsense-container {
   @apply relative overflow-hidden rounded-xl border p-4;
   background: rgba(255, 255, 255, 0.03);

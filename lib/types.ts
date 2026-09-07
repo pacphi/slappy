@@ -14,7 +14,7 @@ export interface NameTagRow {
 
 /**
  * Represents a logical page of name tags
- * Can span multiple physical pages if more than 10 tags
+ * Can span multiple physical pages when tags exceed the selected stock capacity
  */
 export interface NameTagPage {
   tags: NameTagRow[]
