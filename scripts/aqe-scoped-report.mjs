@@ -24,7 +24,7 @@ for (const directory of [
   'server/utils',
   'cli',
 ]) {
-  for (const name of await readdir(directory)) {
+  for (const name of await readdir(directory, { recursive: true })) {
     if (!name.endsWith('.ts') || name.endsWith('types.ts')) continue
     const file = `${directory}/${name}`
     const metrics = await analyzer.analyzeFile(file)

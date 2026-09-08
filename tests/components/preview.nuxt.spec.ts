@@ -30,8 +30,36 @@ describe('preview behavior', () => {
   it('renders returned HTML with sheet geometry and label stock metadata', async () => {
     const wrapper = await render()
     expect(wrapper.get('iframe').attributes('srcdoc')).toBe(result.html)
-    expect(wrapper.text()).toContain('10 per sheet · 1 sheet')
+    expect(wrapper.text()).toContain('8 per sheet · 1 sheet')
+    expect(wrapper.get('[aria-label="Label stock"]').text()).toBe('Avery 5390')
+    expect(fetchMock).toHaveBeenCalledWith(expect.objectContaining({ labelTemplate: 'avery-5390' }))
+    expect(wrapper.text()).toContain('Label size: 3.5″ × 2.25″')
+    expect(wrapper.text()).toContain('US Letter · 8½″ × 11″')
+    expect(wrapper.get('a[href="https://www.avery.com/templates/5390"]').text()).toContain(
+      'Manufacturer template and specifications'
+    )
     expect(wrapper.get('[aria-label="Label preview"]').attributes('tabindex')).toBe('0')
+  })
+  it('shows only alphabetized provider and template names in the picker', async () => {
+    const wrapper = await render()
+    await wrapper.get('[aria-label="Label stock"]').trigger('click')
+    await vi.waitFor(() => expect(document.querySelectorAll('[role="option"]')).toHaveLength(34))
+    const names = [...document.querySelectorAll('[role="option"]')].map(
+      el => el.textContent?.trim() ?? ''
+    )
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b, 'en')))
+    expect(names.every(name => /^(Avery|OnlineLabels|TownStix) [A-Z0-9-]+$/.test(name))).toBe(true)
+    expect(names).not.toContain('OnlineLabels OL875')
+  })
+  it('formats fractional inch sizes without repeating decimal tails', async () => {
+    const wrapper = await render()
+    await wrapper.get('[aria-label="Label stock"]').trigger('click')
+    await vi.waitFor(() => expect(document.querySelectorAll('[role="option"]')).toHaveLength(34))
+    const option = [...document.querySelectorAll<HTMLElement>('[role="option"]')].find(
+      element => element.textContent?.trim() === 'Avery 5395'
+    )!
+    option.click()
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Label size: 3.375″ × 2.333″'))
   })
   it('bounds zoom and resets through rendered controls', async () => {
     const wrapper = await render()
@@ -84,17 +112,29 @@ describe('preview interactions and lifecycle', () => {
     }))
     await wrapper.get('[aria-label="Label stock"]').trigger('click')
     await vi.waitFor(() => expect(document.querySelector('[role="option"]')).not.toBeNull())
-    const option = [...document.querySelectorAll<HTMLElement>('[role="option"]')].find(el =>
-      el.textContent?.includes('OL175')
+    const option = [...document.querySelectorAll<HTMLElement>('[role="option"]')].find(
+      el => el.textContent?.trim() === 'Avery L7160'
     )!
     option.click()
     await vi.waitFor(() =>
-      expect(wrapper.get('iframe').attributes('srcdoc')).toContain('onlinelabels-ol175')
+      expect(wrapper.get('iframe').attributes('srcdoc')).toContain('avery-l7160')
     )
-    expect(wrapper.text()).toContain('1 per sheet · 2 sheets')
+    expect(wrapper.text()).toContain('21 per sheet · 2 sheets')
+    expect(wrapper.text()).toContain('63.5 × 38.1 mm')
+    expect(wrapper.text()).toContain('A4 · 210 × 297 mm')
+    expect(wrapper.text()).toContain('Print on A4')
+    expect(wrapper.get('a[href="https://www.avery.co.uk/template-l7160"]').exists()).toBe(true)
+    const frame = wrapper.get('iframe').element as HTMLIFrameElement
+    expect(parseFloat(frame.style.width)).toBeCloseTo((210 / 25.4) * 96)
+    expect(parseFloat(frame.style.height)).toBeCloseTo(2 * (297 / 25.4) * 96)
+    await wrapper.get('[aria-label="Zoom in"]').trigger('click')
+    const sheet = wrapper.get('.preview-sheet').element as HTMLElement
+    expect(parseFloat(sheet.style.width)).toBeCloseTo((210 / 25.4) * 96 * 1.1)
+    expect(parseFloat(sheet.style.height)).toBeCloseTo(2 * (297 / 25.4) * 96 * 1.1)
+    expect(frame.style.transform).toBe('scale(1.1)')
     await wrapper.setProps({ hasHeaders: true })
     await vi.waitFor(() =>
-      expect(wrapper.get('iframe').attributes('srcdoc')).toContain('onlinelabels-ol175:true')
+      expect(wrapper.get('iframe').attributes('srcdoc')).toContain('avery-l7160:true')
     )
   })
   it('downloads generated HTML through the browser boundary', async () => {

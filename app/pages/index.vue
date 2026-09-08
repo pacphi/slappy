@@ -14,7 +14,7 @@ useSeoMeta({
   // Basic meta tags
   title: 'Slappy - Professional Name Tags in 60 Seconds',
   description:
-    'Transform your spreadsheets into print-ready name tags on 20 label stocks instantly. Free, fast, and easy to use.',
+    'Transform your spreadsheets into print-ready name tags on 34 label templates instantly. Free, fast, and easy to use.',
   author: 'Slappy',
 
   // Open Graph (Facebook, LinkedIn, etc.)
@@ -22,7 +22,7 @@ useSeoMeta({
   ogUrl: 'https://slappy.cloud',
   ogTitle: 'Slappy - Professional Name Tags in 60 Seconds',
   ogDescription:
-    'Generate print-ready name tags from CSV files or Google Sheets. 20 stocks from TownStix, Avery, and OnlineLabels.',
+    'Generate print-ready name tags from CSV files or Google Sheets. 34 templates from TownStix, Avery, and OnlineLabels.',
   ogImage: 'https://slappy.cloud/slappy-logo.png',
   ogImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
   ogSiteName: 'Slappy',
@@ -45,7 +45,7 @@ useSchemaOrg([
   defineSoftwareApp({
     name: 'Slappy',
     url: 'https://slappy.cloud',
-    description: 'Generate print-ready name tags on 20 label stocks from CSV or Google Sheets.',
+    description: 'Generate print-ready name tags on 34 label templates from CSV or Google Sheets.',
     applicationCategory: 'BusinessApplication',
     operatingSystem: 'Any',
     offers: { price: 0, priceCurrency: 'USD' },
@@ -81,7 +81,7 @@ const features = [
     icon: 'i-heroicons-printer',
     title: 'Choose Your Label Stock',
     description: [
-      '20 stocks from TownStix, Avery, and OnlineLabels.',
+      '34 templates from TownStix, Avery, and OnlineLabels.',
       'Search by product number or label size.',
     ],
   },

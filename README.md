@@ -4,7 +4,7 @@ Slappy 2.1.0 · Node.js 26 · pnpm 12
 
 [![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy.fly.dev/)
 
-Generate print-ready name tags on 20 label stocks from TownStix, Avery, and OnlineLabels from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
+Generate print-ready name tags on 34 label templates from TownStix, Avery, and OnlineLabels from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
 
 **Perfect for**: Conferences, choir groups, school events, workshops, and volunteer programs.
 
@@ -123,7 +123,7 @@ CSV uploads preserve quoted and multiline fields and blank-row page breaks. Inpu
 ### CLI Tool
 
 - ✅ **Command-line interface** - Automated workflows and scripting
-- ✅ **Label stock selection** - 20 stock IDs via `--label-template=ID`; `townstix-us-10` remains the default
+- ✅ **Label stock selection** - 34 active stock IDs via `--label-template=ID`; `avery-5390` is the default
 - ✅ **Google Sheets integration** - Direct CSV export from published sheets
 - ✅ **Flexible column mapping** - Custom column-to-line mapping via flags
 - ✅ **Dual output formats** - HTML or PDF generation
@@ -136,7 +136,7 @@ CSV uploads preserve quoted and multiline fields and blank-row page breaks. Inpu
 - ✅ **Partial mapping** - Use 1, 2, or 3 lines per tag
 - ✅ **Headers support** - Optional header row handling
 - ✅ **PDF generation** - High-fidelity PDF via Puppeteer
-- ✅ **Label stock picker** - Search 20 stocks by brand, product number, or size; selection applies to preview, HTML, PDF, and printing
+- ✅ **Label stock picker** - Search 34 templates by provider or template; selection applies to preview, HTML, PDF, and printing
 - ✅ **Google Sheets integration** - Direct CSV export API access
 - ✅ **Automatic page breaks** - Blank rows create new pages
 - ✅ **Print-ready output** - HTML or PDF ready for professional printing
@@ -146,9 +146,9 @@ CSV uploads preserve quoted and multiline fields and blank-row page breaks. Inpu
 
 ### Printing and label stock
 
-See the [20-stock catalog, source links, and research decisions](docs/label-catalog-research.md). OnlineLabels stock IDs use `onlinelabels-olNUMBER`, for example `--label-template=onlinelabels-ol875`. Small labels use proportional text sizing; keep entries short and review before printing.
+See the [34-template Letter/A4 catalog and source evidence](docs/label-catalog-research.md). Avery 5390 is the default. The picker lists alphabetized provider/template names, with size, sheet capacity, suggested uses, and a manufacturer link underneath. The API and CLI also retain 10 historical OnlineLabels IDs with their original geometry. Small labels use proportional text sizing; keep entries short and review before printing.
 
-Choose the stock matching your sheets in Preview, then print on US Letter at **Actual size / 100%** using the template defaults. Avery 5390 is sold as 3½" × 2¼"; Slappy follows [Avery’s official 5390 PDF template](https://s3.amazonaws.com/avery.dpp.projects.s3uspdownloadables/CA_en/Downloadables/pdf/U-0119-01.pdf) for precise placement: its printed cells are 3½" × 2 7/32", with ¾" side margins and 1 1/16" top/bottom margins. Test on plain paper before printing label stock.
+Choose the stock matching your sheets in Preview, then print on the selected Letter or A4 sheet size at **Actual size / 100%** using the template defaults. Avery 5390 is sold as 3½" × 2¼"; Slappy follows [Avery’s official 5390 PDF template](https://s3.amazonaws.com/avery.dpp.projects.s3uspdownloadables/CA_en/Downloadables/pdf/U-0119-01.pdf) for precise placement: its printed cells are 3½" × 2 7/32", with ¾" side margins and 1 1/16" top/bottom margins. Test on plain paper before printing label stock.
 
 ## Configuration
 

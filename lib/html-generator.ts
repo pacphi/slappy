@@ -65,9 +65,9 @@ ${paddedTags.map(tag => generateTagHTML(tag)).join('\n')}
 }
 
 /**
- * Generates a printable US Letter document for the selected label stock.
+ * Generates a printable document for the selected label stock.
  * @param pages Array of pages with name tag data
- * @param templateId Label stock identifier (defaults to TownStix US-10)
+ * @param templateId Label stock identifier (defaults to Avery 5390)
  * @returns HTML string ready for printing
  */
 export function generateNameTagsHTML(
@@ -88,7 +88,7 @@ export function generateNameTagsHTML(
   <title>Name Tags - ${template.name}</title>
   <style>
     @page {
-      size: letter;
+      size: ${template.sheetWidthIn}in ${template.sheetHeightIn}in;
       margin: 0;
     }
 
@@ -107,8 +107,8 @@ export function generateNameTagsHTML(
     .page {
       page-break-after: always;
       break-inside: avoid;
-      width: 8.5in;
-      height: 11in;
+      width: ${template.sheetWidthIn}in;
+      height: ${template.sheetHeightIn}in;
       padding: ${template.marginTopIn}in ${template.marginRightIn}in ${template.marginBottomIn}in ${template.marginLeftIn}in;
       margin: 0 auto;
     }

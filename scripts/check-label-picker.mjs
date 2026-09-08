@@ -36,20 +36,57 @@ try {
   await page.locator('button::-p-text(Continue to Preview)').click()
   await page.waitForSelector('[aria-label="Label stock"]:not([disabled])')
   await checkAccessibility(page, 'preview')
+  assert.match(
+    await page.$eval('[aria-label="Label stock"]', element => element.textContent),
+    /Avery 5390/
+  )
   await page.click('[aria-label="Label stock"]')
   await page.waitForSelector('[role="option"]')
-  assert.equal(await page.$$eval('[role="option"]', elements => elements.length), 20)
-  await page.type('input[placeholder="Search brand, product number, or size…"]', 'OL875')
+  assert.equal(await page.$$eval('[role="option"]', elements => elements.length), 34)
+  const optionNames = await page.$$eval('[role="option"]', elements =>
+    elements.map(element => element.textContent.trim())
+  )
+  assert.deepEqual(
+    optionNames,
+    [...optionNames].sort((a, b) => a.localeCompare(b, 'en'))
+  )
+  assert.ok(optionNames.every(name => /^(Avery|OnlineLabels|TownStix) [A-Z0-9-]+$/.test(name)))
+  await page.type('input[placeholder="Search provider or template…"]', 'Avery 5160')
   await page.waitForFunction(() => document.querySelectorAll('[role="option"]').length === 1)
   await page.keyboard.press('ArrowDown')
   await page.keyboard.press('Enter')
   await page.waitForFunction(() =>
-    document.querySelector('iframe')?.srcdoc.includes('Name Tags - OnlineLabels OL875')
+    document.querySelector('iframe')?.srcdoc.includes('Name Tags - Avery 5160')
   )
   assert.equal(
     await page.$eval('iframe', element => (element.srcdoc.match(/class="name-tag"/g) || []).length),
     30
   )
+  await page.waitForSelector('[aria-label="Label stock"]:not([disabled])')
+  await page.click('[aria-label="Label stock"]')
+  await page.type('input[placeholder="Search provider or template…"]', 'Avery L7160')
+  await page.waitForFunction(() => document.querySelectorAll('[role="option"]').length === 1)
+  await page.keyboard.press('ArrowDown')
+  await page.keyboard.press('Enter')
+  await page.waitForFunction(() =>
+    document.querySelector('iframe')?.srcdoc.includes('Name Tags - Avery L7160')
+  )
+  assert.equal(
+    await page.$eval('iframe', element => (element.srcdoc.match(/class="name-tag"/g) || []).length),
+    21
+  )
+  assert.ok(
+    Math.abs(
+      (await page.$eval('iframe', element => parseFloat(element.style.width))) - (210 / 25.4) * 96
+    ) < 0.01
+  )
+  assert.match(
+    await page.$eval('.preview-panel', element => element.textContent),
+    /A4 · 210 × 297 mm/
+  )
+  // Reka keeps the closed menu mounted during its exit transition.
+  await page.waitForFunction(() => document.querySelectorAll('[role="option"]').length === 0)
+  await checkAccessibility(page, 'A4 preview')
   // Exercise the actual upload → mapping → generation path, including quoting and page breaks.
   page.on('dialog', dialog => void dialog.accept())
   await page.locator('button::-p-text(Start Over)').click()
@@ -85,7 +122,7 @@ try {
     'Blank records must preserve physical page breaks'
   )
   console.log(
-    'Picker passed: 20 options, search, keyboard selection, and OL875 preview regeneration'
+    'Picker passed: 34 alphabetized options, Avery 5390 default, search, keyboard selection, Letter and A4 regeneration'
   )
 } finally {
   await browser.close()

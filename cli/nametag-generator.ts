@@ -37,7 +37,9 @@ export async function generateNameTags(
   const path = outputPath || `./name-tags.${request.format}`
   if (request.format === 'pdf') await generatePDFFile(html, path)
   else await writeFile(path, html, 'utf8')
-  console.log(`Generated ${path} using ${template.name}. Print on US Letter at Actual size / 100%.`)
+  console.log(
+    `Generated ${path} using ${template.name}. Print on ${template.paperSize} at Actual size / 100%.`
+  )
 }
 
 function showHelp() {
@@ -49,7 +51,7 @@ function showHelp() {
     'Column indexes are zero-based. If any column flag is provided, omitted lines are blank.'
   )
   console.log(
-    `Label stocks (default: townstix-us-10): ${labelTemplates.map(template => template.id).join(', ')}`
+    `Label stocks (default: avery-5390): ${labelTemplates.map(template => template.id).join(', ')}`
   )
 }
 

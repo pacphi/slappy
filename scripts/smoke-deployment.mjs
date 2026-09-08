@@ -25,6 +25,9 @@ const payload = { csvContent, mapping: { line1: 0, line2: null, line3: null }, h
 for (const [labelTemplate, expectedPages, expectedSlots] of [
   ['townstix-us-10', 1, 10],
   ['avery-5390', 2, 16],
+  ['avery-l7160', 1, 21],
+  ['townstix-a4-2', 5, 10],
+  ['onlinelabels-eu30142', 2, 16],
   ['onlinelabels-ol875', 1, 30],
   ['onlinelabels-ol175', 9, 9],
   ['onlinelabels-ol1100', 1, 100],
@@ -51,6 +54,11 @@ for (const [labelTemplate, expectedPages, expectedSlots] of [
   assert.match(pdfResponse.headers.get('content-type'), /application\/pdf/)
   const pdf = Buffer.from(await pdfResponse.arrayBuffer()).toString('latin1')
   assert.ok(pdf.startsWith('%PDF-'))
+  const a4 = ['avery-l7160', 'townstix-a4-2', 'onlinelabels-eu30142'].includes(labelTemplate)
+  const mediaBox = /\/MediaBox\s*\[\s*0\s+0\s+([\d.]+)\s+([\d.]+)\s*\]/.exec(pdf)
+  assert.ok(mediaBox, `${labelTemplate}: missing PDF paper dimensions`)
+  assert.ok(Math.abs(Number(mediaBox[1]) - (a4 ? 210 / 25.4 : 8.5) * 72) < 1)
+  assert.ok(Math.abs(Number(mediaBox[2]) - (a4 ? 297 / 25.4 : 11) * 72) < 1)
   assert.equal((pdf.match(/\/Type\s*\/Page\b/g) || []).length, expectedPages)
   console.log(`${labelTemplate}: HTML and PDF passed (${expectedPages} sheet(s))`)
 }

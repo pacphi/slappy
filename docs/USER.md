@@ -8,7 +8,7 @@ This guide is for non-technical users who want to create name tags using the web
 2. **Your data** - Either:
    - A CSV file with your roster
    - OR a Google Sheet with your roster (must be published to the web)
-3. **A printer** loaded with TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet) label sheets (for printing)
+3. **A printer** loaded with one of 34 Avery, TownStix, or OnlineLabels templates on Letter or A4 sheets label sheets (for printing)
 
 ## Using the Web Interface
 
@@ -69,7 +69,7 @@ Now you'll see a preview of your data and options to map it to your name tags.
 
 You'll now see exactly how your name tags will look!
 
-Choose **Label stock** to match your sheets: TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet). TownStix is the default. Changing the picker updates the preview and all downloads.
+Choose **Label stock** to match your sheets: one of 34 Avery, TownStix, or OnlineLabels templates on Letter or A4 sheets. Avery 5390 is the default. The alphabetized picker shows provider and template; label dimensions, sheet capacity, coverage details, and a manufacturer link appear below it. Changing the picker updates the preview and all downloads.
 
 **What you can do:**
 
@@ -86,7 +86,7 @@ Choose **Label stock** to match your sheets: TownStix US-10 (4" × 2", 10 per sh
 1. Open the downloaded HTML file in your browser
 2. Press **Ctrl+P** (Windows) or **Cmd+P** (Mac)
 3. Set these print options:
-   - Paper size: **US Letter** (8.5" × 11")
+   - Paper size: **Letter or A4**, matching the selected template
    - Margins: use the generated template defaults; do not add custom margins
    - Scale: **100%** (very important!)
    - Headers and footers: **OFF**
@@ -145,7 +145,7 @@ Your name tags will show:
 ### Printing
 
 - **Test print first** - Print one page on regular paper to check alignment
-- **Match the label stock picker** - TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet)
+- **Match the label stock picker** - one of 34 Avery, TownStix, or OnlineLabels templates on Letter or A4 sheets
 - **Check your settings** - 100% scale is crucial for proper alignment
 
 ## Troubleshooting
@@ -178,8 +178,8 @@ Your name tags will show:
 
 For HTML:
 
-- Verify print settings: US Letter paper, 0.5" margins, 100% scale
-- Make sure your sheets match the **Label stock** picker (TownStix US-10 or Avery 5390)
+- Verify print settings: the selected Letter/A4 paper size, template margins, 100% scale
+- Make sure your sheets match the **Label stock** picker (including its paper size)
 - Try the "Default" margin setting if 0.5" isn't available
 
 For PDF:

@@ -38,8 +38,24 @@ const labelTemplate = ref<LabelTemplateId>(defaultLabelTemplateId)
 const selectedTemplate = computed(() => getLabelTemplate(labelTemplate.value))
 const labelOptions = labelTemplates.map(template => ({
   value: template.id,
-  label: `${template.name} · ${template.nominalWidthIn}″ × ${template.nominalHeightIn}″ · ${template.columns * template.rows}/sheet`,
+  label: template.name,
 }))
+const labelSize = computed(() => {
+  const template = selectedTemplate.value
+  if (template.paperSize === 'A4') {
+    const millimetres = (inches: number) => Number((inches * 25.4).toFixed(2))
+    return `${millimetres(template.nominalWidthIn)} × ${millimetres(template.nominalHeightIn)} mm`
+  }
+  const inches = (value: number) => Number(value.toFixed(3))
+  return `${inches(template.nominalWidthIn)}″ × ${inches(template.nominalHeightIn)}″`
+})
+const paperDescription = computed(() =>
+  selectedTemplate.value.paperSize === 'A4' ? 'A4 · 210 × 297 mm' : 'US Letter · 8½″ × 11″'
+)
+const sheetWidthPx = computed(() => selectedTemplate.value.sheetWidthIn * 96)
+const sheetsHeightPx = computed(
+  () => Math.max(1, sheetCount.value) * selectedTemplate.value.sheetHeightIn * 96
+)
 const previewFrame = ref<HTMLIFrameElement | null>(null)
 const labelsPerSheet = computed(() => selectedTemplate.value.columns * selectedTemplate.value.rows)
 
@@ -134,19 +150,25 @@ defineShortcuts({
       <USelectMenu
         v-model="labelTemplate"
         value-key="value"
-        :search-input="{ placeholder: 'Search brand, product number, or size…' }"
+        :search-input="{ placeholder: 'Search provider or template…' }"
         :items="labelOptions"
         :disabled="loading"
         class="w-full"
         aria-label="Label stock"
       />
     </UFormField>
+    <div class="space-y-2 text-sm text-muted" aria-live="polite">
+      <p>Label size: {{ labelSize }}</p>
+      <p>
+        {{ paperDescription }} · {{ labelsPerSheet }} per sheet · {{ sheetCount }} sheet{{
+          sheetCount === 1 ? '' : 's'
+        }}
+      </p>
+      <p>{{ selectedTemplate.coverageDescription }}</p>
+    </div>
     <p class="text-sm text-muted">
-      {{ selectedTemplate.nominalWidthIn }}″ × {{ selectedTemplate.nominalHeightIn }}″ ·
-      {{ labelsPerSheet }} per sheet · {{ sheetCount }} sheet{{ sheetCount === 1 ? '' : 's' }}
-    </p>
-    <p class="text-sm text-muted">
-      Print on US Letter at 100% / Actual size. Turn off browser headers and footers.
+      Print on {{ selectedTemplate.paperSize === 'A4' ? 'A4' : 'US Letter' }} at 100% / Actual size.
+      Turn off browser headers and footers.
     </p>
 
     <a
@@ -224,16 +246,16 @@ defineShortcuts({
       <div
         class="preview-sheet"
         :style="{
-          width: `${8.5 * 96 * (zoom / 100)}px`,
-          height: `${Math.max(1, sheetCount) * 11 * 96 * (zoom / 100)}px`,
+          width: `${sheetWidthPx * (zoom / 100)}px`,
+          height: `${sheetsHeightPx * (zoom / 100)}px`,
         }"
       >
         <iframe
           ref="previewFrame"
           :srcdoc="iframeContent"
           :style="{
-            width: `${8.5 * 96}px`,
-            height: `${Math.max(1, sheetCount) * 11 * 96}px`,
+            width: `${sheetWidthPx}px`,
+            height: `${sheetsHeightPx}px`,
             transform: `scale(${zoom / 100})`,
             transformOrigin: 'top left',
           }"

@@ -46,7 +46,7 @@ You'll see a preview of your data with mapping options:
 
 ### Step 4: Preview & Download
 
-1. Choose **Label stock**: TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet), then review the generated name tags
+1. Choose **Label stock**: one of 34 Avery, TownStix, or OnlineLabels templates on Letter or A4 sheets, then review the generated name tags
 2. Choose your format:
    - **Download HTML** - For browser printing
    - **Download PDF** - Ready to print or share
@@ -57,7 +57,7 @@ You'll see a preview of your data with mapping options:
 **For HTML:**
 
 - Press Ctrl+P (Cmd+P on Mac)
-- Settings: US Letter, template default margins, 100% scale, no headers/footers
+- Settings: selected Letter/A4 paper size, template default margins, 100% scale, no headers/footers
 
 **For PDF:**
 

@@ -1,4 +1,72 @@
-# Label catalog research and design
+# Letter and A4 label catalog
+
+Reviewed 2026-09-08. The picker contains **34 provider templates**: 22 Letter and 12 A4, comprising 17 Avery, 7 TownStix, and 10 OnlineLabels. These are product layouts; they are not 34 unique physical label sizes.
+
+The single picker sorts provider/template names alphabetically and defaults to **Avery 5390**. Physical label size, paper size, labels per sheet, export sheet count, suggested uses, and the manufacturer link appear beneath it. Suggested uses are editorial guidance, not certification of compatibility with a particular printer or application.
+
+## Provider preference and compatibility
+
+Avery replaces overlapping OnlineLabels choices in the visible picker. Ten historical IDs remain valid in API and CLI requests with their original geometry: OL100, OL125, OL150, OL400, OL500, OL525, OL750, OL875, OL900, and OL175. They are not aliases to Avery, because matching nominal dimensions does not establish matching margins and pitch.
+
+Runtime definitions are split by provider in `shared/labels/`. `shared/label-templates.ts` supplies the active picker catalog and the complete compatibility catalog. Validation uses the complete catalog. HTML, PDF, pagination, and the preview use the selected template's sheet dimensions.
+
+## Sources and geometry
+
+- Avery: individual manufacturer downloads, documented in [Avery geometry evidence](quality/avery-geometry.md). Nominal dimensions remain separate from measured printing geometry.
+- TownStix: [published measurements and downloads](https://townstix.com/templates/). US-4, US-10, US-22-12, A4-2, A4-8, A4-10, and A4-24 are included. US-10 now follows the published 0.15-inch side margins and 0.2-inch horizontal gap, correcting the former 0.25-inch/no-gap definition. Its PDF is a raster illustration with a nonstandard page box; the published measurements are the authoritative geometry used here.
+- OnlineLabels A4: [EU30142](https://uk.onlinelabels.com/templates/blank/eu30142) is 80 × 60 mm, eight per sheet, 21 mm vertical margins, 22.5 mm horizontal margins, and 5 mm gaps. [EU30147](https://uk.onlinelabels.com/templates/blank/eu30147) is 70 × 50 mm, ten per sheet, 13.5 mm vertical margins, 32.5 mm horizontal margins, and 5 mm gaps.
+- Existing OnlineLabels Letter dimensions remain unchanged from the separately recorded manufacturer specifications below.
+
+TownStix US-21 is excluded: its published row dimensions, gaps, and margins do not fit Letter paper. Round and other nonrectangular stock remain outside this rectangular renderer's scope.
+
+All templates are static reviewed data, with no manufacturer network dependency at print time. Full-bleed stock may require a printer capable of printing near the sheet edge. Print at actual size on the selected paper format and test alignment on plain paper.
+
+## Active picker choices
+
+| Provider / template                                                         | Paper  | Nominal label size            | Labels per sheet |
+| --------------------------------------------------------------------------- | ------ | ----------------------------- | ---------------- |
+| [Avery 5126](https://www.avery.com/templates/5126)                          | Letter | 8.5 × 5.5 in                  | 2                |
+| [Avery 5160](https://www.avery.com/templates/5160)                          | Letter | 2.625 × 1 in                  | 30               |
+| [Avery 5161](https://www.avery.com/templates/5161)                          | Letter | 4 × 1 in                      | 20               |
+| [Avery 5162](https://www.avery.com/templates/5162)                          | Letter | 4 × 1.3333333333333333 in     | 14               |
+| [Avery 5163](https://www.avery.com/templates/5163)                          | Letter | 4 × 2 in                      | 10               |
+| [Avery 5164](https://www.avery.com/templates/5164)                          | Letter | 4 × 3.3333333333333335 in     | 6                |
+| [Avery 5165](https://www.avery.com/templates/5165)                          | Letter | 8.5 × 11 in                   | 1                |
+| [Avery 5390](https://www.avery.com/templates/5390)                          | Letter | 3.5 × 2.25 in                 | 8                |
+| [Avery 5392](https://www.avery.com/templates/5392)                          | Letter | 4 × 3 in                      | 6                |
+| [Avery 5395](https://www.avery.com/templates/5395)                          | Letter | 3.375 × 2.3333333333333335 in | 8                |
+| [Avery 6572](https://www.avery.com/templates/6572)                          | Letter | 2.625 × 2 in                  | 15               |
+| [Avery L7160](https://www.avery.co.uk/template-l7160)                       | A4     | 63.5 × 38.1 mm                | 21               |
+| [Avery L7161](https://www.avery.co.uk/template-l7161)                       | A4     | 63.5 × 46.6 mm                | 18               |
+| [Avery L7162](https://www.avery.co.uk/template-l7162)                       | A4     | 99.1 × 33.9 mm                | 16               |
+| [Avery L7163](https://www.avery.co.uk/template-l7163)                       | A4     | 99.1 × 38.1 mm                | 14               |
+| [Avery L7165](https://www.avery.co.uk/template-l7165)                       | A4     | 99.1 × 67.7 mm                | 8                |
+| [Avery L7166](https://www.avery.co.uk/template-l7166)                       | A4     | 99.1 × 93.1 mm                | 6                |
+| [OnlineLabels EU30142](https://uk.onlinelabels.com/templates/blank/eu30142) | A4     | 80 × 60 mm                    | 8                |
+| [OnlineLabels EU30147](https://uk.onlinelabels.com/templates/blank/eu30147) | A4     | 70 × 50 mm                    | 10               |
+| [OnlineLabels OL1000](https://www.onlinelabels.com/templates/blank/ol1000)  | Letter | 1.5 × 1 in                    | 50               |
+| [OnlineLabels OL1100](https://www.onlinelabels.com/templates/blank/ol1100)  | Letter | 1.5 × 0.5 in                  | 100              |
+| [OnlineLabels OL200](https://www.onlinelabels.com/templates/blank/ol200)    | Letter | 3.4375 × 0.669 in             | 30               |
+| [OnlineLabels OL250](https://www.onlinelabels.com/templates/blank/ol250)    | Letter | 4 × 1.5 in                    | 12               |
+| [OnlineLabels OL450](https://www.onlinelabels.com/templates/blank/ol450)    | Letter | 4.25 × 5.5 in                 | 4                |
+| [OnlineLabels OL600](https://www.onlinelabels.com/templates/blank/ol600)    | Letter | 4 × 2.5 in                    | 8                |
+| [OnlineLabels OL700](https://www.onlinelabels.com/templates/blank/ol700)    | Letter | 4 × 1.75 in                   | 12               |
+| [OnlineLabels OL800](https://www.onlinelabels.com/templates/blank/ol800)    | Letter | 2.5 × 1.563 in                | 18               |
+| [TownStix A4-10](https://townstix.com/templates/)                           | A4     | 105 × 57 mm                   | 10               |
+| [TownStix A4-2](https://townstix.com/templates/)                            | A4     | 210 × 148.5 mm                | 2                |
+| [TownStix A4-24](https://townstix.com/templates/)                           | A4     | 70 × 36 mm                    | 24               |
+| [TownStix A4-8](https://townstix.com/templates/)                            | A4     | 105 × 74.25 mm                | 8                |
+| [TownStix US-10](https://townstix.com/templates/)                           | Letter | 4 × 2 in                      | 10               |
+| [TownStix US-22-12](https://townstix.com/templates/)                        | Letter | 2 × 2 in                      | 12               |
+| [TownStix US-4](https://townstix.com/templates/)                            | Letter | 4 × 5 in                      | 4                |
+
+## Verification
+
+Catalog tests check provider/paper counts, alphabetical order, default choice, compatibility, bounds, and pagination. Independently recorded specification fixtures drive browser coordinate and physical PDF page-size checks for all 44 supported IDs. Vue tests exercise the actual picker, details, A4 preview dimensions, zoom, and regeneration. Browser checks cover both paper formats and accessibility. Automated geometry checks do not certify physical printer alignment.
+
+---
+
+# Original 2.1.0 catalog research
 
 Reviewed 2026-09-07. Decision: retain TownStix US-10 and Avery 5390, add 18 OnlineLabels stocks, for **20 selectable product templates across three providers**. These are product layouts, not a claim of 20 unique physical dimensions. All use US Letter sheets.
 
