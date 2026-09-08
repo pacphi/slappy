@@ -109,7 +109,7 @@ Reference only: the current `package.json` is private and `pnpm build` produces 
    ```json
    {
      "name": "slappy",
-     "version": "2.0.1",
+     "version": "2.1.0",
      "description": "Generate printable name tags from Google Sheets",
      "main": "dist/nametag-generator.js",
      "bin": {
@@ -1080,7 +1080,7 @@ USER node
 | `wrangler pages deploy`  | Deploy to Cloudflare Pages               |
 | `netlify deploy --prod`  | Deploy to Netlify production             |
 | `npm publish`            | Publish CLI tool to npm registry         |
-| `npm version patch`      | Bump CLI package version (2.0.1 → 2.0.2) |
+| `npm version patch`      | Bump CLI package version (2.1.0 → 2.1.1) |
 
 ---
 

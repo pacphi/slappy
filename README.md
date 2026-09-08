@@ -1,6 +1,6 @@
 # Slappy
 
-Slappy 2.0 · Node.js 26 · pnpm 12
+Slappy 2.1.0 · Node.js 26 · pnpm 12
 
 [![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy.fly.dev/)
 
