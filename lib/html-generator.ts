@@ -1,4 +1,4 @@
-import type { NameTagRow, NameTagPage } from './types'
+import type { NameTagRow, NameTagPage } from '../shared/types'
 import {
   defaultLabelTemplateId,
   getLabelTemplate,

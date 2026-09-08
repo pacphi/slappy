@@ -1,5 +1,5 @@
-import { ref, computed } from 'vue'
-import type { WizardStep } from '~/types'
+import { ref, computed, readonly } from 'vue'
+import type { WizardStep } from '#shared/types'
 
 const STEP_ORDER: WizardStep[] = ['upload', 'mapping', 'preview']
 
@@ -29,7 +29,7 @@ export const useWizardNavigation = () => {
     if (stepIdx === 0) return true // Upload is always accessible
 
     const previousStep = STEP_ORDER[stepIdx - 1]
-    return completedSteps.value.has(previousStep)
+    return previousStep !== undefined && completedSteps.value.has(previousStep)
   }
 
   const goToStep = (step: WizardStep) => {

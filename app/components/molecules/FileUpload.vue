@@ -47,7 +47,7 @@ const validateFile = (file: File): ValidationResult => {
   return { valid: true }
 }
 
-const handleFileChange = (files: File[] | File | null) => {
+const handleFileChange = (files: File[] | File | null | undefined) => {
   if (!files) return
 
   // Handle both array and single file

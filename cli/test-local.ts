@@ -1,4 +1,6 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 import { parseCSVToPages } from '../lib/csv-parser'
 import { generateNameTagsHTML } from '../lib/html-generator'
 
@@ -49,9 +51,9 @@ async function testWithLocalFile(csvFilePath: string) {
 
 // CLI interface
 // Check if this file is being run directly (ES module version)
-const isMainModule = import.meta.url === `file://${process.argv[1]}`
+const isMainModule = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])
 if (isMainModule) {
   const args = process.argv.slice(2)
-  const csvFile = args.length > 0 ? args[0] : './sample/sample-roster.csv'
+  const csvFile = args[0] || './sample/sample-roster.csv'
   testWithLocalFile(csvFile)
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, reactive } from 'vue'
 import { z } from 'zod'
-import type { ColumnMapping, WizardStep } from '~/types'
+import type { ColumnMapping, WizardStep } from '#shared/types'
 import type { FormSubmitEvent } from '#ui/types'
 import { getErrorMessage } from '~/utils/error-messages'
 import { isValidGoogleSheetsUrl } from '~/utils/validators'
@@ -23,7 +23,7 @@ const { parsedData, uploadFile, uploadSheets, loading, error, reset: resetUpload
 const toast = useToast()
 
 // C1: Browser navigation protection
-useUnsavedChanges()
+useUnsavedChanges(parsedData)
 
 // Local error state for file upload
 const uploadError = ref<string | null>(null)
@@ -37,7 +37,7 @@ watch([() => uploadError.value, error], ([uploadErr, apiErr]) => {
       title: errorContext.message,
       description: errorContext.solution,
       color: 'error',
-      timeout: 8000,
+      duration: 8000,
     })
   }
 })
@@ -80,10 +80,18 @@ const canShowPreviewContent = computed(
   () => isStepCompleted('mapping') || currentStep.value === 'preview'
 )
 
+const prepareUpload = () => {
+  resetWizard()
+  mapping.value = null
+  csvContent.value = ''
+  hasHeaders.value = false
+  uploadError.value = null
+}
+
 const handleFileSelected = async (file: File) => {
-  uploadError.value = null // Clear previous errors
-  await uploadFile(file)
-  if (parsedData.value) {
+  prepareUpload()
+  const succeeded = await uploadFile(file)
+  if (succeeded) {
     nextStep()
   }
 }
@@ -93,9 +101,9 @@ const handleUploadError = (errorMessage: string) => {
 }
 
 const handleSheetsSubmit = async (event: FormSubmitEvent<z.infer<typeof sheetsSchema>>) => {
-  uploadError.value = null
-  await uploadSheets(event.data.url)
-  if (parsedData.value) {
+  prepareUpload()
+  const succeeded = await uploadSheets(event.data.url)
+  if (succeeded) {
     nextStep()
     sheetsState.url = '' // Clear form on success
   }
@@ -156,11 +164,7 @@ Henry Clark,AppStudio,Mobile Developer`
   const blob = new Blob([sampleCSV], { type: 'text/csv' })
   const file = new File([blob], 'sample-data.csv', { type: 'text/csv' })
 
-  uploadError.value = null
-  await uploadFile(file)
-  if (parsedData.value) {
-    nextStep()
-  }
+  await handleFileSelected(file)
 }
 </script>
 

@@ -4,14 +4,7 @@ import { version } from './package.json'
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   future: { compatibilityVersion: 4 },
-  modules: [
-    '@nuxt/ui',
-    '@pinia/nuxt',
-    '@pinia/colada-nuxt',
-    '@nuxt/eslint',
-    '@nuxtjs/seo',
-    'nuxt-feature-flags',
-  ],
+  modules: ['@nuxt/ui', '@nuxt/eslint', '@nuxtjs/seo', 'nuxt-feature-flags'],
   css: ['~/assets/css/main.css'],
 
   // Social previews use public/og-image.png; no dynamic image renderer is needed.
@@ -22,7 +15,7 @@ export default defineNuxtConfig({
     url: 'https://slappy.cloud',
     name: 'Slappy',
     description:
-      'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
+      'Transform your spreadsheets into print-ready name tags on 20 stocks from TownStix, Avery, and OnlineLabels instantly. Free, fast, and easy to use.',
     defaultLocale: 'en',
   },
 
@@ -43,6 +36,7 @@ export default defineNuxtConfig({
   // Sitemap configuration
   sitemap: {
     strictNuxtContentPaths: true,
+    zeroRuntime: true,
     // Only include the homepage for now (single-page app)
     urls: ['https://slappy.cloud/'],
     // Exclude API endpoints and internal routes
@@ -81,7 +75,7 @@ export default defineNuxtConfig({
       cssMinify: 'lightningcss',
     },
     optimizeDeps: {
-      include: ['vue', 'vue-router', 'pinia', '@pinia/colada'],
+      include: ['vue', 'vue-router'],
     },
     ssr: {
       noExternal: ['vue', 'vue-router', '@nuxt/ui'],

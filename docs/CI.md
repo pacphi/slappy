@@ -18,15 +18,20 @@ Run the relevant checks locally before pushing:
 pnpm install --frozen-lockfile
 pnpm lint
 pnpm format:check
-pnpm test
+pnpm typecheck
+pnpm test:coverage
+pnpm quality:metrics
 pnpm test:local
 pnpm build
 pnpm test:build
+pnpm test:web
 pnpm deadcode
 pnpm audit --audit-level=low
 ```
 
-- ESLint and Prettier check code and formatting.
+- ESLint and Prettier check code and formatting. First-party functions, including Vue script blocks, have a blocking cyclomatic complexity limit of 10.
+- Strict Vue and CLI typechecks are blocking. c8 enforces 80% statements, branches, functions, and lines across executable TypeScript; Vue templates are outside this percentage. Coverage and complexity reports are uploaded as CI artifacts.
+- `pnpm test:web` starts the built server, checks HTML/PDF APIs, and exercises stock search, keyboard selection, and quoted CSV upload through the browser UI.
 - `pnpm test` runs the Node test runner through tsx (`tsx --test tests/*.test.ts`) for the shared label generation behavior. CI explicitly runs `pnpm exec puppeteer browsers install chrome` before these tests: restoring pnpm's package cache does not restore Puppeteer's separate browser cache or guarantee its install hook runs again.
 - The CLI sample test generates `sample/sample-roster-tags.html`; CI checks that it exists, is substantial, and contains an HTML doctype.
 - `pnpm test:build` runs `node scripts/check-build.mjs` after the build and rejects any uncompiled `@apply` or `@reference` directive in output CSS.
@@ -53,7 +58,7 @@ pnpm test:deployment
 SLAPPY_SMOKE_URL=http://127.0.0.1:3001 pnpm test:deployment
 ```
 
-`pnpm test:deployment` runs `node scripts/smoke-deployment.mjs`; the default URL is `http://127.0.0.1:3000`. It checks Node 26, the homepage, HTML and PDF page counts for both stocks, and HTTP 400 for an invalid stock.
+`pnpm test:deployment` runs `node scripts/smoke-deployment.mjs`; the default URL is `http://127.0.0.1:3000`. It checks Node 26, the homepage, HTML and PDF page counts for representative original and expanded catalog stocks, and HTTP 400 for an invalid stock.
 
 The Docker builder runs `pnpm build && pnpm test:build`. The **Docker Deployment Smoke Test** CI job builds the Dockerfile, starts a `slappy-smoke` container, and executes the same script inside it:
 

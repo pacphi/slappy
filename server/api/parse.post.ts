@@ -1,39 +1,36 @@
-import { parseRawData } from '../utils/data-parser'
-import { fetchGoogleSheetAsCSV } from '../utils/sheets-fetcher'
+import { createError, defineEventHandler, getHeader } from 'h3'
+import { parseRawData } from '../../lib/data-parser'
+import { fetchGoogleSheetAsCSV } from '../../lib/sheets-fetcher'
+import { invalidInput, readBoundedBody, readBoundedJSON } from '../utils/request-body'
+import { sheetsRequestSchema } from '../../shared/validation'
 
 export default defineEventHandler(async event => {
-  const contentType = getHeader(event, 'content-type')
-
+  const contentType = getHeader(event, 'content-type') || ''
   let csvContent: string
-
-  if (contentType?.includes('multipart/form-data')) {
-    // Handle file upload
-    const form = await readMultipartFormData(event)
-    const file = form?.find(item => item.name === 'file')
-
-    if (!file) {
-      throw createError({
-        statusCode: 400,
-        message: 'No file provided',
-      })
+  if (contentType.startsWith('multipart/form-data')) {
+    const bytes = await readBoundedBody(event)
+    try {
+      const form = await new Response(new Uint8Array(bytes), {
+        headers: { 'Content-Type': contentType },
+      }).formData()
+      const file = form.get('file')
+      if (!(file instanceof File)) throw new Error('No file provided')
+      csvContent = await file.text()
+    } catch (error) {
+      invalidInput(error)
     }
-
-    csvContent = file.data.toString('utf-8')
   } else {
-    // Handle Google Sheets URL
-    const body = await readBody(event)
-
-    if (!body.sheetsUrl) {
-      throw createError({
-        statusCode: 400,
-        message: 'No sheetsUrl provided',
-      })
+    const result = sheetsRequestSchema.safeParse(await readBoundedJSON(event))
+    if (!result.success) throw createError({ statusCode: 400, message: 'Invalid sheetsUrl' })
+    try {
+      csvContent = await fetchGoogleSheetAsCSV(result.data.sheetsUrl)
+    } catch (error) {
+      invalidInput(error)
     }
-
-    csvContent = await fetchGoogleSheetAsCSV(body.sheetsUrl)
   }
-
-  const parsedData = parseRawData(csvContent)
-
-  return parsedData
+  try {
+    return parseRawData(csvContent)
+  } catch (error) {
+    invalidInput(error)
+  }
 })

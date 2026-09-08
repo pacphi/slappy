@@ -1,5 +1,4 @@
-import { computed, onMounted, onUnmounted } from 'vue'
-import { useDataUpload } from './useDataUpload'
+import { computed, readonly, onMounted, onUnmounted, type Ref } from 'vue'
 
 /**
  * Protects users from accidentally losing work by warning them before:
@@ -8,9 +7,7 @@ import { useDataUpload } from './useDataUpload'
  * - Page refresh
  * - URL navigation
  */
-export const useUnsavedChanges = () => {
-  const { parsedData } = useDataUpload()
-
+export const useUnsavedChanges = (parsedData: Readonly<Ref<unknown | null>>) => {
   const hasUnsavedWork = computed(() => {
     return parsedData.value !== null
   })

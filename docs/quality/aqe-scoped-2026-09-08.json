@@ -1,0 +1,189 @@
+{
+  "tool": "agentic-qe CodeMetricsAnalyzer",
+  "version": "3.14.0",
+  "limitations": "File-level heuristic/AST hybrid totals, not per-function ESLint complexity. Vue is measured separately by quality:metrics. No synthetic quality score.",
+  "results": [
+    {
+      "file": "app/composables/useAppNavigation.ts",
+      "cyclomatic": 1,
+      "functions": 3,
+      "lines": 21,
+      "maintainability": 52.53
+    },
+    {
+      "file": "app/composables/useColumnMapping.ts",
+      "cyclomatic": 9,
+      "functions": 3,
+      "lines": 42,
+      "maintainability": 42.04
+    },
+    {
+      "file": "app/composables/useDataUpload.ts",
+      "cyclomatic": 11,
+      "functions": 5,
+      "lines": 47,
+      "maintainability": 40.64
+    },
+    {
+      "file": "app/composables/useMappingTemplates.ts",
+      "cyclomatic": 26,
+      "functions": 8,
+      "lines": 85,
+      "maintainability": 30.01
+    },
+    {
+      "file": "app/composables/useNameTagGeneration.ts",
+      "cyclomatic": 19,
+      "functions": 5,
+      "lines": 82,
+      "maintainability": 32.12
+    },
+    {
+      "file": "app/composables/useUnsavedChanges.ts",
+      "cyclomatic": 5,
+      "functions": 2,
+      "lines": 22,
+      "maintainability": 49.89
+    },
+    {
+      "file": "app/composables/useWizardNavigation.ts",
+      "cyclomatic": 25,
+      "functions": 10,
+      "lines": 73,
+      "maintainability": 32.77
+    },
+    {
+      "file": "app/utils/download.ts",
+      "cyclomatic": 1,
+      "functions": 1,
+      "lines": 11,
+      "maintainability": 59.78
+    },
+    {
+      "file": "app/utils/error-messages.ts",
+      "cyclomatic": 9,
+      "functions": 1,
+      "lines": 54,
+      "maintainability": 37.27
+    },
+    {
+      "file": "app/utils/validators.ts",
+      "cyclomatic": 1,
+      "functions": 2,
+      "lines": 7,
+      "maintainability": 62.66
+    },
+    {
+      "file": "lib/column-mapper.ts",
+      "cyclomatic": 11,
+      "functions": 5,
+      "lines": 37,
+      "maintainability": 43.48
+    },
+    {
+      "file": "lib/csv-parser.ts",
+      "cyclomatic": 2,
+      "functions": 2,
+      "lines": 8,
+      "maintainability": 63.42
+    },
+    {
+      "file": "lib/csv-records.ts",
+      "cyclomatic": 6,
+      "functions": 2,
+      "lines": 23,
+      "maintainability": 49.02
+    },
+    {
+      "file": "lib/data-parser.ts",
+      "cyclomatic": 4,
+      "functions": 1,
+      "lines": 19,
+      "maintainability": 51.93
+    },
+    {
+      "file": "lib/html-generator.ts",
+      "cyclomatic": 7,
+      "functions": 4,
+      "lines": 139,
+      "maintainability": 25.59
+    },
+    {
+      "file": "lib/pdf-generator.ts",
+      "cyclomatic": 4,
+      "functions": 2,
+      "lines": 50,
+      "maintainability": 40.15
+    },
+    {
+      "file": "lib/sheets-fetcher.ts",
+      "cyclomatic": 29,
+      "functions": 6,
+      "lines": 71,
+      "maintainability": 31.37
+    },
+    {
+      "file": "shared/label-templates.ts",
+      "cyclomatic": 2,
+      "functions": 1,
+      "lines": 349,
+      "maintainability": 15.9
+    },
+    {
+      "file": "shared/limits.ts",
+      "cyclomatic": 1,
+      "functions": 0,
+      "lines": 4,
+      "maintainability": 72.66
+    },
+    {
+      "file": "shared/validation.ts",
+      "cyclomatic": 5,
+      "functions": 1,
+      "lines": 47,
+      "maintainability": 40.99
+    },
+    {
+      "file": "server/api/generate.post.ts",
+      "cyclomatic": 3,
+      "functions": 1,
+      "lines": 48,
+      "maintainability": 39.99
+    },
+    {
+      "file": "server/api/parse.post.ts",
+      "cyclomatic": 1,
+      "functions": 0,
+      "lines": 35,
+      "maintainability": 45.45
+    },
+    {
+      "file": "server/utils/request-body.ts",
+      "cyclomatic": 6,
+      "functions": 9,
+      "lines": 56,
+      "maintainability": 38.11
+    },
+    {
+      "file": "cli/nametag-generator.ts",
+      "cyclomatic": 8,
+      "functions": 2,
+      "lines": 68,
+      "maintainability": 34.26
+    },
+    {
+      "file": "cli/options.ts",
+      "cyclomatic": 13,
+      "functions": 3,
+      "lines": 53,
+      "maintainability": 37.07
+    },
+    {
+      "file": "cli/test-local.ts",
+      "cyclomatic": 3,
+      "functions": 1,
+      "lines": 44,
+      "maintainability": 40.83
+    }
+  ]
+}

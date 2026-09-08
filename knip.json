@@ -17,10 +17,9 @@
     "scripts/**/*.mjs",
     "app/**/*.css"
   ],
-  "ignore": ["app/components/**", "app/composables/**"],
+  "ignore": [],
   "ignoreExportsUsedInFile": true,
   "ignoreDependencies": [
-    "date-fns",
     "@iconify-json/heroicons",
     "@iconify-json/lucide",
     "eslint-config-prettier",

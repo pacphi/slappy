@@ -15,8 +15,6 @@ useSeoMeta({
   title: 'Slappy - Professional Name Tags in 60 Seconds',
   description:
     'Transform your spreadsheets into print-ready name tags on 20 label stocks instantly. Free, fast, and easy to use.',
-  keywords:
-    'name tags, labels, CSV to PDF, TownStix, Avery 5390, label maker, US-10 labels, Google Sheets, badge printing, event labels',
   author: 'Slappy',
 
   // Open Graph (Facebook, LinkedIn, etc.)
@@ -25,10 +23,8 @@ useSeoMeta({
   ogTitle: 'Slappy - Professional Name Tags in 60 Seconds',
   ogDescription:
     'Generate print-ready name tags from CSV files or Google Sheets. 20 stocks from TownStix, Avery, and OnlineLabels.',
-  ogImage: 'https://slappy.cloud/og-image.png',
+  ogImage: 'https://slappy.cloud/slappy-logo.png',
   ogImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
-  ogImageWidth: '1200',
-  ogImageHeight: '630',
   ogSiteName: 'Slappy',
   ogLocale: 'en_US',
 
@@ -36,43 +32,25 @@ useSeoMeta({
   twitterCard: 'summary_large_image',
   twitterTitle: 'Slappy - Professional Name Tags in 60 Seconds',
   twitterDescription: 'Generate print-ready name tags from CSV files or Google Sheets instantly.',
-  twitterImage: 'https://slappy.cloud/og-image.png',
+  twitterImage: 'https://slappy.cloud/slappy-logo.png',
   twitterImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
 })
 
 // Canonical URL and structured data
 useHead({
   link: [{ rel: 'canonical', href: 'https://slappy.cloud/' }],
-  script: [
-    {
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'WebApplication',
-        name: 'Slappy',
-        url: 'https://slappy.cloud',
-        description:
-          'Transform your spreadsheets into print-ready name tags on 20 label stocks instantly. Free, fast, and easy to use.',
-        applicationCategory: 'BusinessApplication',
-        operatingSystem: 'Any',
-        offers: {
-          '@type': 'Offer',
-          price: '0',
-          priceCurrency: 'USD',
-        },
-        featureList: [
-          'CSV file upload',
-          'Google Sheets integration',
-          'TownStix US-10 (4×2" labels, 10 per sheet)',
-          'Avery 5390 (3½×2¼" inserts, 8 per sheet)',
-          'PDF and HTML export',
-          'Live preview with zoom',
-          'Intelligent column mapping',
-        ],
-      }),
-    },
-  ],
 })
+
+useSchemaOrg([
+  defineSoftwareApp({
+    name: 'Slappy',
+    url: 'https://slappy.cloud',
+    description: 'Generate print-ready name tags on 20 label stocks from CSV or Google Sheets.',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Any',
+    offers: { price: 0, priceCurrency: 'USD' },
+  }),
+])
 
 const { currentView, uploadMode } = useAppNavigation()
 const { isEnabled } = useFeatureFlags()
@@ -122,7 +100,7 @@ const features = [
 
     <!-- Name Tag Wizard (shown when navigation option is selected) -->
     <section v-if="currentView === 'wizard'" class="wizard-section">
-      <OrganismsNameTagWizard :initial-upload-mode="uploadMode" />
+      <LazyOrganismsNameTagWizard :initial-upload-mode="uploadMode" />
     </section>
 
     <!-- Marketing stays visible, including while using the wizard. -->

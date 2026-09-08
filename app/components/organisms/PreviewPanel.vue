@@ -6,7 +6,7 @@ import {
   getLabelTemplate,
   type LabelTemplateId,
 } from '#shared/label-templates'
-import type { ColumnMapping } from '~/types'
+import type { ColumnMapping } from '#shared/types'
 
 const props = defineProps<{
   csvContent: string
