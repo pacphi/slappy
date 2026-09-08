@@ -15,7 +15,7 @@ export default defineNuxtConfig({
     url: 'https://slappy.cloud',
     name: 'Slappy',
     description:
-      'Transform your spreadsheets into print-ready name tags on 20 stocks from TownStix, Avery, and OnlineLabels instantly. Free, fast, and easy to use.',
+      'Transform your spreadsheets into print-ready name tags on 34 templates from TownStix, Avery, and OnlineLabels instantly. Free, fast, and easy to use.',
     defaultLocale: 'en',
   },
 

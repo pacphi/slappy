@@ -3,17 +3,17 @@ import { test } from 'node:test'
 import { generateNameTagsHTML } from '../lib/html-generator'
 import { labelTemplates, getLabelTemplate } from '../shared/label-templates'
 
-test('should_offerTwentyDistinctStocks_when_catalogLoaded', () => {
-  assert.equal(new Set(labelTemplates.map(template => template.id)).size, 20)
+test('should_offerThirtyFourDistinctStocks_when_catalogLoaded', () => {
+  assert.equal(new Set(labelTemplates.map(template => template.id)).size, 34)
 })
 
-test('should_keepAllLabelsWithinLetterSheet_when_catalogLoaded', () => {
+test('should_keepAllLabelsWithinSelectedSheet_when_catalogLoaded', () => {
   for (const t of labelTemplates) {
     assert.ok(
       t.marginLeftIn + t.columns * t.widthIn + (t.columns - 1) * t.columnGapIn + t.marginRightIn <=
-        8.501 &&
+        t.sheetWidthIn + 0.001 &&
         t.marginTopIn + t.rows * t.heightIn + (t.rows - 1) * t.rowGapIn + t.marginBottomIn <=
-          11.001,
+          t.sheetHeightIn + 0.001,
       t.id
     )
   }
@@ -49,9 +49,9 @@ test('should_keepLogicalPageBreaks_when_partialAverySheetsProvided', () => {
   assert.equal((html.match(/class="name-tag"/g) || []).length, 16)
 })
 
-test('should_preserveTenLabelDefault_when_templateOmitted', () => {
+test('should_useEightLabelAveryDefault_when_templateOmitted', () => {
   const html = generateNameTagsHTML([{ tags: tags(11) }])
-  assert.equal((html.match(/class="name-tag"/g) || []).length, 20)
+  assert.equal((html.match(/class="name-tag"/g) || []).length, 16)
 })
 
 test('should_rejectUnknownTemplate_when_untrustedValuePassed', () => {
@@ -67,5 +67,15 @@ test('should_escapeMarkup_when_labelContainsHTML', () => {
 for (const id of [null, '', ' ', 0, false, {}, [], 'AVERY-5390']) {
   test(`should_rejectUnsupportedId_when_${JSON.stringify(id)}Passed`, () => {
     assert.throws(() => getLabelTemplate(id), RangeError)
+  })
+}
+
+for (const id of ['avery-5390', 'avery-l7160'] as const) {
+  test(`should_setPhysicalPaperSize_when_${id}Selected`, () => {
+    const t = getLabelTemplate(id)
+    const html = generateNameTagsHTML([{ tags: tags(1) }], id)
+    assert.ok(html.includes(`size: ${t.sheetWidthIn}in ${t.sheetHeightIn}in;`))
+    assert.ok(html.includes(`width: ${t.sheetWidthIn}in;`))
+    assert.ok(html.includes(`height: ${t.sheetHeightIn}in;`))
   })
 }

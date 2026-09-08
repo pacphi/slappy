@@ -137,3 +137,18 @@ test('API parses Sheets exports and handles upstream failures', async t => {
     400
   )
 })
+
+test('API accepts A4 and retired stocks while defaulting to Avery 5390', async t => {
+  const { post } = await startAPI(t)
+  for (const [labelTemplate, slots, title] of [
+    [undefined, 8, 'Avery 5390'],
+    ['avery-l7160', 21, 'Avery L7160'],
+    ['onlinelabels-ol875', 30, 'OnlineLabels OL875'],
+  ] as const) {
+    const response = await post('/generate', { csvContent: 'Ada', mapping, labelTemplate })
+    assert.equal(response.status, 200, title)
+    const { html } = await response.json()
+    assert.ok(html.includes(`<title>Name Tags - ${title}</title>`))
+    assert.equal((html.match(/class="name-tag"/g) || []).length, slots)
+  }
+})

@@ -32,7 +32,6 @@ export async function generatePDF(html: string): Promise<Buffer> {
     })
     await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: PDF_TIMEOUT_MS })
     const pdf = await page.pdf({
-      format: 'Letter',
       printBackground: true,
       preferCSSPageSize: true,
       timeout: PDF_TIMEOUT_MS,

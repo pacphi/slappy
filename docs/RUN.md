@@ -136,7 +136,7 @@ Map your data columns to the three lines on each name tag:
 Preview and download your name tags:
 
 1. **Preview**: View your name tags in the browser
-   - Choose **Label stock**: TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet)
+   - Choose **Label stock**: one of 34 Avery, TownStix, or OnlineLabels templates on Letter or A4 sheets
    - TownStix is the default; the selected stock applies to preview, HTML, PDF, and printing
    - Dashed borders visible on screen (hidden when printing)
    - Scroll to review all pages
@@ -147,7 +147,7 @@ Preview and download your name tags:
    - **Print**: Open the browser print dialog for immediate printing
 
 3. **Print Settings** (when using Print button or opening HTML):
-   - Paper size: US Letter (8.5" × 11")
+   - Paper size: Letter or A4, matching the selected template
    - Margins: use the generated template defaults; do not add custom margins
    - Scale: 100%
    - Disable headers/footers
@@ -179,7 +179,7 @@ pnpm cli <SPREADSHEET_ID> <GID> [OUTPUT_FILE] [OPTIONS]
 - `--line3-col=N`: Map column N to line 3 (default: 2)
 - `--has-headers`: Treat first row as headers (skip it)
 - `--format=FORMAT`: Output format: `html` or `pdf` (default: `html`)
-- `--label-template=STOCK`: Label stock: `avery-5390` (8 per sheet) or `townstix-us-10` (default, 10 per sheet)
+- `--label-template=STOCK`: Label stock ID from the catalog; default `avery-5390` (8 per sheet). The CLI also accepts the 10 historical OnlineLabels IDs.
 
 Column indices are 0-based (first column = 0, second = 1, etc.).
 
@@ -217,7 +217,7 @@ pnpm cli SHEET_ID GID avery-5390.pdf \
   --has-headers --format=pdf --label-template=avery-5390
 ```
 
-Omit `--label-template` or use `--label-template=townstix-us-10` for the default TownStix layout.
+Omit `--label-template` or use `--label-template=avery-5390` for the default Avery layout.
 
 **Example 4: Partial mapping (2 lines only)**
 
@@ -408,7 +408,7 @@ Select the label stock matching your sheets before downloading or printing:
 
 **Required Settings:**
 
-- **Paper size**: US Letter (8.5" × 11")
+- **Paper size**: Letter or A4, matching the selected template
 - **Margins**: use the generated template defaults; do not add custom margins
 - **Scale**: 100% (no shrinking or "fit to page")
 - **Headers/Footers**: Disabled
@@ -435,7 +435,7 @@ Select the label stock matching your sheets before downloading or printing:
 
 1. File → Print
 2. Show Details
-3. Paper Size: US Letter
+3. Paper Size: Letter or A4, matching the selected template
 4. Scale: 100%
 5. Enable "Print backgrounds" checkbox
 
@@ -543,7 +543,7 @@ Cause: Incorrect print settings
 
 Solutions:
 
-1. Verify paper size: **US Letter** (not A4)
+1. Verify paper size: **Letter or A4**, matching the selected template
 2. Use the generated template margins and confirm the **Label stock** picker matches the sheets
 3. Ensure scale is **100%** (not "fit to page")
 4. Disable "Shrink to fit" or auto-scaling options

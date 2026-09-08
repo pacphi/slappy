@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { defaultLabelTemplateId, labelTemplates } from './label-templates'
+import { defaultLabelTemplateId, allLabelTemplates } from './label-templates'
 import { MAX_COLUMNS, MAX_CSV_BYTES } from './limits'
 import type { ColumnMapping } from './types'
 
@@ -44,7 +44,7 @@ export const generationRequestSchema = z.object({
   hasHeaders: z.boolean().default(false),
   format: z.enum(['html', 'pdf']).default('html'),
   labelTemplate: z
-    .enum(labelTemplates.map(template => template.id))
+    .enum(allLabelTemplates.map(template => template.id))
     .default(defaultLabelTemplateId),
 })
 
