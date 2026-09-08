@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import {
   labelTemplates,
   defaultLabelTemplateId,
@@ -29,7 +29,10 @@ const {
   error,
   generate,
   downloadHtml,
+  reset,
 } = useNameTagGeneration()
+onBeforeUnmount(reset)
+
 const zoom = ref(100)
 const labelTemplate = ref<LabelTemplateId>(defaultLabelTemplateId)
 const selectedTemplate = computed(() => getLabelTemplate(labelTemplate.value))
@@ -40,12 +43,13 @@ const labelOptions = labelTemplates.map(template => ({
 const previewFrame = ref<HTMLIFrameElement | null>(null)
 const labelsPerSheet = computed(() => selectedTemplate.value.columns * selectedTemplate.value.rows)
 
+const regeneratePreview = () =>
+  generate(props.csvContent, props.mapping, props.hasHeaders, 'html', labelTemplate.value)
+
 // Regenerate both pagination and geometry whenever the selected stock or data changes.
 watch(
   [labelTemplate, () => props.csvContent, () => props.mapping, () => props.hasHeaders],
-  async () => {
-    await generate(props.csvContent, props.mapping, props.hasHeaders, 'html', labelTemplate.value)
-  },
+  regeneratePreview,
   { immediate: true }
 )
 
@@ -106,12 +110,12 @@ defineShortcuts({
       downloadHtml()
     },
   },
-  plus: {
+  '+': {
     handler: () => {
       zoomIn()
     },
   },
-  minus: {
+  '-': {
     handler: () => {
       zoomOut()
     },
@@ -157,10 +161,13 @@ defineShortcuts({
     </p>
 
     <!-- Error Display -->
-    <UAlert v-if="error" color="error" variant="soft" :title="error" />
+    <div v-if="error" role="alert">
+      <UAlert color="error" variant="soft" :title="error" />
+      <UButton class="mt-3" @click="regeneratePreview">Retry preview</UButton>
+    </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="loading-state" role="status" aria-live="polite">
       <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin" />
       <p>Generating preview...</p>
     </div>
@@ -207,7 +214,13 @@ defineShortcuts({
     </div>
 
     <!-- Preview Iframe -->
-    <div v-if="!loading && !error" class="preview-card">
+    <div
+      v-if="!loading && !error"
+      class="preview-card"
+      role="region"
+      aria-label="Label preview"
+      tabindex="0"
+    >
       <div
         class="preview-sheet"
         :style="{

@@ -47,7 +47,7 @@ onMounted(() => {
   // Push ads to AdSense queue (window.adsbygoogle)
   try {
     const win = window as unknown as WindowWithAdsByGoogle
-    if (typeof window !== 'undefined' && win.adsbygoogle) {
+    if (publisherId) {
       ;(win.adsbygoogle = win.adsbygoogle || []).push({})
     }
   } catch (error) {

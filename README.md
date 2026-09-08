@@ -92,7 +92,7 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 
 ## Quality and maintenance
 
-Run `pnpm check:all` for lint, formatting, unused-code checks, strict types, and coverage. Run `pnpm build && pnpm test:build && pnpm test:web` for production validation. See the [brutal honesty report](docs/quality/brutal-honesty-2026-09-08.md) for findings, remediation, and measurement scope.
+Run `pnpm check:all` for lint, formatting, unused-code checks, strict types, and coverage. Run `pnpm build && pnpm test:build && pnpm test:web` for production validation. See the [brutal honesty report](docs/quality/brutal-honesty-2026-09-08.md) for findings, remediation, and measurement scope. The [Vue component follow-up](docs/quality/vue-component-testing.md) adds rendered component tests and browser accessibility checks.
 
 CSV uploads preserve quoted and multiline fields and blank-row page breaks. Inputs are capped at 5 MiB, 10,000 records, and 100 columns; output is capped at 500 sheets.
 

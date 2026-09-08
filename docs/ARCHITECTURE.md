@@ -53,6 +53,6 @@ pnpm test:web
 pnpm audit --audit-level=low
 ```
 
-ESLint enforces cyclomatic complexity at most 10 per first-party function, including Vue script blocks. Strict typechecking covers Vue and CLI code. Knip checks unused code and dependencies. c8 requires at least 80% statements, lines, branches, and functions across executable TypeScript in `lib`, `shared`, `app/composables`, `app/utils`, `server`, and `cli`; declaration-only types are excluded. Vue templates are not included in that coverage percentage. Production browser checks exercise the picker and upload-to-preview flow.
+ESLint enforces cyclomatic complexity at most 10 per first-party function, including Vue script blocks. Strict typechecking covers Vue and CLI code. Knip checks unused code and dependencies. c8 requires at least 80% statements, lines, branches, and functions across executable TypeScript in `lib`, `shared`, `app/composables`, `app/utils`, `server`, and `cli`; declaration-only types are excluded. Vue templates are not included in that TypeScript coverage percentage. A separate Vitest gate measures all component `.vue` files with real Nuxt UI, at 80% minimum in all dimensions. Production browser checks exercise the picker and upload-to-preview flow and run axe on four rendered states. See [component testing](quality/vue-component-testing.md).
 
 See [CI](CI.md) and the [brutal honesty report](quality/brutal-honesty-2026-09-08.md) for measurements and limitations. Historical planning documents describe proposals and may not match implemented code.

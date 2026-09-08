@@ -191,10 +191,8 @@ defineShortcuts({
           <USelect
             v-model="selectedTemplate"
             placeholder="Choose a saved template..."
-            :items="[
-              { label: 'Choose a saved template...', value: '' },
-              ...templateNames.map(name => ({ label: name, value: name })),
-            ]"
+            aria-label="Load template"
+            :items="templateNames.map(name => ({ label: name, value: name }))"
           />
         </div>
 
@@ -202,7 +200,8 @@ defineShortcuts({
           <UInput
             v-model="templateName"
             placeholder="Template name..."
-            @keyup.enter="handleSaveTemplate"
+            aria-label="Template name"
+            @keydown.enter.prevent="handleSaveTemplate"
           />
           <UButton
             size="sm"

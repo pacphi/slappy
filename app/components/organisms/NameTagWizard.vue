@@ -130,22 +130,6 @@ const handleColumnClick = (step: WizardStep) => {
   goToStep(step)
 }
 
-// Keyboard shortcuts
-defineShortcuts({
-  escape: {
-    handler: () => {
-      if (currentStep.value === 'preview') {
-        handleReset()
-      }
-    },
-  },
-  meta_r: {
-    handler: () => {
-      handleReset()
-    },
-  },
-})
-
 // F6: Sample data / demo mode
 const loadSampleData = async () => {
   const sampleCSV = `Name,Company,Title
@@ -182,6 +166,13 @@ Henry Clark,AppStudio,Mobile Developer`
           @click="handleColumnClick('upload')"
         />
         <div class="column-content">
+          <UAlert
+            v-if="uploadError || error"
+            color="error"
+            title="Unable to load data"
+            :description="uploadError || error || undefined"
+            role="alert"
+          />
           <!-- CSV Upload Mode -->
           <template v-if="uploadMode === 'csv'">
             <MoleculesFileUpload

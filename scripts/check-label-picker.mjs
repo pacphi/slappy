@@ -1,20 +1,41 @@
+import { fileURLToPath } from 'node:url'
 import assert from 'node:assert/strict'
 import puppeteer from 'puppeteer'
-import { fileURLToPath } from 'node:url'
+import { AxePuppeteer } from '@axe-core/puppeteer'
+import { mkdir, writeFile } from 'node:fs/promises'
+
+const accessibility = []
+async function checkAccessibility(page, state) {
+  const results = await new AxePuppeteer(page)
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+    .analyze()
+  accessibility.push({ state, violations: results.violations, incomplete: results.incomplete })
+  await mkdir('coverage/accessibility', { recursive: true })
+  await writeFile('coverage/accessibility/results.json', JSON.stringify(accessibility, null, 2))
+  assert.deepEqual(
+    results.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(node => node.target) })),
+    [],
+    `Accessibility violations in ${state}`
+  )
+}
 
 const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
 try {
   const page = await browser.newPage()
   await page.setViewport({ width: 1600, height: 1000 })
   await page.goto(process.env.SLAPPY_SMOKE_URL || 'http://127.0.0.1:3000')
+  await checkAccessibility(page, 'homepage')
   await page.locator('button::-p-text(Upload CSV)').click()
+  await checkAccessibility(page, 'upload')
   await page.locator('button::-p-text(Try Sample Data)').click()
   await page.waitForSelector('button[role="combobox"]')
   await page.click('button[role="combobox"]')
   await page.locator('[role="option"]::-p-text(Column 1 (Name))').click()
   await page.waitForFunction(() => document.querySelectorAll('[role="option"]').length === 0)
+  await checkAccessibility(page, 'mapping')
   await page.locator('button::-p-text(Continue to Preview)').click()
   await page.waitForSelector('[aria-label="Label stock"]:not([disabled])')
+  await checkAccessibility(page, 'preview')
   await page.click('[aria-label="Label stock"]')
   await page.waitForSelector('[role="option"]')
   assert.equal(await page.$$eval('[role="option"]', elements => elements.length), 20)

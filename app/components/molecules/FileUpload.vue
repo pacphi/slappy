@@ -27,8 +27,10 @@ const validateFile = (file: File): ValidationResult => {
     }
   }
 
-  // Check MIME type (when available)
-  if (file.type && file.type !== 'text/csv' && file.type !== 'application/csv') {
+  // Firefox on Windows can report CSV using Excel's registered MIME type.
+  // https://bugzilla.mozilla.org/show_bug.cgi?id=1934918
+  const csvMimeTypes = ['text/csv', 'application/csv', 'application/vnd.ms-excel']
+  if (file.type && !csvMimeTypes.includes(file.type)) {
     return {
       valid: false,
       error: 'Please upload a CSV file',
@@ -68,7 +70,7 @@ const handleFileChange = (files: File[] | File | null | undefined) => {
 <template>
   <div class="file-upload-wrapper">
     <!-- M4: Loading overlay -->
-    <div v-if="loading" class="loading-overlay">
+    <div v-if="loading" class="loading-overlay" role="status">
       <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin" />
       <p class="mt-4 text-lg font-medium">Processing CSV file...</p>
       <p class="mt-2 text-sm opacity-60">This may take a few seconds for large files</p>

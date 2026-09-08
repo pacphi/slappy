@@ -15,7 +15,7 @@
     "format": "prettier --write \"**/*.{ts,vue,js,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,vue,js,json,css,md}\"",
     "deadcode": "knip",
-    "check:all": "pnpm lint && pnpm format:check && pnpm deadcode && pnpm typecheck && pnpm test:coverage",
+    "check:all": "pnpm lint && pnpm format:check && pnpm deadcode && pnpm typecheck && pnpm test:coverage && pnpm test:components:coverage",
     "fix:all": "pnpm lint:fix && pnpm format",
     "outdated": "pnpm outdated",
     "update": "pnpm up",
@@ -33,7 +33,9 @@
     "quality:metrics": "node scripts/quality-metrics.mjs",
     "test:picker": "node scripts/check-label-picker.mjs",
     "test:web": "node scripts/check-web.mjs",
-    "quality:aqe": "node scripts/aqe-scoped-report.mjs"
+    "quality:aqe": "node scripts/aqe-scoped-report.mjs",
+    "test:components": "vitest run",
+    "test:components:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@nuxt/ui": "^4.11.1",
@@ -47,21 +49,27 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@axe-core/puppeteer": "^4.13.0",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/lucide": "^1.2.130",
     "@nuxt/eslint": "^1.17.0",
+    "@nuxt/test-utils": "^4.2.0",
     "@nuxtjs/seo": "^5.3.14",
     "@types/node": "^26.5.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vue/test-utils": "^2.5.0",
     "c8": "^12.0.0",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
+    "happy-dom": "^20.14.0",
     "knip": "^6.34.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.69.0",
+    "vitest": "^4.1.11",
     "vue-tsc": "^3.3.11"
   },
   "engines": {

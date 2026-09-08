@@ -77,6 +77,14 @@ jobs:
       - name: Verify production API and upload/picker workflows
         run: pnpm test:web
 
+      - name: Upload accessibility evidence
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: accessibility-evidence
+          path: coverage/accessibility/
+          retention-days: 7
+
       - name: Verify compiled production styles
         run: pnpm test:build
 
@@ -130,6 +138,9 @@ jobs:
 
       - name: Test and enforce coverage
         run: pnpm test:coverage
+
+      - name: Test Vue components and enforce coverage
+        run: pnpm test:components:coverage
 
       - name: Record function complexity
         run: pnpm quality:metrics
