@@ -28,9 +28,9 @@ useHead({
     // Only added when AdSense is enabled
     ...(isAdSenseEnabled
       ? [
-          { rel: 'dns-prefetch', href: 'https://pagead2.googlesyndication.com' },
-          { rel: 'dns-prefetch', href: 'https://googleads.g.doubleclick.net' },
-          { rel: 'preconnect', href: 'https://pagead2.googlesyndication.com' },
+          { rel: 'dns-prefetch' as const, href: 'https://pagead2.googlesyndication.com' },
+          { rel: 'dns-prefetch' as const, href: 'https://googleads.g.doubleclick.net' },
+          { rel: 'preconnect' as const, href: 'https://pagead2.googlesyndication.com' },
         ]
       : []),
   ],
@@ -42,7 +42,7 @@ useHead({
           {
             src: `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`,
             async: true,
-            crossorigin: 'anonymous',
+            crossorigin: 'anonymous' as const,
           },
         ]
       : []),

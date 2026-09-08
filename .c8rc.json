@@ -1,0 +1,18 @@
+{
+  "all": true,
+  "include": [
+    "lib/**/*.ts",
+    "shared/**/*.ts",
+    "app/composables/**/*.ts",
+    "app/utils/**/*.ts",
+    "server/**/*.ts",
+    "cli/**/*.ts"
+  ],
+  "exclude": ["**/*.d.ts", "**/types.ts"],
+  "reporter": ["text", "json", "json-summary", "lcov"],
+  "check-coverage": true,
+  "statements": 80,
+  "lines": 80,
+  "functions": 80,
+  "branches": 80
+}

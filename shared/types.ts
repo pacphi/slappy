@@ -35,6 +35,7 @@ export interface ColumnMapping {
  * Parsed raw data with metadata
  */
 export interface ParsedData {
+  csvContent: string // Original input, including quoting and logical page breaks
   columns: string[][] // All rows as arrays of column values
   headers?: string[] // Column names if hasHeaders is true
   columnCount: number
@@ -46,3 +47,5 @@ export interface ParsedData {
  * Output format options
  */
 export type OutputFormat = 'html' | 'pdf'
+
+export type WizardStep = 'upload' | 'mapping' | 'preview'

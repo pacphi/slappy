@@ -1,6 +1,31 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { generateNameTagsHTML } from '../lib/html-generator'
+import { labelTemplates, getLabelTemplate } from '../shared/label-templates'
+
+test('should_offerTwentyDistinctStocks_when_catalogLoaded', () => {
+  assert.equal(new Set(labelTemplates.map(template => template.id)).size, 20)
+})
+
+test('should_keepAllLabelsWithinLetterSheet_when_catalogLoaded', () => {
+  for (const t of labelTemplates) {
+    assert.ok(
+      t.marginLeftIn + t.columns * t.widthIn + (t.columns - 1) * t.columnGapIn + t.marginRightIn <=
+        8.501 &&
+        t.marginTopIn + t.rows * t.heightIn + (t.rows - 1) * t.rowGapIn + t.marginBottomIn <=
+          11.001,
+      t.id
+    )
+  }
+})
+
+test('should_paginateEveryStock_when_oneMoreThanFullSheetProvided', () => {
+  for (const t of labelTemplates) {
+    const capacity = t.columns * t.rows
+    const html = generateNameTagsHTML([{ tags: tags(capacity + 1) }], t.id)
+    assert.equal((html.match(/class="name-tag"/g) || []).length, capacity * 2, t.id)
+  }
+})
 
 const tags = (count: number) =>
   Array.from({ length: count }, (_, index) => ({
@@ -37,3 +62,10 @@ test('should_escapeMarkup_when_labelContainsHTML', () => {
   const html = generateNameTagsHTML([{ tags: [{ line1: '<script>', line2: '&', line3: '"' }] }])
   assert.ok(html.includes('&lt;script&gt;'))
 })
+
+// Invalid-input cases suggested by Agentic-QE; exercise the real catalog lookup.
+for (const id of [null, '', ' ', 0, false, {}, [], 'AVERY-5390']) {
+  test(`should_rejectUnsupportedId_when_${JSON.stringify(id)}Passed`, () => {
+    assert.throws(() => getLabelTemplate(id), RangeError)
+  })
+}

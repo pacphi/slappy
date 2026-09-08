@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Type-check application and CLI
+        run: pnpm typecheck
+
       - name: Run ESLint
         run: pnpm lint
 
@@ -67,6 +70,20 @@ jobs:
 
       - name: Build Nuxt
         run: pnpm build
+
+      - name: Install Chrome for browser checks
+        run: pnpm exec puppeteer browsers install chrome
+
+      - name: Verify production API and upload/picker workflows
+        run: pnpm test:web
+
+      - name: Upload accessibility evidence
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: accessibility-evidence
+          path: coverage/accessibility/
+          retention-days: 7
 
       - name: Verify compiled production styles
         run: pnpm test:build
@@ -119,8 +136,22 @@ jobs:
       - name: Install Chrome for Puppeteer tests
         run: pnpm exec puppeteer browsers install chrome
 
-      - name: Test label templates
-        run: pnpm test
+      - name: Test and enforce coverage
+        run: pnpm test:coverage
+
+      - name: Test Vue components and enforce coverage
+        run: pnpm test:components:coverage
+
+      - name: Record function complexity
+        run: pnpm quality:metrics
+
+      - name: Upload coverage and complexity
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: quality-evidence
+          path: coverage/
+          retention-days: 7
 
       - name: Test CLI with sample/sample-roster.csv
         run: pnpm test:local
@@ -208,7 +239,7 @@ jobs:
       - name: Start production server
         run: docker run -d --name slappy-smoke slappy:ci
 
-      - name: Verify Node 26, both label formats, and Chromium PDF generation
+      - name: Verify Node 26, label formats, validation, and Chromium PDF generation
         run: docker exec -i slappy-smoke node --input-type=module < scripts/smoke-deployment.mjs
 
       - name: Show server logs

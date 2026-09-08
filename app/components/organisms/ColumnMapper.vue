@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, reactive } from 'vue'
 import { z } from 'zod'
-import type { ParsedData, ColumnMapping } from '~/types'
+import { isValidMapping } from '#shared/validation'
+import type { ParsedData, ColumnMapping } from '#shared/types'
 import type { FormSubmitEvent } from '#ui/types'
 
 const props = defineProps<{
@@ -20,7 +21,7 @@ const mappingState = reactive({
   hasHeaders: false,
 })
 
-// Validation schema
+// Validate saved mappings against this upload's actual columns as well as the shared contract.
 const mappingSchema = z
   .object({
     line1: z.number().nullable(),
@@ -28,35 +29,16 @@ const mappingSchema = z
     line3: z.number().nullable(),
     hasHeaders: z.boolean(),
   })
-  .refine(
-    data => {
-      // At least one line must be selected
-      return data.line1 !== null || data.line2 !== null || data.line3 !== null
-    },
-    {
-      message: 'Select at least one column to continue',
-      path: ['line1'], // Show error on line1
-    }
-  )
-  .refine(
-    data => {
-      // No duplicates allowed
-      const selected = [data.line1, data.line2, data.line3].filter(v => v !== null)
-      return selected.length === new Set(selected).size
-    },
-    {
-      message: 'Each column can only be mapped once',
-      path: ['line1'], // Show error on line1
-    }
-  )
-
-const isValid = computed(() => {
-  const selected = [mappingState.line1, mappingState.line2, mappingState.line3]
-  const hasSelection = selected.some(v => v !== null)
-  const uniqueSelected = selected.filter(v => v !== null)
-  const noDuplicates = uniqueSelected.length === new Set(uniqueSelected).size
-  return hasSelection && noDuplicates
-})
+  .refine(data => validForUpload(data), {
+    message: 'Select at least one available column, without duplicates',
+    path: ['line1'],
+  })
+const validForUpload = (mapping: ColumnMapping) =>
+  isValidMapping({ line1: mapping.line1, line2: mapping.line2, line3: mapping.line3 }) &&
+  Object.values(mapping)
+    .filter(value => typeof value === 'number')
+    .every(value => value < props.parsedData.columnCount)
+const isValid = computed(() => validForUpload(mappingState))
 
 // F2: Mapping templates
 const { templateNames, hasTemplates, saveTemplate, loadTemplate } = useMappingTemplates()
@@ -81,7 +63,9 @@ const effectiveHeaders = computed(() => {
 
 // F7: Create column options for dropdowns with sample data preview
 const columnOptions = computed(() => {
-  const options = [{ label: '(Skip this line)', value: null }]
+  const options: { label: string; value: number | null }[] = [
+    { label: '(Skip this line)', value: null },
+  ]
 
   for (let i = 0; i < props.parsedData.columnCount; i++) {
     let label: string
@@ -132,17 +116,13 @@ const labelCount = computed(() => {
 })
 
 const handleSubmit = (event: FormSubmitEvent<z.infer<typeof mappingSchema>>) => {
-  // Reconstruct CSV content from columns
-  const rows = props.parsedData.columns.map(row => row.join(','))
-  const csvContent = rows.join('\n')
-
   const mapping: ColumnMapping = {
     line1: event.data.line1,
     line2: event.data.line2,
     line3: event.data.line3,
   }
 
-  emit('complete', mapping, event.data.hasHeaders, csvContent)
+  emit('complete', mapping, event.data.hasHeaders, props.parsedData.csvContent)
 }
 
 // F2: Template management
@@ -211,10 +191,8 @@ defineShortcuts({
           <USelect
             v-model="selectedTemplate"
             placeholder="Choose a saved template..."
-            :items="[
-              { label: 'Choose a saved template...', value: '' },
-              ...templateNames.map(name => ({ label: name, value: name })),
-            ]"
+            aria-label="Load template"
+            :items="templateNames.map(name => ({ label: name, value: name }))"
           />
         </div>
 
@@ -222,7 +200,8 @@ defineShortcuts({
           <UInput
             v-model="templateName"
             placeholder="Template name..."
-            @keyup.enter="handleSaveTemplate"
+            aria-label="Template name"
+            @keydown.enter.prevent="handleSaveTemplate"
           />
           <UButton
             size="sm"
@@ -243,7 +222,7 @@ defineShortcuts({
           label="Line 1 (Large, Bold)"
           description="This line will be displayed in a large, bold font"
         >
-          <USelect v-model="mappingState.line1" :items="columnOptions" />
+          <USelect v-model="mappingState.line1" :items="columnOptions" aria-label="Line 1 column" />
         </UFormField>
 
         <UFormField
@@ -251,7 +230,7 @@ defineShortcuts({
           label="Line 2 (Regular)"
           description="This line will be displayed in regular font"
         >
-          <USelect v-model="mappingState.line2" :items="columnOptions" />
+          <USelect v-model="mappingState.line2" :items="columnOptions" aria-label="Line 2 column" />
         </UFormField>
 
         <UFormField
@@ -259,7 +238,7 @@ defineShortcuts({
           label="Line 3 (Regular)"
           description="This line will be displayed in regular font"
         >
-          <USelect v-model="mappingState.line3" :items="columnOptions" />
+          <USelect v-model="mappingState.line3" :items="columnOptions" aria-label="Line 3 column" />
         </UFormField>
       </div>
 

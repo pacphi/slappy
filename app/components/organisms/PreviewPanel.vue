@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import {
   labelTemplates,
   defaultLabelTemplateId,
   getLabelTemplate,
   type LabelTemplateId,
 } from '#shared/label-templates'
-import type { ColumnMapping } from '~/types'
+import type { ColumnMapping } from '#shared/types'
 
 const props = defineProps<{
   csvContent: string
@@ -29,23 +29,27 @@ const {
   error,
   generate,
   downloadHtml,
+  reset,
 } = useNameTagGeneration()
+onBeforeUnmount(reset)
+
 const zoom = ref(100)
 const labelTemplate = ref<LabelTemplateId>(defaultLabelTemplateId)
 const selectedTemplate = computed(() => getLabelTemplate(labelTemplate.value))
 const labelOptions = labelTemplates.map(template => ({
   value: template.id,
-  label: `${template.name} — ${template.columns * template.rows} per sheet`,
+  label: `${template.name} · ${template.nominalWidthIn}″ × ${template.nominalHeightIn}″ · ${template.columns * template.rows}/sheet`,
 }))
 const previewFrame = ref<HTMLIFrameElement | null>(null)
 const labelsPerSheet = computed(() => selectedTemplate.value.columns * selectedTemplate.value.rows)
 
+const regeneratePreview = () =>
+  generate(props.csvContent, props.mapping, props.hasHeaders, 'html', labelTemplate.value)
+
 // Regenerate both pagination and geometry whenever the selected stock or data changes.
 watch(
   [labelTemplate, () => props.csvContent, () => props.mapping, () => props.hasHeaders],
-  async () => {
-    await generate(props.csvContent, props.mapping, props.hasHeaders, 'html', labelTemplate.value)
-  },
+  regeneratePreview,
   { immediate: true }
 )
 
@@ -106,12 +110,12 @@ defineShortcuts({
       downloadHtml()
     },
   },
-  plus: {
+  '+': {
     handler: () => {
       zoomIn()
     },
   },
-  minus: {
+  '-': {
     handler: () => {
       zoomOut()
     },
@@ -127,8 +131,10 @@ defineShortcuts({
 <template>
   <div class="preview-panel">
     <UFormField label="Label stock" name="labelTemplate">
-      <USelect
+      <USelectMenu
         v-model="labelTemplate"
+        value-key="value"
+        :search-input="{ placeholder: 'Search brand, product number, or size…' }"
         :items="labelOptions"
         :disabled="loading"
         class="w-full"
@@ -136,18 +142,32 @@ defineShortcuts({
       />
     </UFormField>
     <p class="text-sm text-muted">
-      {{ selectedTemplate.widthIn }}″ × {{ selectedTemplate.nominalHeightIn }}″ ·
+      {{ selectedTemplate.nominalWidthIn }}″ × {{ selectedTemplate.nominalHeightIn }}″ ·
       {{ labelsPerSheet }} per sheet · {{ sheetCount }} sheet{{ sheetCount === 1 ? '' : 's' }}
     </p>
     <p class="text-sm text-muted">
       Print on US Letter at 100% / Actual size. Turn off browser headers and footers.
     </p>
 
+    <a
+      :href="selectedTemplate.sourceUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-sm text-primary underline"
+      >Manufacturer template and specifications</a
+    >
+    <p v-if="selectedTemplate.heightIn < 1" class="text-sm text-muted">
+      Small stock uses compact text. Keep entries short and check the preview.
+    </p>
+
     <!-- Error Display -->
-    <UAlert v-if="error" color="error" variant="soft" :title="error" />
+    <div v-if="error" role="alert">
+      <UAlert color="error" variant="soft" :title="error" />
+      <UButton class="mt-3" @click="regeneratePreview">Retry preview</UButton>
+    </div>
 
     <!-- Loading State -->
-    <div v-if="loading" class="loading-state">
+    <div v-if="loading" class="loading-state" role="status" aria-live="polite">
       <UIcon name="i-heroicons-arrow-path" class="h-8 w-8 animate-spin" />
       <p>Generating preview...</p>
     </div>
@@ -194,7 +214,13 @@ defineShortcuts({
     </div>
 
     <!-- Preview Iframe -->
-    <div v-if="!loading && !error" class="preview-card">
+    <div
+      v-if="!loading && !error"
+      class="preview-card"
+      role="region"
+      aria-label="Label preview"
+      tabindex="0"
+    >
       <div
         class="preview-sheet"
         :style="{

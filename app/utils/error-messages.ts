@@ -6,7 +6,7 @@ export interface ErrorContext {
   helpLink?: string
 }
 
-export const ERROR_MESSAGES: Record<string, ErrorContext> = {
+export const ERROR_MESSAGES = {
   GOOGLE_SHEETS_FAILED: {
     message: 'Unable to access Google Sheet',
     solution:
@@ -31,24 +31,24 @@ export const ERROR_MESSAGES: Record<string, ErrorContext> = {
   FILE_TOO_LARGE: {
     message: 'File is too large',
     solution:
-      'Maximum file size is 5MB. Try:\n• Removing unnecessary columns\n• Splitting data into multiple files\n• Compressing the file',
+      'Maximum file size is 5MB. Try:\n• Removing unnecessary columns\n• Splitting data into multiple files\n• Keeping only the rows you need',
   },
-}
+} satisfies Record<string, ErrorContext>
 
 /**
  * Maps API error messages to user-friendly error contexts
  */
 export function getErrorMessage(apiError: string): ErrorContext {
-  // Map API errors to user-friendly messages
+  // Match specific failures before broad categories.
+  if (apiError.includes('Invalid Google Sheets URL')) {
+    return ERROR_MESSAGES.GOOGLE_SHEETS_INVALID_URL
+  }
+
   if (apiError.includes('Google Sheet')) {
     if (apiError.includes('403') || apiError.includes('private')) {
       return ERROR_MESSAGES.GOOGLE_SHEETS_PRIVATE
     }
     return ERROR_MESSAGES.GOOGLE_SHEETS_FAILED
-  }
-
-  if (apiError.includes('Invalid Google Sheets URL')) {
-    return ERROR_MESSAGES.GOOGLE_SHEETS_INVALID_URL
   }
 
   if (apiError.includes('parse') || apiError.includes('CSV')) {

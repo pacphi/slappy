@@ -25,6 +25,9 @@ const payload = { csvContent, mapping: { line1: 0, line2: null, line3: null }, h
 for (const [labelTemplate, expectedPages, expectedSlots] of [
   ['townstix-us-10', 1, 10],
   ['avery-5390', 2, 16],
+  ['onlinelabels-ol875', 1, 30],
+  ['onlinelabels-ol175', 9, 9],
+  ['onlinelabels-ol1100', 1, 100],
 ]) {
   const response = await fetch(`${baseUrl}/api/generate`, {
     method: 'POST',

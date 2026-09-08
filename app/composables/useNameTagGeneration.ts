@@ -1,6 +1,7 @@
 import { ref, readonly } from 'vue'
 import { defaultLabelTemplateId, type LabelTemplateId } from '#shared/label-templates'
-import type { ColumnMapping, OutputFormat } from '~/types'
+import type { ColumnMapping, OutputFormat } from '#shared/types'
+import { downloadBlob } from '../utils/download'
 
 export const useNameTagGeneration = () => {
   const loading = ref(false)
@@ -9,6 +10,12 @@ export const useNameTagGeneration = () => {
   const labelCount = ref(0)
   const sheetCount = ref(0)
   let latestRequest = 0
+
+  const reportError = (request: number, err: unknown) => {
+    if (request === latestRequest) {
+      error.value = err instanceof Error ? err.message : 'Failed to generate name tags'
+    }
+  }
 
   const generate = async (
     csvContent: string,
@@ -20,26 +27,23 @@ export const useNameTagGeneration = () => {
     const request = ++latestRequest
     loading.value = true
     error.value = null
-    if (format === 'html') generatedHtml.value = null
+    if (format === 'html') {
+      generatedHtml.value = null
+      labelCount.value = 0
+      sheetCount.value = 0
+    }
 
     try {
       if (format === 'pdf') {
         // For PDF, download directly
-        const response = await $fetch('/api/generate', {
+        const response = await $fetch<Blob>('/api/generate', {
           method: 'POST',
           body: { csvContent, mapping, hasHeaders, format: 'pdf', labelTemplate },
           responseType: 'blob',
         })
         if (request !== latestRequest) return
 
-        // Create download link
-        const blob = new Blob([response as BlobPart], { type: 'application/pdf' })
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = 'name-tags.pdf'
-        link.click()
-        window.URL.revokeObjectURL(url)
+        downloadBlob(new Blob([response], { type: 'application/pdf' }), 'name-tags.pdf')
       } else {
         // For HTML, get the HTML content
         const response = await $fetch<{ html: string; labelCount: number; sheetCount: number }>(
@@ -56,9 +60,7 @@ export const useNameTagGeneration = () => {
         sheetCount.value = response.sheetCount
       }
     } catch (err) {
-      if (request === latestRequest) {
-        error.value = err instanceof Error ? err.message : 'Failed to generate name tags'
-      }
+      reportError(request, err)
     } finally {
       if (request === latestRequest) loading.value = false
     }
@@ -67,13 +69,7 @@ export const useNameTagGeneration = () => {
   const downloadHtml = () => {
     if (!generatedHtml.value) return
 
-    const blob = new Blob([generatedHtml.value], { type: 'text/html' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'name-tags.html'
-    link.click()
-    window.URL.revokeObjectURL(url)
+    downloadBlob(new Blob([generatedHtml.value], { type: 'text/html' }), 'name-tags.html')
   }
 
   const reset = () => {

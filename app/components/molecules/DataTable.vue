@@ -9,23 +9,18 @@ const props = defineProps<{
 
 // Transform data for UTable
 const columns = computed(() => {
-  if (!props.headers || props.headers.length === 0) {
-    // Generate column headers if none provided
-    const firstRow = props.rows[0] || []
-    return firstRow.map((_, index) => ({
-      accessorKey: `col${index}`,
-      header: `Column ${index + 1}`,
-    }))
-  }
-
-  return props.headers.map((header, index) => ({
+  const width = props.rows.reduce(
+    (count, row) => Math.max(count, row.length),
+    props.headers?.length ?? 0
+  )
+  return Array.from({ length: width }, (_, index) => ({
     accessorKey: `col${index}`,
-    header: header,
+    header: props.headers?.[index] ?? `Column ${index + 1}`,
   }))
 })
 
 const data = computed(() => {
-  const displayRows = props.rows.slice(0, props.maxRows || props.rows.length)
+  const displayRows = props.rows.slice(0, props.maxRows ?? props.rows.length)
   return displayRows.map(row => {
     const rowData: Record<string, string> = {}
     row.forEach((cell, index) => {
@@ -49,8 +44,17 @@ const data = computed(() => {
 
     <!-- Table with data -->
     <template v-else>
-      <UTable :columns="columns" :data="data" />
-      <p v-if="maxRows && rows.length > maxRows" class="mt-3 text-center text-xs opacity-50">
+      <UTable
+        :columns="columns"
+        :data="data"
+        tabindex="0"
+        role="region"
+        aria-label="Data preview"
+      />
+      <p
+        v-if="maxRows !== undefined && rows.length > maxRows"
+        class="mt-3 text-center text-xs opacity-50"
+      >
         Showing {{ maxRows }} of {{ rows.length }} rows
       </p>
     </template>

@@ -124,7 +124,7 @@ const nativeShare = async () => {
       <UButton
         v-if="canUseNativeShare"
         icon="i-heroicons-share"
-        color="gray"
+        color="neutral"
         variant="soft"
         size="sm"
         aria-label="Share via..."

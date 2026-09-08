@@ -1,5 +1,6 @@
-import { ref, computed } from 'vue'
-import type { ColumnMapping } from '~/types'
+import { ref, computed, readonly } from 'vue'
+import type { ColumnMapping } from '#shared/types'
+import { isValidMapping } from '#shared/validation'
 
 export const useColumnMapping = (columnCount: number) => {
   const mapping = ref<ColumnMapping>({
@@ -20,13 +21,11 @@ export const useColumnMapping = (columnCount: number) => {
     return uniqueValues.size !== mappedValues.length
   })
 
-  const isValid = computed(() => {
-    // Must have at least one mapping AND no duplicates
-    const hasMapping =
-      mapping.value.line1 !== null || mapping.value.line2 !== null || mapping.value.line3 !== null
-
-    return hasMapping && !hasDuplicates.value
-  })
+  const isValid = computed(
+    () =>
+      isValidMapping(mapping.value) &&
+      Object.values(mapping.value).every(value => value === null || value < columnCount)
+  )
 
   const updateMapping = (line: keyof ColumnMapping, value: number | null) => {
     mapping.value[line] = value

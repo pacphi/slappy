@@ -4,7 +4,7 @@ Slappy 2.0 · Node.js 26 · pnpm 12
 
 [![GA](https://img.shields.io/badge/Release-GA-darkgreen)](https://img.shields.io/badge/Release-GA-darkgreen) ![Github Action CI Workflow Status](https://github.com/pacphi/slappy/actions/workflows/ci.yml/badge.svg) [![Online Demo](https://img.shields.io/badge/Online-Try%20on%20fly.io-darkpurple)](https://slappy.fly.dev/)
 
-Generate print-ready name tags on TownStix US-10 (4" × 2", 10 per sheet) or Avery 5390 (3½" × 2¼", 8 per sheet) from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
+Generate print-ready name tags on 20 label stocks from TownStix, Avery, and OnlineLabels from CSV files or Google Sheets. Features an intuitive multi-step wizard with flexible column mapping and both HTML and PDF export options.
 
 **Perfect for**: Conferences, choir groups, school events, workshops, and volunteer programs.
 
@@ -90,6 +90,12 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 - **[Custom Domain Setup](docs/CUSTOM_DOMAIN_SETUP.md)** - Connect a custom domain to your Fly.io deployment with HTTPS
 - **[AdSense & SEO Setup](docs/ADSENSE_SEO_SETUP.md)** - Configure Google AdSense and SEO optimization
 
+## Quality and maintenance
+
+Run `pnpm check:all` for lint, formatting, unused-code checks, strict types, and coverage. Run `pnpm build && pnpm test:build && pnpm test:web` for production validation. See the [brutal honesty report](docs/quality/brutal-honesty-2026-09-08.md) for findings, remediation, and measurement scope. The [Vue component follow-up](docs/quality/vue-component-testing.md) adds rendered component tests and browser accessibility checks.
+
+CSV uploads preserve quoted and multiline fields and blank-row page breaks. Inputs are capped at 5 MiB, 10,000 records, and 100 columns; output is capped at 500 sheets.
+
 ## Requirements
 
 - Node.js 26.x
@@ -117,7 +123,7 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 ### CLI Tool
 
 - ✅ **Command-line interface** - Automated workflows and scripting
-- ✅ **Label stock selection** - `--label-template=avery-5390` or `townstix-us-10` (default)
+- ✅ **Label stock selection** - 20 stock IDs via `--label-template=ID`; `townstix-us-10` remains the default
 - ✅ **Google Sheets integration** - Direct CSV export from published sheets
 - ✅ **Flexible column mapping** - Custom column-to-line mapping via flags
 - ✅ **Dual output formats** - HTML or PDF generation
@@ -130,7 +136,7 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 - ✅ **Partial mapping** - Use 1, 2, or 3 lines per tag
 - ✅ **Headers support** - Optional header row handling
 - ✅ **PDF generation** - High-fidelity PDF via Puppeteer
-- ✅ **Label stock picker** - TownStix US-10 (default, 2 × 5) or Avery 5390 (2 × 4), used for preview, HTML, PDF, and printing
+- ✅ **Label stock picker** - Search 20 stocks by brand, product number, or size; selection applies to preview, HTML, PDF, and printing
 - ✅ **Google Sheets integration** - Direct CSV export API access
 - ✅ **Automatic page breaks** - Blank rows create new pages
 - ✅ **Print-ready output** - HTML or PDF ready for professional printing
@@ -139,6 +145,8 @@ See **[Run Guide](docs/RUN.md)** for complete CLI documentation and options.
 - ✅ **Backwards compatible** - Existing workflows continue to work
 
 ### Printing and label stock
+
+See the [20-stock catalog, source links, and research decisions](docs/label-catalog-research.md). OnlineLabels stock IDs use `onlinelabels-olNUMBER`, for example `--label-template=onlinelabels-ol875`. Small labels use proportional text sizing; keep entries short and review before printing.
 
 Choose the stock matching your sheets in Preview, then print on US Letter at **Actual size / 100%** using the template defaults. Avery 5390 is sold as 3½" × 2¼"; Slappy follows [Avery’s official 5390 PDF template](https://s3.amazonaws.com/avery.dpp.projects.s3uspdownloadables/CA_en/Downloadables/pdf/U-0119-01.pdf) for precise placement: its printed cells are 3½" × 2 7/32", with ¾" side margins and 1 1/16" top/bottom margins. Test on plain paper before printing label stock.
 

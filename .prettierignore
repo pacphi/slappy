@@ -6,3 +6,15 @@ dist
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Machine-local agent state and generated quality artifacts
+.agentic-qe
+.claude-flow
+.swarm
+.codex
+.mcp.json
+coverage
+
+# Local agent instructions are managed separately from application formatting.
+AGENTS.md
+CLAUDE.md

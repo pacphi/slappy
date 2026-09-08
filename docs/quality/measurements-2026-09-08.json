@@ -1,0 +1,87 @@
+{
+  "baselineCommit": "e066b92",
+  "scope": "Executable TypeScript in lib, shared, app/composables, app/utils, server, cli. Vue templates excluded; identical c8 configuration for both runs.",
+  "before": {
+    "lines": {
+      "total": 1739,
+      "covered": 668,
+      "skipped": 0,
+      "pct": 38.41
+    },
+    "statements": {
+      "total": 1739,
+      "covered": 668,
+      "skipped": 0,
+      "pct": 38.41
+    },
+    "functions": {
+      "total": 32,
+      "covered": 10,
+      "skipped": 0,
+      "pct": 31.25
+    },
+    "branches": {
+      "total": 64,
+      "covered": 38,
+      "skipped": 0,
+      "pct": 59.37
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "after": {
+    "lines": {
+      "total": 1715,
+      "covered": 1706,
+      "skipped": 0,
+      "pct": 99.47
+    },
+    "statements": {
+      "total": 1715,
+      "covered": 1706,
+      "skipped": 0,
+      "pct": 99.47
+    },
+    "functions": {
+      "total": 63,
+      "covered": 63,
+      "skipped": 0,
+      "pct": 100
+    },
+    "branches": {
+      "total": 380,
+      "covered": 362,
+      "skipped": 0,
+      "pct": 95.26
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "tests": {
+    "before": 31,
+    "after": 94
+  },
+  "complexity": {
+    "method": "ESLint AST classic per-function complexity, including Vue scripts",
+    "beforeMaximum": 17,
+    "beforeOver10": 3,
+    "afterMaximum": 10,
+    "afterOver10": 0,
+    "afterFunctions": 187
+  },
+  "dependencyVulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  }
+}

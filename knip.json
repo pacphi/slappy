@@ -17,15 +17,15 @@
     "scripts/**/*.mjs",
     "app/**/*.css"
   ],
-  "ignore": ["app/components/**", "app/composables/**"],
+  "ignore": [],
   "ignoreExportsUsedInFile": true,
   "ignoreDependencies": [
-    "date-fns",
     "@iconify-json/heroicons",
     "@iconify-json/lucide",
     "eslint-config-prettier",
     "eslint-plugin-prettier",
-    "typescript-eslint"
+    "typescript-eslint",
+    "vitest-environment-nuxt"
   ],
   "nuxt": {
     "entry": ["nuxt.config.ts", "app.config.ts"]
