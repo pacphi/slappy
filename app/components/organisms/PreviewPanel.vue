@@ -35,7 +35,7 @@ const labelTemplate = ref<LabelTemplateId>(defaultLabelTemplateId)
 const selectedTemplate = computed(() => getLabelTemplate(labelTemplate.value))
 const labelOptions = labelTemplates.map(template => ({
   value: template.id,
-  label: `${template.name} — ${template.columns * template.rows} per sheet`,
+  label: `${template.name} · ${template.nominalWidthIn}″ × ${template.nominalHeightIn}″ · ${template.columns * template.rows}/sheet`,
 }))
 const previewFrame = ref<HTMLIFrameElement | null>(null)
 const labelsPerSheet = computed(() => selectedTemplate.value.columns * selectedTemplate.value.rows)
@@ -127,8 +127,10 @@ defineShortcuts({
 <template>
   <div class="preview-panel">
     <UFormField label="Label stock" name="labelTemplate">
-      <USelect
+      <USelectMenu
         v-model="labelTemplate"
+        value-key="value"
+        :search-input="{ placeholder: 'Search brand, product number, or size…' }"
         :items="labelOptions"
         :disabled="loading"
         class="w-full"
@@ -136,11 +138,22 @@ defineShortcuts({
       />
     </UFormField>
     <p class="text-sm text-muted">
-      {{ selectedTemplate.widthIn }}″ × {{ selectedTemplate.nominalHeightIn }}″ ·
+      {{ selectedTemplate.nominalWidthIn }}″ × {{ selectedTemplate.nominalHeightIn }}″ ·
       {{ labelsPerSheet }} per sheet · {{ sheetCount }} sheet{{ sheetCount === 1 ? '' : 's' }}
     </p>
     <p class="text-sm text-muted">
       Print on US Letter at 100% / Actual size. Turn off browser headers and footers.
+    </p>
+
+    <a
+      :href="selectedTemplate.sourceUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-sm text-primary underline"
+      >Manufacturer template and specifications</a
+    >
+    <p v-if="selectedTemplate.heightIn < 1" class="text-sm text-muted">
+      Small stock uses compact text. Keep entries short and check the preview.
     </p>
 
     <!-- Error Display -->

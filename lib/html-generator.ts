@@ -75,6 +75,8 @@ export function generateNameTagsHTML(
   templateId: LabelTemplateId = defaultLabelTemplateId
 ): string {
   const template = getLabelTemplate(templateId)
+  // Scale the three-line badge design to small stock while preserving existing badge sizes.
+  const textScale = Math.min(1, template.widthIn / 3.5, template.heightIn / 2)
   const labelsPerPage = template.columns * template.rows
   const gridWidth =
     template.columns * template.widthIn + (template.columns - 1) * template.columnGapIn
@@ -134,28 +136,28 @@ export function generateNameTagsHTML(
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 0.25in;
+      padding: ${0.25 * textScale}in;
       overflow: hidden;
     }
 
     .line1 {
-      font-size: 32pt;
+      font-size: ${32 * textScale}pt;
       font-weight: bold;
       line-height: 1.2;
-      margin-bottom: 0.1in;
+      margin-bottom: ${0.1 * textScale}in;
       max-width: 100%;
       word-wrap: break-word;
     }
 
     .line2, .line3 {
-      font-size: 18pt;
+      font-size: ${18 * textScale}pt;
       line-height: 1.3;
       max-width: 100%;
       word-wrap: break-word;
     }
 
     .line2 {
-      margin-bottom: 0.05in;
+      margin-bottom: ${0.05 * textScale}in;
     }
 
     /* Hide borders for printing */

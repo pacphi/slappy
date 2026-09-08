@@ -14,7 +14,7 @@ useSeoMeta({
   // Basic meta tags
   title: 'Slappy - Professional Name Tags in 60 Seconds',
   description:
-    'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
+    'Transform your spreadsheets into print-ready name tags on 20 label stocks instantly. Free, fast, and easy to use.',
   keywords:
     'name tags, labels, CSV to PDF, TownStix, Avery 5390, label maker, US-10 labels, Google Sheets, badge printing, event labels',
   author: 'Slappy',
@@ -24,7 +24,7 @@ useSeoMeta({
   ogUrl: 'https://slappy.cloud',
   ogTitle: 'Slappy - Professional Name Tags in 60 Seconds',
   ogDescription:
-    'Generate print-ready name tags from CSV files or Google Sheets. TownStix US-10 (10 per sheet) and Avery 5390 (8 per sheet).',
+    'Generate print-ready name tags from CSV files or Google Sheets. 20 stocks from TownStix, Avery, and OnlineLabels.',
   ogImage: 'https://slappy.cloud/og-image.png',
   ogImageAlt: 'Slappy - Transform spreadsheets into print-ready name tag labels',
   ogImageWidth: '1200',
@@ -52,7 +52,7 @@ useHead({
         name: 'Slappy',
         url: 'https://slappy.cloud',
         description:
-          'Transform your spreadsheets into print-ready TownStix US-10 or Avery 5390 name tags instantly. Free, fast, and easy to use.',
+          'Transform your spreadsheets into print-ready name tags on 20 label stocks instantly. Free, fast, and easy to use.',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Any',
         offers: {
@@ -102,7 +102,10 @@ const features = [
   {
     icon: 'i-heroicons-printer',
     title: 'Choose Your Label Stock',
-    description: ['TownStix US-10: 10 per sheet.', 'Avery 5390: 8 per sheet.'],
+    description: [
+      '20 stocks from TownStix, Avery, and OnlineLabels.',
+      'Search by product number or label size.',
+    ],
   },
   {
     icon: 'i-heroicons-eye',

@@ -5,7 +5,7 @@ import { parseCSVToPagesWithMapping, getDefaultMapping } from '../lib/column-map
 import { generateNameTagsHTML } from '../lib/html-generator'
 import { generatePDFFile } from '../lib/pdf-generator'
 import type { ColumnMapping, OutputFormat } from '../lib/types'
-import { getLabelTemplate, type LabelTemplateId } from '../shared/label-templates'
+import { labelTemplates, getLabelTemplate, type LabelTemplateId } from '../shared/label-templates'
 
 interface GenerateOptions {
   mapping?: ColumnMapping
@@ -108,7 +108,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     console.log('  --line3-col=N    Column index (0-based) for line 3 (default: 2)')
     console.log('  --has-headers    First row contains headers (default: false)')
     console.log('  --format=FORMAT  Output format: html or pdf (default: html)')
-    console.log('  --label-template=ID  townstix-us-10 (default) or avery-5390')
+    console.log('  --label-template=ID  Label stock (default: townstix-us-10)')
+    console.log(`  Available: ${labelTemplates.map(template => template.id).join(', ')}`)
     console.log('')
     console.log('Examples:')
     console.log('  Basic usage (default column mapping):')

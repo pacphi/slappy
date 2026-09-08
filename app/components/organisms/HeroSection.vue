@@ -23,7 +23,10 @@ const features = [
   {
     icon: 'i-heroicons-printer',
     title: 'Choose Your Label Stock',
-    description: ['TownStix US-10: 10 per sheet.', 'Avery 5390: 8 per sheet.'],
+    description: [
+      '20 stocks from TownStix, Avery, and OnlineLabels.',
+      'Search by product number or label size.',
+    ],
   },
   {
     icon: 'i-heroicons-eye',

@@ -71,3 +71,64 @@ for (const [templateId, count, expectedPages] of [
     assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length, expectedPages)
   })
 }
+
+// Snapshot transcribed from manufacturer detailed specifications, independent of runtime catalog.
+test('should_alignAndPaginateNewStocks_when_printedInBrowser', async () => {
+  const { readFile } = await import('node:fs/promises')
+  const stocks = JSON.parse(
+    await readFile(new URL('./fixtures/label-stock-specs.json', import.meta.url), 'utf8')
+  )
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+  try {
+    const page = await browser.newPage()
+    await page.setViewport({ width: 816, height: 1056 })
+    await page.emulateMediaType('print')
+    for (const stock of stocks) {
+      const capacity = stock.columns * stock.rows
+      await page.setContent(generateNameTagsHTML([{ tags: tags(capacity + 1) }], stock.id))
+      const boxes = await page.$$eval('.page:first-child .name-tag', elements =>
+        elements.map(element => {
+          const r = element.getBoundingClientRect()
+          return { left: r.left, top: r.top, width: r.width, height: r.height }
+        })
+      )
+      for (const [index, box] of boxes.entries()) {
+        const expected = {
+          left:
+            (stock.marginLeftIn + (index % stock.columns) * (stock.widthIn + stock.columnGapIn)) *
+            96,
+          top:
+            (stock.marginTopIn +
+              Math.floor(index / stock.columns) * (stock.heightIn + stock.rowGapIn)) *
+            96,
+          width: stock.widthIn * 96,
+          height: stock.heightIn * 96,
+        }
+        assert.ok(
+          Object.entries(expected).every(
+            ([key, value]) => Math.abs(box[key as keyof typeof box] - value) < 0.2
+          ),
+          `${stock.id} cell ${index}`
+        )
+      }
+      const clipped = await page.$$eval('.name-tag', elements =>
+        elements.some(element => {
+          const outer = element.getBoundingClientRect()
+          return Array.from(element.children).some(child => {
+            const r = child.getBoundingClientRect()
+            return (
+              r.top < outer.top ||
+              r.bottom > outer.bottom ||
+              child.scrollWidth > child.clientWidth + 1
+            )
+          })
+        })
+      )
+      assert.equal(clipped, false, `${stock.id}: sample three-line text must fit`)
+      const pdf = Buffer.from(await page.pdf({ preferCSSPageSize: true }))
+      assert.equal((pdf.toString('latin1').match(/\/Type\s*\/Page\b/g) || []).length, 2, stock.id)
+    }
+  } finally {
+    await browser.close()
+  }
+})
