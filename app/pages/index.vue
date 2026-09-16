@@ -103,7 +103,8 @@ const features = [
       <LazyOrganismsNameTagWizard :initial-upload-mode="uploadMode" />
     </section>
 
-    <!-- Marketing stays visible, including while using the wizard. -->
+    <!-- The AdSense ad stays visible during the wizard; the marketing copy and
+    "Why Choose Slappy?" cards hide once the user is working in the wizard. -->
     <section class="features-section">
       <div v-if="currentView === 'features'" class="hero-text">
         <h1 class="hero-title">Professional Name Tags in 60 Seconds</h1>
@@ -119,7 +120,7 @@ const features = [
         format="horizontal"
       />
 
-      <div class="features-container">
+      <div v-if="currentView === 'features'" class="features-container">
         <h2 class="features-heading">Why Choose Slappy?</h2>
         <div class="features-grid">
           <MoleculesFeatureCard
