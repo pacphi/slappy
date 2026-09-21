@@ -42,7 +42,7 @@
     "csv-parse": "^7.0.2",
     "h3": "^1.15.11",
     "nuxt": "^4.5.2",
-    "nuxt-feature-flags": "1.1.7",
+    "nuxt-feature-flags": "2.0.5",
     "puppeteer": "^25.10.0",
     "vue": "^3.5.42",
     "vue-router": "^5.3.1",
