@@ -172,8 +172,8 @@ importers:
         version: 4.6.7
     devDependencies:
       '@axe-core/puppeteer':
-        specifier: ~4.13.0
-        version: 4.13.0(puppeteer@25.14.0)
+        specifier: ~4.14.0
+        version: 4.14.0(puppeteer@25.14.0)
       '@iconify-json/heroicons':
         specifier: ^1.2.3
         version: 1.2.3
@@ -253,9 +253,9 @@ packages:
     peerDependencies:
       '@types/json-schema': ^7.0.15
 
-  '@axe-core/puppeteer@4.13.0':
-    resolution: {integrity: sha512-y43krMJveVzxIZckPxo/2cHG5x4NBNF8fuwNcCYlTWV9cVtm5bagKZ6EmJO6EcKj37hsIL+nWUHGhTCvz4GNNg==}
-    engines: {node: '>=6.4.0'}
+  '@axe-core/puppeteer@4.14.0':
+    resolution: {integrity: sha512-EWAKemFmYfdzZx+xt2QZ/gCp2jaysfZEYbYgLqTDd2JUC4jBLYz+oSCzPT/sySLr5tcI/++CKDYUPQsf7Lr1xA==}
+    engines: {node: '>=22.12.0'}
     peerDependencies:
       puppeteer: '>=1.10.0'
 
@@ -3089,8 +3089,8 @@ packages:
     peerDependencies:
       postcss: ^8.5.23
 
-  axe-core@4.13.0:
-    resolution: {integrity: sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A==}
+  axe-core@4.14.0:
+    resolution: {integrity: sha512-9WTZxEjsZ7b13TH8JPmbV2z8CHbl80/2hm3XPEG4JgNdQLK81IBRXmSxHfMAOkSqQeRxT/0dwNDz2GOm3zzpcQ==}
     engines: {node: '>=4'}
 
   b4a@1.9.0:
@@ -6344,9 +6344,9 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.3.2
 
-  '@axe-core/puppeteer@4.13.0(puppeteer@25.14.0)':
+  '@axe-core/puppeteer@4.14.0(puppeteer@25.14.0)':
     dependencies:
-      axe-core: 4.13.0
+      axe-core: 4.14.0
       puppeteer: 25.14.0
 
   '@babel/code-frame@7.29.7':
@@ -9502,7 +9502,7 @@ snapshots:
       postcss: 8.5.31
       postcss-value-parser: 4.2.0
 
-  axe-core@4.13.0: {}
+  axe-core@4.14.0: {}
 
   b4a@1.9.0: {}
 
