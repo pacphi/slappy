@@ -17,9 +17,7 @@ overrides:
   '@vue/devtools-api': '8.0.3'
   '@vue/devtools-core': '8.0.3'
   'node-forge': '^1.4.0'
-  'devalue': '^5.6.2'
   'fast-xml-parser': '^5.3.5'
-  'simple-git': '^3.32.3'
   'tar': '^7.5.21'
   '@isaacs/brace-expansion': '^5.0.1'
   'defu': '^6.1.5'
@@ -45,7 +43,16 @@ overrides:
   'unplugin-auto-import>picomatch': '^4.0.4'
   'unplugin-vue-components>picomatch': '^4.0.4'
   '@rollup/pluginutils>picomatch': '^4.0.4'
-minimumReleaseAgeExclude:
-  - '@iconify-json/lucide@1.2.130'
-  - '@nuxt/ui@4.11.1'
-  - '@types/node@26.5.0'
+auditConfig:
+  ignoreGhsas:
+    # node-forge <=1.4.0 RSA PKCS#1 v1.5 signature forgery (CVE-2026-85393); no patched release exists.
+    # https://github.com/advisories/GHSA-86w9-cpqp-85rv
+    # Path: nuxt > @nuxt/nitro-server > nitropack > listhen > node-forge (dev-server self-signed certs only;
+    # the vulnerable signature-verification path is not called and node-forge is not bundled into .output).
+    # Remove once node-forge ships a fix or listhen drops it.
+    - GHSA-86w9-cpqp-85rv
+    # braces <=3.0.3 stack-exhaustion DoS on deeply nested patterns (CVE-2026-93687); no patched release exists.
+    # https://github.com/advisories/GHSA-vfj7-8cjw-p6xm
+    # Path: nitropack > globby/fast-glob > micromatch > braces (build-time globbing of repo-defined patterns,
+    # never user input; not bundled into .output). Remove once braces ships a fix.
+    - GHSA-vfj7-8cjw-p6xm
