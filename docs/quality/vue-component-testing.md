@@ -2,7 +2,7 @@
 
 ## Decision and research
 
-Use Nuxt test-utils 4.2.0, Vue Test Utils 2.5.0, Vitest/coverage-v8 4.1.11, and happy-dom 20.14.0. Nuxt test-utils declares Vitest 4 as its supported peer; installing the newest Vitest 5 initially exposed an incompatible peer, so both runner and provider were aligned to 4.1.11.
+Use Nuxt test-utils 4.2.0, Vue Test Utils 2.5.0, Vitest/coverage-v8 4.1.11, and happy-dom 21.0.4. Nuxt test-utils declares Vitest 4 as its supported peer; installing the newest Vitest 5 initially exposed an incompatible peer, so both runner and provider were aligned to 4.1.11.
 
 - [Nuxt testing documentation](https://nuxt.com/docs/4.x/getting-started/testing) provides `mountSuspended` and `registerEndpoint` for real Nuxt context and HTTP boundaries.
 - [Vue Test Utils](https://test-utils.vuejs.org/guide/essentials/forms) recommends interacting with rendered forms and asserting their effects. These tests mount real Nuxt UI controls, rather than replacing forms, dropdowns, or application composables with stubs.
